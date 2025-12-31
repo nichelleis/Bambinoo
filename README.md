@@ -99,11 +99,32 @@ Collectively, these outcomes demonstrate that Bambinoo provides a **scalable, di
 
 ---
 
-## 👤 Author
+## 👥 Development Team
 
-**Lakindu Jayathilaka**  
-Undergraduate – Computer Science  
-Final Year Project / Research-Based System
+### Thinal Fernando  
+**Developer**  
+Frontend, Backend, Machine Learning Specialist  
+
+### Lakindu Jayathilaka  
+**Developer**  
+Frontend, Backend Specialist  
+
+### Dilum Samarathunga  
+**Developer**  
+Machine Learning, Database Specialist  
+
+### Yasadya Lakdini  
+**Developer**  
+UI/UX and Frontend Specialist  
+
+### Dilmith Laktharana  
+**Developer**  
+Machine Learning and UI/UX Specialist  
+
+### Nichelle Jeewandara  
+**Developer**  
+UI/UX and Database Specialist  
+
 
 ---
 
