@@ -151,7 +151,7 @@ Database and UI/UX Specialist
 
 ### Nichelle Jeewandara  
 **Developer**  
-UI/UX and Database Specialist  
+Frontend, Backend, Machine Learning Specialist  
 
 
 ---
