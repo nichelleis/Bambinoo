@@ -147,7 +147,7 @@ UI/UX and Frontend Specialist
 
 ### Dilmith Laktharana  
 **Developer**  
-Machine Learning and UI/UX Specialist  
+Database and UI/UX Specialist  
 
 ### Nichelle Jeewandara  
 **Developer**  
