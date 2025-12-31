@@ -97,6 +97,34 @@ Collectively, these outcomes demonstrate that Bambinoo provides a **scalable, di
 - Wearable device integration
 - Expanded reporting for public health planning
 
+## 🛠️ Technology Stack
+
+### Backend
+- **Flask (Python)** – Lightweight web framework used to develop RESTful APIs and manage server-side logic
+- **Flask-JWT-Extended** – Secure authentication and authorization
+- **Flask-SQLAlchemy** – Object Relational Mapping (ORM) for database management
+- **Flask-CORS** – Cross-origin resource sharing support
+
+### Frontend
+- HTML5, CSS3, JavaScript
+- Bootstrap / Tailwind CSS (UI responsiveness)
+
+### Database
+- PostgreSQL / MySQL / SQLite (development)
+
+### Machine Learning & Analytics
+- Python-based ML models for growth trend analysis and risk prediction
+- Data preprocessing and statistical analysis modules
+
+### Cloud & Deployment
+- Cloud-based hosting (e.g., AWS / Azure / Hostinger)
+- Secure data storage and backup mechanisms
+
+### Security
+- Role-based access control
+- Encrypted password hashing
+- Secure API communication
+
 ---
 
 ## 👥 Development Team
