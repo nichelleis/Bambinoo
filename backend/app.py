@@ -116,6 +116,22 @@ class Milestone(db.Model):
     max_age = db.Column(db.Integer)  
     achieved_date = db.Column(db.Date)
 
+class Vaccination(db.Model):
+    __tablename__ = 'vaccination'
+    id = db.Column(db.Integer, primary_key=True)
+    child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
+    vaccine_name = db.Column(db.String(100), nullable=False)  
+    dose_number = db.Column(db.String(20))  
+    due_date = db.Column(db.Date)
+    administered_date = db.Column(db.Date)
+    status = db.Column(db.String(20), default='scheduled') 
+    administered_by = db.Column(db.String(100)) 
+    location = db.Column(db.String(200))
+    batch_number = db.Column(db.String(50))
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 with app.app_context():
     db.create_all()
 
