@@ -1,10 +1,37 @@
 from flask import Flask, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from datetime import timedelta,datetime
+import os
 
 app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return "Flask is running!"
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'bambinoo.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    __tablename__ = 'user'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    phone = db.Column(db.String(20))
+    role = db.Column(db.String(50), nullable=False, default='parent')
+
+
+
+with app.app_context():
+    db.create_all()
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
+
