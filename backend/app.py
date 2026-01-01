@@ -105,7 +105,16 @@ class HealthRecord(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     notes = db.Column(db.Text)
 
-
+class Milestone(db.Model):
+    __tablename__ = 'milestone'
+    id = db.Column(db.Integer, primary_key=True)
+    child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
+    milestone_id = db.Column(db.Integer, nullable=False)  
+    category = db.Column(db.String(50), nullable=False)  
+    description = db.Column(db.Text)
+    min_age = db.Column(db.Integer)  
+    max_age = db.Column(db.Integer)  
+    achieved_date = db.Column(db.Date)
 
 with app.app_context():
     db.create_all()
