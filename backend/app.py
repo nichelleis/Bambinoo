@@ -48,6 +48,22 @@ class Appointment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)    
 
+
+
+class GrowthRecord(db.Model):
+    __tablename__ = 'growth_record'
+    id = db.Column(db.Integer, primary_key=True)
+    child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
+    record_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    weight = db.Column(db.Float)  
+    height = db.Column(db.Float)  
+    head_circumference = db.Column(db.Float)  
+    bmi = db.Column(db.Float)  
+    age_at_record = db.Column(db.Integer)  
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 with app.app_context():
     db.create_all()
 
