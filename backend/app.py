@@ -83,6 +83,30 @@ class HealthNote(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     notes = db.Column(db.Text)
 
+class HealthRecord(db.Model):
+    __tablename__ = 'health_record'
+    id = db.Column(db.Integer, primary_key=True)
+    child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
+    record_type = db.Column(db.String(50), nullable=False) 
+    record_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    title = db.Column(db.String(200))  
+    description = db.Column(db.Text)
+    temperature = db.Column(db.Float)
+    weight = db.Column(db.Float) 
+    medication_name = db.Column(db.String(100))
+    medication_dosage = db.Column(db.String(50))
+    doctor_name = db.Column(db.String(100))
+    clinic_hospital = db.Column(db.String(200))
+    diagnosis = db.Column(db.Text)
+    treatment = db.Column(db.Text)
+    follow_up_date = db.Column(db.Date)
+    attachments = db.Column(db.Text) 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    notes = db.Column(db.Text)
+
+
+
 with app.app_context():
     db.create_all()
 
