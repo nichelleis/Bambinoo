@@ -34,7 +34,12 @@ class Child(db.Model):
     gender = db.Column(db.String(10), nullable=False)
 
     
-    
+    growth_records = db.relationship('GrowthRecord', backref='child', lazy=True, cascade='all, delete-orphan')
+    vaccinations = db.relationship('Vaccination', backref='child', lazy=True, cascade='all, delete-orphan')
+    health_records = db.relationship('HealthRecord', backref='child', lazy=True, cascade='all, delete-orphan')
+    milestones = db.relationship('Milestone', backref='child', lazy=True, cascade='all, delete-orphan')
+    appointments = db.relationship('Appointment', backref='child', lazy=True, cascade='all, delete-orphan')
+    health_notes = db.relationship('HealthNote', backref='child', lazy=True, cascade='all, delete-orphan')
 
 
 class Appointment(db.Model):
@@ -131,6 +136,9 @@ class Vaccination(db.Model):
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+    
 
 with app.app_context():
     db.create_all()
