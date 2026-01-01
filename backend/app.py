@@ -25,6 +25,16 @@ class User(db.Model):
     role = db.Column(db.String(50), nullable=False, default='parent')
 
 
+class Child(db.Model):
+    __tablename__ = 'child'
+    id = db.Column(db.Integer, primary_key=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    date_of_birth = db.Column(db.Date, nullable=False)
+    gender = db.Column(db.String(10), nullable=False)
+
+
+
 
 with app.app_context():
     db.create_all()
