@@ -64,6 +64,25 @@ class GrowthRecord(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class HealthNote(db.Model):
+    __tablename__ = 'health_note'
+    id = db.Column(db.Integer, primary_key=True)
+    child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
+    record_type = db.Column(db.String(50), nullable=False)  
+    record_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    title = db.Column(db.String(200))  
+    description = db.Column(db.Text)
+    temperature = db.Column(db.Float)
+    weight = db.Column(db.Float)  
+    medication_name = db.Column(db.String(100))
+    medication_dosage = db.Column(db.String(50))
+    reason = db.Column(db.Text)
+    symptom_type = db.Column(db.String(50))
+    severity = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    notes = db.Column(db.Text)
+
 with app.app_context():
     db.create_all()
 
