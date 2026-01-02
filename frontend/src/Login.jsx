@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
+import "assets/styleSheets/login.css";
 
 const API_URL = "http://127.0.0.1:5000";
 
