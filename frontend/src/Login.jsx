@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import style from "./assets/styleSheets/Login.module.css";
+import logo from "./assets/images/site icon.png";
 
 const API_URL = "http://127.0.0.1:5000";
 
@@ -74,6 +75,7 @@ const Login = () => {
   const logout = () => {
     localStorage.removeItem("token");
     window.location.reload();
+    navigate("/", { replace: true });
   };
 
   const redirectDashboard = (role) => {
@@ -104,6 +106,7 @@ const Login = () => {
       <div id="loginSection" className={style.containerWrapper}>
         <div className={style.logoSection}>
           <a href="http://bambinoo.net/">
+           <img src={logo} alt="Bambinoo Logo" className={style.logoImage} />
             <h1 className={style.logoTitle}>Bambinoo</h1>
           </a>
           <p className={style.logoSubtitle}>

@@ -1,143 +1,402 @@
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+/* Login Page Container */
 .loginPage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   padding: 20px;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .containerWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1200px;
   width: 100%;
-  max-width: 440px;
+  gap: 0;
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  min-height: 600px;
+}
+
+/* ============================================
+   LEFT SECTION - REIMAGINED HERO DESIGN
+   ============================================ */
+
+.logoSection {
+  background: #ffffff;
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Colorful blob shapes in background */
+.logoSection::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, #667eea 100%, #764ba2 50%, #f093fb 0%);
+  border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
+  top: -200px;
+  right: -200px;
+  opacity: 0.1;
+  animation: morphBlob 8s ease-in-out infinite;
+}
+
+.logoSection::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  border-radius: 38% 62% 63% 37% / 70% 33% 67% 30%;
+  bottom: -150px;
+  left: -150px;
+  opacity: 0.08;
+  animation: morphBlob 10s ease-in-out infinite reverse;
+}
+
+/* Morphing blob animation */
+@keyframes morphBlob {
+  0%, 100% {
+    border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
+    transform: rotate(0deg);
+  }
+  25% {
+    border-radius: 48% 52% 30% 70% / 28% 63% 37% 72%;
+  }
+  50% {
+    border-radius: 40% 60% 70% 30% / 40% 50% 50% 60%;
+    transform: rotate(90deg);
+  }
+  75% {
+    border-radius: 60% 40% 50% 50% / 55% 70% 30% 45%;
+  }
+}
+
+.logoSection a {
+  text-decoration: none;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.logoSection {
   text-align: center;
-  margin-bottom: 1.5rem;
 }
 
+/* Logo with modern card effect */
+.logoImage {
+  max-width: 180px;
+  height: auto;
+  margin-bottom: 40px;
+  z-index: 10;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px;
+  border-radius: 30px;
+  box-shadow: 
+    0 20px 60px rgba(102, 126, 234, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  position: relative;
+}
+
+.logoImage::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #667eea);
+  border-radius: 32px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background-size: 300% 300%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.logoImage:hover::before {
+  opacity: 1;
+}
+
+.logoImage:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 
+    0 30px 80px rgba(102, 126, 234, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+/* Title with gradient */
 .logoTitle {
-  font-family: "Oswald", sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  font-size: clamp(3rem, 8vw, 5rem);
-  background: linear-gradient(135deg, #2196f3 0%, #ff6f91 100%);
+  font-size: clamp(3.5rem, 7vw, 5rem);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   line-height: 1;
-  margin-bottom: 0.5rem;
-  filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.15));
+  margin: 0 0 30px 0;
+  z-index: 10;
+  position: relative;
+  background-size: 200% auto;
+  animation: gradientText 3s linear infinite;
 }
 
+@keyframes gradientText {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* Subtitle with modern card */
 .logoSubtitle {
-  font-family: "Roboto", sans-serif;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 400;
+  font-family: 'Roboto', sans-serif;
+  color: #4a5568;
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0;
+  max-width: 350px;
+  line-height: 1.7;
+  z-index: 10;
+  text-align: center;
+  background: #f7fafc;
+  padding: 20px 30px;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  position: relative;
 }
 
+.logoSubtitle::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #667eea, transparent);
+}
+
+/* Right Section - Login Card */
 .loginCard {
-  background: white;
-  border-radius: 12px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  width: 100%;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #fff;
 }
 
 .loginTitle {
-  font-family: "Oswald", sans-serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
   font-size: clamp(1.75rem, 5vw, 2.25rem);
   color: #000;
-  text-align: center;
-  margin-bottom: 0.5rem;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.02em;
 }
 
 .loginSubtitle {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   color: #5a5a5a;
-  text-align: center;
   font-size: 0.95rem;
-  margin-bottom: 2rem;
+  margin: 0 0 40px 0;
+  font-weight: 400;
 }
 
+/* Form Elements */
 .formLabel {
-  font-family: "Roboto", sans-serif;
-  color: #000;
-  font-weight: 500;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  font-family: 'Roboto', sans-serif;
   display: block;
+  font-size: 0.9rem;
+  color: #000;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .formControl {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   width: 100%;
+  padding: 14px 16px;
+  font-size: 0.95rem;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: 0.95rem;
-  transition: border-color 0.3s;
+  transition: all 0.2s ease;
+  color: #000;
+  background: #fff;
+  box-sizing: border-box;
 }
 
 .formControl:focus {
-  border-color: #2196f3;
   outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
 }
 
+.formControl::placeholder {
+  color: #999;
+}
+
+/* Alert/Error Message */
+.alert {
+  background-color: #ffebee;
+  border: 1px solid #ef9a9a;
+  color: #c62828;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Login Button */
 .btnLogin {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
+  padding: 14px;
   background: linear-gradient(135deg, #2196f3 0%, #ff6f91 100%);
-  color: white;
+  color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 0.75rem;
-  width: 100%;
-  margin-top: 1rem;
-  cursor: pointer;
   font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 24px;
+}
+
+.btnLogin:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
+}
+
+.btnLogin:active {
+  transform: translateY(0);
 }
 
 .btnLogin:disabled {
   background: #bdbdbd;
   cursor: not-allowed;
   opacity: 0.7;
+  transform: none;
 }
 
-.alert {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ef9a9a;
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-
+/* Footer Text */
 .footerText {
-  font-family: "Roboto", sans-serif;
-  color: #5a5a5a;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 32px;
   text-align: center;
-  font-size: 0.9rem;
-  margin-top: 1.5rem;
 }
 
-.footerLink {
+.footerText p {
+  font-size: 0.9rem;
+  color: #5a5a5a;
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+}
+
+.footerText a {
   color: #2196f3;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.footerLink:hover {
+.footerText a:hover {
+  color: #1976d2;
   text-decoration: underline;
 }
 
-@media (max-width: 576px) {
+.footerLink {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: #2196f3;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footerLink:hover {
+  color: #1976d2;
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .containerWrapper {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+
+  .logoSection {
+    padding: 60px 40px;
+    min-height: 300px;
+  }
+
+  .logoImage {
+    max-width: 150px;
+    padding: 35px;
+  }
+
+  .logoTitle {
+    font-size: clamp(3rem, 8vw, 4.5rem);
+  }
+
+  .logoSubtitle {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
   .loginCard {
-    padding: 1.5rem;
+    padding: 40px;
+  }
+
+  .loginTitle {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+}
+
+@media (max-width: 576px) {
+  .loginPage {
+    padding: 0;
+  }
+
+  .containerWrapper {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .logoSection {
+    padding: 50px 30px;
+    min-height: 280px;
+  }
+
+  .logoImage {
+    max-width: 130px;
+    padding: 30px;
+  }
+
+  .logoTitle {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+  }
+
+  .loginCard {
+    padding: 30px 20px;
+  }
+
+  .loginTitle {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
   }
 }
