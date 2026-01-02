@@ -4,10 +4,7 @@ import DashboardNav from "../Components/DashboardNav";
 function Home() {
   return (
     <>
-      <DashboardHeader />
-      <div>
-        <DashboardNav />
-      </div>
+    
     </>
   );
 }
