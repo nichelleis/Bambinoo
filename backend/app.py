@@ -5,7 +5,6 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
-from flask import session
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
@@ -167,9 +166,7 @@ def login():
         if not user or not check_password_hash(user.password_hash, password):
             return jsonify({"message": "Invalid username or password"}), 401
 
-        token = create_access_token(identity=user.id)
-
-        session['user_id'] = user.id
+        token = create_access_token(identity=str(user.id))
 
         return jsonify({
             "token": token,
@@ -215,14 +212,14 @@ def verify_token():
 
 
 @app.route('/header', methods=["GET"])
+@jwt_required()
 def get_child():
 
-    user_id = session.get('user_id')
+    user_id = get_jwt_identity()
 
-    if not user_id:
-        return jsonify({"message": "Not logged in"}), 401
-    
     child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+            return jsonify({"message": "Child not found"}), 404    
     
     records = (GrowthRecord.query.filter_by(child_id = child.id).order_by(GrowthRecord.record_date.desc()).limit(2).all())
 
