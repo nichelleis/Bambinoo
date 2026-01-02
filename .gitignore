@@ -1,4 +1,11 @@
 node_modules/
 
 .env
-backend/bambinoo.db
+
+# Databases
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+
