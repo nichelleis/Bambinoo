@@ -1,4 +1,0 @@
-This is to test git and see if it works
-testing
-git
-project
