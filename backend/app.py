@@ -2,17 +2,24 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta,datetime
 import os
+from flask_cors import CORS
+from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
+from werkzeug.security import check_password_hash
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'bambinoo.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'bambinoo-secret-key'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=6)
 
 
 db = SQLAlchemy(app)
+jwt = JWTManager(app)
 
 
 class User(db.Model):
@@ -52,7 +59,6 @@ class Appointment(db.Model):
     status = db.Column(db.String(20), default='scheduled') 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)    
-
 
 
 class GrowthRecord(db.Model):
@@ -143,7 +149,36 @@ class Vaccination(db.Model):
 with app.app_context():
     db.create_all()
 
+# Login route
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
 
+        username = data.get('username')   
+        password = data.get('password')
+
+        user = User.query.filter_by(username=username).first()
+
+        if not user or not check_password_hash(user.password_hash, password):
+            return jsonify({"message": "Invalid username or password"}), 401
+
+        token = create_access_token(identity=user.id)
+
+        return jsonify({
+            "token": token,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "role": user.role
+            }
+        }), 200
+
+    except Exception as e:
+        print("Login Error:", e)
+        return jsonify({
+            "error": str(e)
+        }), 500
 
 
 if __name__ == "__main__":
