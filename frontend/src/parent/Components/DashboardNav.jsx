@@ -19,18 +19,17 @@ function SideNav() {
 
   const menuItems = [
     { name: "Home", path: "/parent", icon: "bi-house-door-fill" },
-    { name: "Analytics", path: "/analytics", icon: "bi-graph-up" },
-    { name: "Milestones", path: "/milestones", icon: "bi-trophy-fill" },
-    { name: "AI Analytics", path: "/ai-analytics", icon: "bi-robot" },
-    { name: "Education", path: "/education", icon: "bi-book-half" },
+    { name: "Analytics", path: "/parent/analytics", icon: "bi-graph-up" },
+    { name: "Milestones", path: "/parent/milestones", icon: "bi-trophy-fill" },
+    { name: "AI Analytics", path: "/parent/ai-analytics", icon: "bi-robot" },
+    { name: "Education", path: "/parent/education", icon: "bi-book-half" },
     {
       name: "Message Doctor",
-      path: "/message-doctor",
+      path: "/parent/message-doctor",
       icon: "bi-chat-dots-fill",
     },
-    { name: "More", path: "/more", icon: "bi-three-dots" },
+    { name: "More", path: "/parent/more", icon: "bi-three-dots" },
   ];
-
   return (
     <nav className={style.mainMenu}>
       <div className={style.area}>
@@ -39,6 +38,7 @@ function SideNav() {
             <li key={item.name}>
               <NavLink
                 to={item.path}
+                end={item.name === "Home"}
                 className={({ isActive }) => (isActive ? "active" : "")}
                 style={({ isActive }) =>
                   isActive
