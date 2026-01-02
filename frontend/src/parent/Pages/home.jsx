@@ -1,12 +1,12 @@
-import DashboardHeader from "../Components/DashBoardHeader"
+import DashboardHeader from "../Components/DashBoardHeader";
+import DashboardNav from "../Components/DashboardNav";
 
-function Home(){
-    return(
-        <DashboardHeader/>
-    )
+function Home() {
+  return (
+    <>
     
-
+    </>
+  );
 }
 
-
-export default Home
+export default Home;
