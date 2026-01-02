@@ -5,6 +5,7 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
+from flask import session
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
@@ -16,6 +17,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'b
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'bambinoo-secret-key'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=6)
+
+
+app.secret_key = "3245567562534q4534635q"
 
 
 db = SQLAlchemy(app)
@@ -165,6 +169,8 @@ def login():
 
         token = create_access_token(identity=user.id)
 
+        session['user_id'] = user.id
+
         return jsonify({
             "token": token,
             "user": {
@@ -206,6 +212,47 @@ def verify_token():
             "valid": False,
             "error": "Internal server error"
         }), 500
+
+
+@app.route('/header', methods=["GET"])
+def get_child():
+
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return jsonify({"message": "Not logged in"}), 401
+    
+    child = Child.query.filter_by(parent_id=user_id).first()
+    
+    records = (GrowthRecord.query.filter_by(child_id = child.id).order_by(GrowthRecord.record_date.desc()).limit(2).all())
+
+
+    current = records[0] if len(records) > 0 else None
+    previous = records[1] if len(records) > 1 else None
+
+    return jsonify({
+        "id": child.id,
+        "name": child.name,
+        "date_of_birth": child.date_of_birth.isoformat(),
+        "gender": child.gender,
+
+         "growth": {
+            "weight": {
+                "current": current.weight if current else None,
+                "previous": previous.weight if previous else None
+            },
+            "height": {
+                "current": current.height if current else None,
+                "previous": previous.height if previous else None
+            },
+            "head": {
+                "current": current.head_circumference if current else None,
+                "previous": previous.head_circumference if previous else None
+            }
+        }
+    })
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
