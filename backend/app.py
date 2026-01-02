@@ -179,7 +179,33 @@ def login():
         return jsonify({
             "error": str(e)
         }), 500
+    
+# JWT Verification route
+@app.route('/verify-token', methods=['GET'])
+@jwt_required()
+def verify_token():
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
 
+        if not user:
+            return jsonify({"valid": False}), 401
+
+        return jsonify({
+            "valid": True,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "role": user.role
+            }
+        }), 200
+
+    except Exception as e:
+        print("Verify token error:", e)
+        return jsonify({
+            "valid": False,
+            "error": "Internal server error"
+        }), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

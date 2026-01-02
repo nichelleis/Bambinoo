@@ -12,7 +12,8 @@ h3 {
 
 body {
   font-family: 'Roboto', sans-serif;
-  background-color: #414141;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+  opacity: 0.95;
   min-height: 100vh;
   display: flex;
   align-items: center;
