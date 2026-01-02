@@ -1,3 +1,12 @@
-export default function ParentLayout() {
-  return <h2>Parent Dashboard</h2>;
+import Home from "../parent/Pages/home";
+import style from "../assets/styleSheets/ParentDashboard.module.css";
+
+function ParentLayout() {
+  return (
+    <div className={style.body}>
+      <Home />
+    </div>
+  );
 }
+
+export default ParentLayout;

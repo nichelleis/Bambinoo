@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; 
-import "./assets/styleSheets/login.css";
+import { useNavigate } from "react-router-dom";
+import style from "./assets/styleSheets/Login.module.css";
 
 const API_URL = "http://127.0.0.1:5000";
 
@@ -39,7 +39,7 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
-        redirectDashboard(data.user.role); 
+        redirectDashboard(data.user.role);
       } else {
         setError(data.message || "Login failed. Please try again.");
       }
@@ -100,79 +100,85 @@ const Login = () => {
   };
 
   return (
-    <div id="loginSection" className="container-wrapper">
-      <div className="logo-section">
-        <a href="http://bambinoo.net/">
-          <h1 className="logo-title">Bambinoo</h1>
-        </a>
-        <p className="logo-subtitle">
-          Digital Child Health and Development Record
-        </p>
-      </div>
-
-      <div className="login-card">
-        <h2 className="login-title">Sign In</h2>
-        <p className="login-subtitle">Sign in to access your CHDR account</p>
-
-        {error && (
-          <div className="alert" role="alert">
-            {error}
-          </div>
-        )}
-
-        <div className="mb-3">
-          <label htmlFor="username" className="form-label">
-            Username
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onKeyDown={handleKeyDown}
-            required
-            aria-label="username"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">
-            Password
-          </label>
-          <input
-            type="password"
-            className="form-control"
-            id="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={handleKeyDown}
-            required
-            aria-label="Password"
-          />
-        </div>
-
-        <button
-          type="button"
-          className="btn-login"
-          onClick={handleLogin}
-          disabled={loading}
-          aria-label="Sign In Button"
-        >
-          {loading ? "Signing In..." : "Sign In"}
-        </button>
-
-        <div className="footer-text">
-          <p>
-            <a href="#">Forget Password?</a> Reset your password <br />
-            <a href="Patient_Registration.html">Don't have an account?</a> Visit
-            your nearest clinic.
-          </p>
-          <a href="http://bambinoo.net/" className="footer-link">
-            Learn more about Bambinoo
+    <div className={style.loginPage}>
+      <div id="loginSection" className={style.containerWrapper}>
+        <div className={style.logoSection}>
+          <a href="http://bambinoo.net/">
+            <h1 className={style.logoTitle}>Bambinoo</h1>
           </a>
+          <p className={style.logoSubtitle}>
+            Digital Child Health and Development Record
+          </p>
+        </div>
+
+        <div className={style.loginCard}>
+          <h2 className={style.loginTitle}>Sign In</h2>
+          <p className={style.loginSubtitle}>
+            Sign in to access your CHDR account
+          </p>
+
+          {error && (
+            <div className={style.alert} role="alert">
+              {error}
+            </div>
+          )}
+
+          <div className="mb-3">
+            <label htmlFor="username" className={style.formLabel}>
+              Username
+            </label>
+            <input
+              type="text"
+              className={style.formControl}
+              id="username"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={handleKeyDown}
+              required
+              aria-label="username"
+            />
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="password" className={style.formLabel}>
+              Password
+            </label>
+            <input
+              type="password"
+              className={style.formControl}
+              id="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
+              required
+              aria-label="Password"
+            />
+          </div>
+
+          <button
+            type="button"
+            className={style.btnLogin}
+            onClick={handleLogin}
+            disabled={loading}
+            aria-label="Sign In Button"
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
+
+          <div className={style.footerText}>
+            <p>
+              <a href="#">Forget Password?</a> Reset your password <br />
+              <a href="Patient_Registration.html">
+                Don't have an account?
+              </a>{" "}
+              Visit your nearest clinic.
+            </p>
+            <a href="http://bambinoo.net/" className={style.footerLink}>
+              Learn more about Bambinoo
+            </a>
+          </div>
         </div>
       </div>
     </div>
