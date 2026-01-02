@@ -1,45 +1,30 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-h1,
-h2,
-h3 {
-  font-family: 'Oswald', sans-serif;
-}
-
-body {
-  font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
-  opacity: 0.95;
+.loginPage {
   min-height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
 
-.container-wrapper {
+.containerWrapper {
   width: 100%;
   max-width: 440px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
-.logo-section {
+.logoSection {
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
-.logo-title {
-  font-family: 'Oswald', sans-serif;
+.logoTitle {
+  font-family: "Oswald", sans-serif;
   font-weight: 700;
   font-size: clamp(3rem, 8vw, 5rem);
-  background: linear-gradient(135deg, #2196F3 0%, #FF6F91 100%);
+  background: linear-gradient(135deg, #2196f3 0%, #ff6f91 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -49,65 +34,50 @@ body {
   filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.15));
 }
 
-a {
-  text-decoration: none;
-  /* removes the underline */
-}
-
-.logo-subtitle {
-  font-family: 'Roboto', sans-serif;
+.logoSubtitle {
+  font-family: "Roboto", sans-serif;
   color: #ffffff;
   font-size: 1rem;
   font-weight: 400;
-  margin-top: 0.5rem;
 }
 
-.login-card {
+.loginCard {
   background: white;
   border-radius: 12px;
   padding: 2.5rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  width: 115%;
+  width: 100%;
 }
 
-.glass-dark {
-  background: rgba(30, 30, 30, 0.55);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  color: #fff;
-}
-
-.login-title {
-  font-family: 'Oswald', sans-serif;
+.loginTitle {
+  font-family: "Oswald", sans-serif;
   font-weight: 700;
   font-size: clamp(1.75rem, 5vw, 2.25rem);
   color: #000;
   text-align: center;
   margin-bottom: 0.5rem;
-  letter-spacing: 0.01em;
 }
 
-.login-subtitle {
-  font-family: 'Roboto', sans-serif;
+.loginSubtitle {
+  font-family: "Roboto", sans-serif;
   color: #5a5a5a;
   text-align: center;
   font-size: 0.95rem;
   margin-bottom: 2rem;
 }
 
-.form-label {
-  font-family: 'Roboto', sans-serif;
+.formLabel {
+  font-family: "Roboto", sans-serif;
   color: #000;
   font-weight: 500;
   font-size: 0.9rem;
   margin-bottom: 0.5rem;
-  margin-right: 0ch;
+  display: block;
 }
 
-.form-control {
-  font-family: 'Roboto', sans-serif;
+.formControl {
+  font-family: "Roboto", sans-serif;
+  width: 100%;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   padding: 0.75rem 1rem;
@@ -115,40 +85,31 @@ a {
   transition: border-color 0.3s;
 }
 
-.form-control:focus {
-  border-color: #2196F3;
-  box-shadow: none;
+.formControl:focus {
+  border-color: #2196f3;
   outline: none;
 }
 
-.btn-login {
-  font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #2196F3 0%, #FF6F91 100%);
+.btnLogin {
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(135deg, #2196f3 0%, #ff6f91 100%);
   color: white;
   border: none;
   border-radius: 8px;
   padding: 0.75rem;
-  font-weight: 500;
   width: 100%;
   margin-top: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
   font-size: 0.95rem;
-  font-weight: 500;
 }
 
-.btn-login:hover:not(:disabled) {
-  background-color: #FF9FBA;
-}
-
-.btn-login:disabled {
-  background-color: #bdbdbd;
+.btnLogin:disabled {
+  background: #bdbdbd;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
 .alert {
-  font-family: 'Roboto', sans-serif;
   background-color: #ffebee;
   color: #c62828;
   border: 1px solid #ef9a9a;
@@ -158,33 +119,25 @@ a {
   margin-bottom: 1rem;
 }
 
-.footer-text {
-  font-family: 'Roboto', sans-serif;
+.footerText {
+  font-family: "Roboto", sans-serif;
   color: #5a5a5a;
   text-align: center;
   font-size: 0.9rem;
   margin-top: 1.5rem;
 }
 
-.footer-link {
-  font-family: 'Roboto', sans-serif;
-  color: #2196F3;
+.footerLink {
+  color: #2196f3;
   text-decoration: none;
-  transition: color 0.3s;
 }
 
-.footer-link:hover {
-  color: #64B5F6;
+.footerLink:hover {
   text-decoration: underline;
 }
 
 @media (max-width: 576px) {
-
-  .login-card {
+  .loginCard {
     padding: 1.5rem;
-  }
-
-  .logo-section {
-    margin-bottom: 1.5rem;
   }
 }
