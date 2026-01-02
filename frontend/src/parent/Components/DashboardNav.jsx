@@ -21,7 +21,7 @@ function SideNav() {
           {menuItems.map((item) => (
             <li key={item.name}>
               <i className={`bi ${item.icon}`}></i>
-              <span className="nav-text">{item.name}</span>
+              <span className={style.navText}>{item.name}</span>
             </li>
           ))}
         </ul>
