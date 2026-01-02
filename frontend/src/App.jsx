@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Login";
+import Logout from "./Logout";
 import ParentLayout from "./layouts/ParentLayout";
 import NurseLayout from "./layouts/NurseLayout";
 import AdminLayout from "./layouts/AdminLayout";
@@ -10,6 +11,8 @@ function App() {
   return (
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
+        
         <Route path="/admin" element={<AdminLayout />} />
         <Route path="/doctor" element={<DoctorLayout />} />
         <Route path="/nurse" element={<NurseLayout />} />
