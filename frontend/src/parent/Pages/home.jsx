@@ -1,8 +1,8 @@
-
+import DashboardHeader from "../Components/DashBoardHeader"
 
 function Home(){
     return(
-        <p>HI</p>
+        <DashboardHeader/>
     )
     
 

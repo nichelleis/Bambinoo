@@ -1,8 +1,12 @@
 import Home from "../parent/Pages/home";
-import "../assets/styleSheets/ParentDashboard.module.css";
+import style from "../assets/styleSheets/ParentDashboard.module.css";
 
 function ParentLayout() {
-  return <Home />;
+  return (
+    <div className={style.body}>
+      <Home />
+    </div>
+  );
 }
 
 export default ParentLayout;
