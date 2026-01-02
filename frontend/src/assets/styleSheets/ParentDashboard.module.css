@@ -195,3 +195,24 @@ nav {
   padding: 0;
 }
 
+.mainMenu ul li a {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  color: white;
+  text-decoration: none;
+}
+
+.mainMenu li > a {
+  position: relative;
+  display: table;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #999;
+  font-family: arial;
+  font-size: 14px;
+  text-decoration: none;
+  -webkit-transform: translateZ(0) scale(1, 1);
+  -webkit-transition: all 0.1s linear;
+  transition: all 0.1s linear;
+}

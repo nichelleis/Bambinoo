@@ -18,7 +18,7 @@ function SideNav() {
   }, []);
 
   const menuItems = [
-    { name: "Home", path: "/", icon: "bi-house-door-fill" },
+    { name: "Home", path: "/parent", icon: "bi-house-door-fill" },
     { name: "Analytics", path: "/analytics", icon: "bi-graph-up" },
     { name: "Milestones", path: "/milestones", icon: "bi-trophy-fill" },
     { name: "AI Analytics", path: "/ai-analytics", icon: "bi-robot" },
@@ -47,11 +47,19 @@ function SideNav() {
                           childGender === "Male" ? "#4A90E2" : "#f576b5ff",
                         color: "white",
                         fontWeight: "bold",
+                        width: "180px",
                       }
                     : {}
                 }
               >
-                <i className={`bi ${item.icon}`}></i>
+                <i
+                  className={`bi ${item.icon}`}
+                  style={{
+                    color: childGender ? "white" : undefined,
+                    paddingLeft: "21px",
+                    paddingRight: "20px",
+                  }}
+                ></i>
                 <span className={style.navText}>{item.name}</span>
               </NavLink>
             </li>
@@ -60,8 +68,10 @@ function SideNav() {
 
         <ul className={style.logout}>
           <li>
-            <i className="bi bi-box-arrow-left"></i>
-            <span className={style.navText}>Logout</span>
+            <NavLink to="/logout">
+              <i className="bi bi-box-arrow-left"></i>
+              <span className={style.navText}>Logout</span>
+            </NavLink>
           </li>
         </ul>
       </div>
