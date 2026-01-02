@@ -74,6 +74,7 @@ const Login = () => {
 
   const logout = () => {
     localStorage.removeItem("token");
+    window.location.reload();
     navigate("/", { replace: true });
   };
 
@@ -105,7 +106,7 @@ const Login = () => {
       <div id="loginSection" className={style.containerWrapper}>
         <div className={style.logoSection}>
           <a href="http://bambinoo.net/">
-            <img src="/frontend/src/assets/images/bambinoologo - Copy.jpg" alt="Bambinoo Logo" className={style.logoImage} />
+           <img src="/frontend/src/assets/images/bambinoologo - Copy.jpg" alt="Bambinoo Logo" className={style.logoImage} />
             <h1 className={style.logoTitle}>Bambinoo</h1>
           </a>
           <p className={style.logoSubtitle}>
@@ -187,4 +188,4 @@ const Login = () => {
   );
 };
 
-  export default Login;
+export default Login;
