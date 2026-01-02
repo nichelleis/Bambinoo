@@ -9,7 +9,94 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-// implement in here 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      verifyToken(token);
+    }
+  }, []);
+
+  const handleLogin = async () => {
+    if (!username || !password) {
+      setError("Please enter both username and password");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        redirectDashboard(data.user.role); 
+      } else {
+        setError(data.message || "Login failed. Please try again.");
+      }
+    } catch (err) {
+      setError(
+        "Connection error. Please check if the backend server is running."
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyToken = async (token) => {
+    try {
+      const response = await fetch(`${API_URL}/verify-token`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok && data.valid && data.user) {
+        redirectDashboard(data.user.role);
+      } else {
+        logout();
+      }
+    } catch (err) {
+      console.error(err);
+      logout();
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
+
+  const redirectDashboard = (role) => {
+    switch (role) {
+      case "admin":
+        navigate("/admin");
+        break;
+      case "doctor":
+        navigate("/doctor");
+        break;
+      case "nurse":
+        navigate("/nurse");
+        break;
+      case "parent":
+        navigate("/parent");
+        break;
+      default:
+        navigate("/");
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleLogin();
+  };
 
   return (
     <div id="loginSection" className="container-wrapper">
