@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import style from "./assets/styleSheets/Login.module.css";
-import { NavigateFunction } from "react-router-dom";
+import logo from "./assets/images/site icon.png";
 
 const API_URL = "http://127.0.0.1:5000";
 
@@ -106,7 +106,7 @@ const Login = () => {
       <div id="loginSection" className={style.containerWrapper}>
         <div className={style.logoSection}>
           <a href="http://bambinoo.net/">
-           <img src="/frontend/src/assets/images/bambinoologo - Copy.jpg" alt="Bambinoo Logo" className={style.logoImage} />
+           <img src={logo} alt="Bambinoo Logo" className={style.logoImage} />
             <h1 className={style.logoTitle}>Bambinoo</h1>
           </a>
           <p className={style.logoSubtitle}>
