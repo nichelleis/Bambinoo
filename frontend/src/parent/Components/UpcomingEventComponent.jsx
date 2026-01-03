@@ -109,6 +109,18 @@ function UpcomingEvent() {
     setShowModal(true);
   };
 
+  const resetModal = () => {
+    setShowModal(false);
+    setIsEditing(false);
+    setEditingId(null);
+    setForm({
+      appointment_type: "",
+      doctor_name: "",
+      appointment_date: "",
+      appointment_time: "",
+    });
+  };
+
   return (
     <div className={`card ${style.dashboardCard}`}>
       <div className={style.cardHeaderCustom}>

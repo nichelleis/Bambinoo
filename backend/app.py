@@ -441,6 +441,56 @@ def add_appointment():
         return jsonify({'error': 'Failed to add appointment'}), 500
 
 
+@app.route('/update-appointment/<int:appointment_id>', methods=['PUT'])
+@jwt_required()
+def update_appointment(appointment_id):
+    try:
+        data = request.get_json()
+
+        appointment = Appointment.query.get(appointment_id)
+        if not appointment:
+            return jsonify({'error': 'Appointment not found'}), 404
+
+        # Validate required fields
+        if not data.get('appointment_type'):
+            return jsonify({'error': 'Appointment type is required'}), 400
+
+        if not data.get('doctor_name'):
+            return jsonify({'error': 'Doctor name is required'}), 400
+
+        if not data.get('appointment_date'):
+            return jsonify({'error': 'Appointment date is required'}), 400
+
+        if len(data.get('appointment_type', '')) > 50:
+            return jsonify({'error': 'Appointment type too long'}), 400
+
+        try:
+            appointment_datetime = datetime.fromisoformat(data['appointment_date'])
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+
+        # Update fields
+        appointment.appointment_type = data['appointment_type'].strip()
+        appointment.doctor_name = data['doctor_name'].strip()
+        appointment.appointment_date = appointment_datetime
+        appointment.updated_at = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({
+            'id': appointment.id,
+            'appointment_type': appointment.appointment_type,
+            'doctor_name': appointment.doctor_name,
+            'appointment_date': appointment.appointment_date.isoformat(),
+            'status': appointment.status,
+            'message': 'Appointment updated successfully'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating appointment: {e}")
+        return jsonify({'error': 'Failed to update appointment'}), 500
+
 
 
 if __name__ == "__main__":
