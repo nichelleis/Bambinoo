@@ -318,3 +318,13 @@ nav {
   padding: 0.3rem;
   margin-right: 6px;
 }
+
+.appointmentEvent {
+  border-left: 4px solid var(--secondary);
+  background: #ff6bb80a;
+}
+
+
+.doctor {
+  font-size: 0.9rem;
+}

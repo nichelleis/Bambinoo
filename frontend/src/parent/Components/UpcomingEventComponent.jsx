@@ -54,7 +54,7 @@ function UpcomingEvent() {
       </div>
 
       {/* Vaccines Section */}
-      <div className="event-section mb-4">
+      <div className="event-section mb-3">
         <div
           style={{
             fontWeight: 600,
@@ -107,7 +107,7 @@ function UpcomingEvent() {
       </div>
 
       {/* Appointments Section */}
-      <div className="event-section mb-3">
+      <div className="event-section mb-2">
         <div
           style={{
             fontWeight: 600,
@@ -130,21 +130,24 @@ function UpcomingEvent() {
           {appointments.map((appt) => (
             <div
               key={appt.id}
-              className="event-item appointment-event p-3 mb-2"
+              className={`${style.eventItem} ${style.appointmentEvent} p-3 mb-2`}
             >
               <div className="d-flex justify-content-between align-items-start">
                 <div>
                   <strong>{appt.appointment_type}</strong>
-                  <div className="doctor">{appt.doctor_name}</div>
-                  <div className="upcoming-date">
+                  <div className={style.doctor}>{appt.doctor_name}</div>
+                  <div className={style.upcomingDate}>
                     {formatDate(appt.appointment_date)} at{" "}
                     {new Date(appt.appointment_date).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
                   </div>
-                  <div className="upcoming-date">
-                    <i className="bi bi-exclamation-triangle-fill"></i>
+                  <div className={style.upcomingDate}>
+                    <i
+                      className={`bi bi-exclamation-triangle-fill ${style.exclamationIconCustom}`}
+                    ></i>
+                    {daysFromNow(appt.appointment_date)}
                   </div>
                 </div>
                 <div className="d-flex gap-2 mt-2">
