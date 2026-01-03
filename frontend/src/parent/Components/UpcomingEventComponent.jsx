@@ -108,6 +108,13 @@ function UpcomingEvent() {
     setEditingId(appt.id);
     setShowModal(true);
   };
+  const handleDelete = (id) => {
+    if (!window.confirm("Delete this appointment?")) return;
+
+    fetch(`http://127.0.0.1:5000/delete-appointment/${id}`, {
+      method: "DELETE",
+    }).then(() => setAppointments(appointments.filter((a) => a.id !== id)));
+  };
 
   const resetModal = () => {
     setShowModal(false);
@@ -236,7 +243,10 @@ function UpcomingEvent() {
                   >
                     Edit
                   </button>
-                  <button className="btn btn-sm btn-outline-danger">
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => handleDelete(appt.id)}
+                  >
                     Delete
                   </button>
                 </div>
