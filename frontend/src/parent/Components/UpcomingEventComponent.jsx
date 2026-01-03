@@ -128,6 +128,11 @@ function UpcomingEvent() {
     });
   };
 
+  useEffect(() => {
+    document.body.style.overflow = showModal ? "hidden" : "auto";
+    return () => (document.body.style.overflow = "auto");
+  }, [showModal]);
+
   return (
     <div className={`card ${style.dashboardCard}`}>
       <div className={style.cardHeaderCustom}>
