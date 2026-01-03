@@ -6,6 +6,8 @@ function UpcomingEvent() {
   const [appointments, setAppointments] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
     appointment_type: "",
     doctor_name: "",
@@ -88,6 +90,21 @@ function UpcomingEvent() {
 
         resetModal();
       });
+  };
+
+  const handleEdit = (appt) => {
+    const dt = new Date(appt.appointment_date);
+
+    setForm({
+      appointment_type: appt.appointment_type,
+      doctor_name: appt.doctor_name,
+      appointment_date: dt.toISOString().split("T")[0],
+      appointment_time: dt.toTimeString().slice(0, 5),
+    });
+
+    setIsEditing(true);
+    setEditingId(appt.id);
+    setShowModal(true);
   };
 
   return (
@@ -199,7 +216,10 @@ function UpcomingEvent() {
                   </div>
                 </div>
                 <div className="d-flex gap-2 mt-2">
-                  <button className="btn btn-sm btn-outline-primary">
+                  <button
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={() => handleEdit(appt)}
+                  >
                     Edit
                   </button>
                   <button className="btn btn-sm btn-outline-danger">
