@@ -161,12 +161,27 @@ with app.app_context():
                   min_age=10, max_age=12, achieved_date=date(2023, 6, 20)),
 
         Milestone(child_id=girl.id, milestone_id=71, category="Physical",
-                  description="Pulls up to stand",
-                  min_age=10, max_age=12, achieved_date=date(2023, 7, 10)),
+                  description="Notices when others are hurt or upset",
+                  min_age=11, max_age=12, achieved_date=date(2023, 7, 10)),
 
-        Milestone(child_id=girl.id, milestone_id=96, category="Physical",
-                  description="Walks without holding on",
-                  min_age=15, max_age=18, achieved_date=date(2023, 12, 1)),
+
+        Milestone(child_id=girl.id, milestone_id=101, category="Social",
+                  description="Notices when others are hurt or upset",
+                  min_age=18, max_age=24, achieved_date=date(2023, 12, 1)),
+
+        Milestone(child_id=girl.id, milestone_id=104, category="Language",
+                  description="Says at least two words together like More milk",
+                  min_age=18, max_age=24, achieved_date=date(2023, 12, 1)),
+
+        Milestone(child_id=girl.id, milestone_id=111, category="Physical",
+                  description="Runs",
+                  min_age=18, max_age=24, achieved_date=date(2023, 12, 1)),
+
+        Milestone(child_id=girl.id, milestone_id=109, category="Cognitive",
+                  description="Plays with more than one toy at a time",
+                  min_age=18, max_age=24, achieved_date=date(2023, 12, 1)),
+
+       
     ])
 
     db.session.add_all([

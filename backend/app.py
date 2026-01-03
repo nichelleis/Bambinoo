@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import timedelta,datetime
+from datetime import timedelta,datetime,date
 import os
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
 from dateutil.relativedelta import relativedelta
 import csv
+from collections import defaultdict
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
@@ -491,6 +493,8 @@ def update_appointment(appointment_id):
         print(f"Error updating appointment: {e}")
         return jsonify({'error': 'Failed to update appointment'}), 500
 
+
+
 @app.route('/delete-appointment/<int:appointment_id>', methods=['DELETE'])
 def delete_appointment(appointment_id):
     try:
@@ -511,6 +515,72 @@ def delete_appointment(appointment_id):
         db.session.rollback()
         print(f"Error deleting appointment: {e}")
         return jsonify({'error': 'Failed to delete appointment'}), 500
+
+
+
+@app.route('/milestone-status')
+@jwt_required()
+def milestones_status():
+
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+        return jsonify([])
+    
+    today = date.today()
+    age_months = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
+
+    categories = defaultdict(lambda: {
+        "total": 0,
+        "completed": 0,
+        "milestones": []
+    })
+
+    try:
+        csv_path = os.path.join(BASE_DIR, "final_milestones.csv")
+
+        with open(csv_path, newline='', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+
+            for row in reader:
+                min_age = int(row['min_age'])
+                max_age = int(row['max_age'])
+
+                if min_age <= age_months <= max_age:
+                    category = row['Category']
+
+                    categories[category]["total"] += 1
+                    categories[category]["milestones"].append(
+                        row['MilestoneDescription']
+                    )
+
+        completed_milestones = Milestone.query.filter(Milestone.child_id == child.id, Milestone.min_age <= age_months, Milestone.max_age >= age_months, ).all()
+
+        for m in completed_milestones:
+            categories[m.category]["completed"] += 1
+
+        response = []
+        for category, data in categories.items():
+            percentage = (
+                int((data["completed"] / data["total"]) * 100)
+                if data["total"] > 0 else 0
+            )
+
+            response.append({
+                "category": category,
+                "total": data["total"],
+                "completed": data["completed"],
+                "percentage": percentage,
+                "description": data["milestones"][0] 
+            })
+
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
 
 
 if __name__ == "__main__":
