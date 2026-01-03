@@ -120,7 +120,45 @@ function UpcomingEvent() {
           ></i>
           Appointments
         </div>
-        <div></div>
+        <div
+          style={{
+            maxHeight: appointments.length > 1 ? "128px" : "auto",
+            overflowY: appointments.length > 1 ? "auto" : "visible",
+          }}
+        >
+          {appointments.length === 0 && <div>No upcoming appointments</div>}
+          {appointments.map((appt) => (
+            <div
+              key={appt.id}
+              className="event-item appointment-event p-3 mb-2"
+            >
+              <div className="d-flex justify-content-between align-items-start">
+                <div>
+                  <strong>{appt.appointment_type}</strong>
+                  <div className="doctor">{appt.doctor_name}</div>
+                  <div className="upcoming-date">
+                    {formatDate(appt.appointment_date)} at{" "}
+                    {new Date(appt.appointment_date).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <div className="upcoming-date">
+                    <i className="bi bi-exclamation-triangle-fill"></i>
+                  </div>
+                </div>
+                <div className="d-flex gap-2 mt-2">
+                  <button className="btn btn-sm btn-outline-primary">
+                    Edit
+                  </button>
+                  <button className="btn btn-sm btn-outline-danger">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <button className="btn btn-outline-primary w-100">
