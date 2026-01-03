@@ -10,7 +10,7 @@ function Home() {
         <div className="col-md-8 mb-4">
           <Overview />
         </div>
-        <div className="col-md-8 mb-4">
+        <div className="col-md-4 mb-4">
           <UpcomingEvent />
         </div>
       </div>

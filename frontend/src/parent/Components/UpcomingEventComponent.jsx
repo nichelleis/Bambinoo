@@ -67,22 +67,22 @@ function UpcomingEvent() {
           {vaccines.map((vaccine) => (
             <div
               key={vaccine.id}
-              className={`event-item p-3 mb-2 ${
+              className={`${style.eventItem} p-3 mb-2 ${
                 vaccine.status === "missed"
-                  ? "vaccine-missed"
-                  : "vaccine-upcoming"
-              } `}
+                  ? style.vaccineMissed
+                  : style.vaccineUpcoming
+              }`}
             >
               <div className="d-flex justify-content-between align-items-start">
-                <div className="upcoming-info">
+                <div className={style.upcomingInfo}>
                   <strong>
                     {vaccine.vaccine_name} ({vaccine.dose_number})
                   </strong>
-                  <div className="upcoming-date">
+                  <div className={style.upcomingDate}>
                     {formatDate(vaccine.due_date)}
                   </div>
-                  <div className="upcoming-date">
-                    <i className="bi bi-exclamation-triangle-fill"></i>{" "}
+                  <div className={style.upcomingDate}>
+                    <i className={`bi bi-exclamation-triangle-fill ${style.exclamationIconCustom}`}></i>{" "}
                     {vaccine.status === "missed"
                       ? "Missed"
                       : daysFromNow(vaccine.due_date)}
