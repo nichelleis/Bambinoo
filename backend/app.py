@@ -385,6 +385,64 @@ def upcoming_appointments():
 
 
 
+@app.route('/add-appointment', methods=['POST'])
+@jwt_required()
+def add_appointment():
+    try:
+        data = request.get_json()
+        
+        if not data.get('appointment_type'):
+            return jsonify({'error': 'Appointment type is required'}), 400
+        
+        if not data.get('doctor_name'):
+            return jsonify({'error': 'Doctor name is required'}), 400
+        
+        if not data.get('appointment_date'):
+            return jsonify({'error': 'Appointment date is required'}), 400
+        
+        if len(data.get('appointment_type', '')) > 50:
+            return jsonify({'error': 'Appointment type cannot exceed 30 characters'}), 400
+        
+        user_id = get_jwt_identity()
+        child = Child.query.filter_by(parent_id=user_id).first()
+
+        if not child:
+            return jsonify({'error': 'Child not found'}), 404
+        
+        try:
+            appointment_datetime = datetime.fromisoformat(data['appointment_date'])
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+        
+        new_appointment = Appointment(
+            child_id=child.id,
+            appointment_type=data['appointment_type'].strip(),
+            appointment_date=appointment_datetime,
+            doctor_name=data['doctor_name'].strip(),
+            status='scheduled',
+  
+        )
+        
+        db.session.add(new_appointment)
+        db.session.commit()
+        
+        return jsonify({
+            'id': new_appointment.id,
+            'appointment_type': new_appointment.appointment_type,
+            'appointment_date': new_appointment.appointment_date.isoformat(),
+            'doctor_name': new_appointment.doctor_name,
+            'status': new_appointment.status,
+            'message': 'Appointment added successfully'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error adding appointment: {str(e)}")
+        return jsonify({'error': 'Failed to add appointment'}), 500
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
