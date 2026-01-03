@@ -5,6 +5,8 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
+from dateutil.relativedelta import relativedelta
+import csv
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
@@ -284,7 +286,231 @@ def growth_trend():
 
 
 
+@app.route("/vaccines-status")
+@jwt_required()
+def vaccines_status():
+    try:
+        user_id = get_jwt_identity()
+        child = Child.query.filter_by(parent_id=user_id).first()
+        
+        if not child:
+            return jsonify([])
 
+        if not child.date_of_birth:
+            return jsonify({"error": "Child date_of_birth not set"}), 400
+
+        today = datetime.today().date()
+        dob = child.date_of_birth
+        if isinstance(dob, datetime):
+            dob = dob.date() 
+
+        age_in_months = (today.year - dob.year) * 12 + (today.month - dob.month)
+
+        completed = Vaccination.query.filter_by(child_id=child.id, status='completed').all()
+        completed_set = set((v.vaccine_name, v.dose_number) for v in completed)
+
+        vaccines_list = []
+
+        csv_path = os.path.join(os.path.dirname(__file__), "vaccine_schedule.csv")
+        if not os.path.exists(csv_path):
+            return jsonify({"error": "vaccine_schedule.csv not found"}), 500
+
+        with open(csv_path, newline="") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                age_str = row.get('Age')
+                if not age_str:
+                    continue
+                try:
+                    if "weeks" in age_str:
+                        scheduled_months = int(int(age_str.split()[0]) / 4)
+                    elif "months" in age_str:
+                        scheduled_months = int(age_str.split()[0])
+                    elif "years" in age_str:
+                        scheduled_months = int(age_str.split()[0]) * 12
+                    else:
+                        continue
+                except Exception as ex:
+                    print(f"Error parsing age '{age_str}':", ex)
+                    continue
+
+                if (row['Vaccine'], row['Dose']) in completed_set:
+                    continue
+
+                due_date = dob + relativedelta(months=scheduled_months)
+
+                if scheduled_months < age_in_months:
+                    status = "missed"
+                elif age_in_months <= scheduled_months <= age_in_months + 26: ## change 26 to like 6 months this is just for testing
+                    status = "upcoming"
+                else:
+                    continue
+
+                vaccines_list.append({
+                    "vaccine_name": row['Vaccine'],
+                    "dose_number": row['Dose'],
+                    "due_date": due_date.isoformat(),
+                    "status": status
+                })
+
+        return jsonify(vaccines_list)
+
+    except Exception as e:
+        print("Vaccines Status Error:", e)
+        return jsonify({"error": "Internal server error"}), 500
+
+
+
+@app.route("/upcoming-appointments")
+@jwt_required()
+def upcoming_appointments():
+
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+   
+    custom_date = datetime.today().date()
+   
+    appointments = Appointment.query.filter(
+        Appointment.child_id == child.id,
+        Appointment.appointment_date >= custom_date
+    ).order_by(Appointment.appointment_date.asc()).all()
+    return jsonify([
+        {"id": a.id,
+         "appointment_type": a.appointment_type,
+         "doctor_name": a.doctor_name,
+         "appointment_date": a.appointment_date.isoformat()
+         }
+        for a in appointments
+    ])
+
+
+
+@app.route('/add-appointment', methods=['POST'])
+@jwt_required()
+def add_appointment():
+    try:
+        data = request.get_json()
+        
+        if not data.get('appointment_type'):
+            return jsonify({'error': 'Appointment type is required'}), 400
+        
+        if not data.get('doctor_name'):
+            return jsonify({'error': 'Doctor name is required'}), 400
+        
+        if not data.get('appointment_date'):
+            return jsonify({'error': 'Appointment date is required'}), 400
+        
+        if len(data.get('appointment_type', '')) > 50:
+            return jsonify({'error': 'Appointment type cannot exceed 30 characters'}), 400
+        
+        user_id = get_jwt_identity()
+        child = Child.query.filter_by(parent_id=user_id).first()
+
+        if not child:
+            return jsonify({'error': 'Child not found'}), 404
+        
+        try:
+            appointment_datetime = datetime.fromisoformat(data['appointment_date'])
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+        
+        new_appointment = Appointment(
+            child_id=child.id,
+            appointment_type=data['appointment_type'].strip(),
+            appointment_date=appointment_datetime,
+            doctor_name=data['doctor_name'].strip(),
+            status='scheduled',
+  
+        )
+        
+        db.session.add(new_appointment)
+        db.session.commit()
+        
+        return jsonify({
+            'id': new_appointment.id,
+            'appointment_type': new_appointment.appointment_type,
+            'appointment_date': new_appointment.appointment_date.isoformat(),
+            'doctor_name': new_appointment.doctor_name,
+            'status': new_appointment.status,
+            'message': 'Appointment added successfully'
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error adding appointment: {str(e)}")
+        return jsonify({'error': 'Failed to add appointment'}), 500
+
+
+@app.route('/update-appointment/<int:appointment_id>', methods=['PUT'])
+@jwt_required()
+def update_appointment(appointment_id):
+    try:
+        data = request.get_json()
+
+        appointment = Appointment.query.get(appointment_id)
+        if not appointment:
+            return jsonify({'error': 'Appointment not found'}), 404
+
+        # Validate required fields
+        if not data.get('appointment_type'):
+            return jsonify({'error': 'Appointment type is required'}), 400
+
+        if not data.get('doctor_name'):
+            return jsonify({'error': 'Doctor name is required'}), 400
+
+        if not data.get('appointment_date'):
+            return jsonify({'error': 'Appointment date is required'}), 400
+
+        if len(data.get('appointment_type', '')) > 50:
+            return jsonify({'error': 'Appointment type too long'}), 400
+
+        try:
+            appointment_datetime = datetime.fromisoformat(data['appointment_date'])
+        except ValueError:
+            return jsonify({'error': 'Invalid date format'}), 400
+
+        # Update fields
+        appointment.appointment_type = data['appointment_type'].strip()
+        appointment.doctor_name = data['doctor_name'].strip()
+        appointment.appointment_date = appointment_datetime
+        appointment.updated_at = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({
+            'id': appointment.id,
+            'appointment_type': appointment.appointment_type,
+            'doctor_name': appointment.doctor_name,
+            'appointment_date': appointment.appointment_date.isoformat(),
+            'status': appointment.status,
+            'message': 'Appointment updated successfully'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating appointment: {e}")
+        return jsonify({'error': 'Failed to update appointment'}), 500
+
+@app.route('/delete-appointment/<int:appointment_id>', methods=['DELETE'])
+def delete_appointment(appointment_id):
+    try:
+        appointment = Appointment.query.get(appointment_id)
+
+        if not appointment:
+            return jsonify({'error': 'Appointment not found'}), 404
+
+        db.session.delete(appointment)
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Appointment deleted successfully',
+            'id': appointment_id
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting appointment: {e}")
+        return jsonify({'error': 'Failed to delete appointment'}), 500
 
 
 if __name__ == "__main__":

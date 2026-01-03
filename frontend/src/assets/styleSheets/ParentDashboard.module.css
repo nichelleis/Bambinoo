@@ -254,3 +254,109 @@ nav {
   background: rgba(76, 175, 79, 0.227);
   color: #4caf50;
 }
+
+.iconYellow {
+  color: rgb(254, 192, 99);
+  background-color: rgba(254, 192, 99, 0.155);
+}
+
+.shieldIconCustom {
+  background: rgba(78, 205, 196, 0.15);
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 0.3rem;
+  color: #3ea39c;
+}
+
+.HospitalIconCustom {
+  background: rgba(255, 107, 156, 0.2);
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 0.3rem;
+  color: var(--secondary);
+}
+
+.eventItem {
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+
+.vaccineUpcoming {
+  border-left: 4px solid #4ecdc4;
+  background: rgba(78, 205, 197, 0.082);
+}
+
+.vaccineMissed {
+  border-left: 4px solid #e74c3c;
+  background: #e74d3c15;
+}
+
+.upcomingInfo {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.upcomingDate {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  margin-bottom: 2px;
+}
+
+.exclamationIconCustom {
+  color: var(--warning);
+  background: rgba(254, 192, 99, 0.2);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  padding: 0.3rem;
+  margin-right: 6px;
+}
+
+.appointmentEvent {
+  border-left: 4px solid var(--secondary);
+  background: #ff6bb80a;
+}
+
+.doctor {
+  font-size: 0.9rem;
+}
+
+.modalBackdropCustom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modalCard {
+  background: #fff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: popup 0.25s ease-out;
+}
+
+@keyframes popup {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
