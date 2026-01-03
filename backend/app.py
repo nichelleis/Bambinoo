@@ -5,6 +5,8 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
+from dateutil.relativedelta import relativedelta
+import csv
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
@@ -279,6 +281,64 @@ def growth_trend():
         "name": child.name,
         "trend": trend
     })
+
+
+
+
+
+@app.route("/vaccines-status")
+@jwt_required()
+def vaccines_status():
+
+    user_id = get_jwt_identity()
+
+    child = Child.query.filter_by(parent_id=user_id).first()
+    
+    if not child:
+        return jsonify([])
+
+    today = datetime.today().date()
+    dob = child.date_of_birth
+
+    age_in_months = (today.year - dob.year) * 12 + (today.month - dob.month)
+
+    completed = Vaccination.query.filter_by(child_id=child.id, status='completed').all()
+    completed_set = set((v.vaccine_name, v.dose_number) for v in completed)
+
+    vaccines_list = []
+    with open("vaccine_schedule.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            age_str = row['Age']
+            if "weeks" in age_str:
+                scheduled_months = int(int(age_str.split()[0]) / 4)
+            elif "months" in age_str:
+                scheduled_months = int(age_str.split()[0])
+            elif "years" in age_str:
+                scheduled_months = int(age_str.split()[0]) * 12
+            else:
+                continue
+
+            if (row['Vaccine'], row['Dose']) in completed_set:
+                continue
+
+            due_date = dob + relativedelta(months=scheduled_months)
+
+            if scheduled_months < age_in_months:
+                status = "missed"
+            elif age_in_months <= scheduled_months <= age_in_months + 16:    ## change 16 to like 6 months this is just for testing
+                status = "upcoming"
+            else:
+                continue 
+
+            vaccines_list.append({
+                "vaccine_name": row['Vaccine'],
+                "dose_number": row['Dose'],
+                "due_date": due_date.isoformat(),
+                "status": status
+            })
+
+    return jsonify(vaccines_list)
 
 
 
