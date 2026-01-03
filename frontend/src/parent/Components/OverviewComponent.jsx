@@ -1,9 +1,13 @@
+import style from "../../assets/styleSheets/ParentDashboard.module.css";
+
 function Overview() {
   return (
-    <div className="card">
-      <div className="d-flex justify-content-between align-items-center">
-        <div className="card-title">
-          <span className="card-icon">
+    <div className={`card ${style.dashboardCard}`}>
+      <div
+        className={`${style.cardHeaderCustom} d-flex justify-content-between align-items-center`}
+      >
+        <div className={style.cardTitle}>
+          <span className={`${style.cardIcon} ${style.iconGreen}`}>
             <i className="bi bi-bar-chart-line-fill"></i>
           </span>
           Growth Overview
@@ -16,7 +20,7 @@ function Overview() {
       <div className="row card-body text-center mb-1">
         <div className="col-4">
           <div
-            className=" p-4 rounded"
+            className="stat-card p-4 rounded"
             style={{ background: "rgba(107, 99, 255, 0.2)" }}
           >
             <div className="fs-2 fw-bold text-primary"> kg</div>
@@ -42,7 +46,7 @@ function Overview() {
 
         <div className="col-4">
           <div
-            className=" p-4 rounded"
+            className="stat-card p-4 rounded"
             style={{ background: "rgba(254, 192, 99, 0.2)" }}
           >
             <div className="fs-2 fw-bold text-warning">cm</div>
