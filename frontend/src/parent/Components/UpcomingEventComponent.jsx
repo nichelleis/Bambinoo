@@ -3,6 +3,7 @@ import style from "../../assets/styleSheets/ParentDashboard.module.css";
 
 function UpcomingEvent() {
   const [vaccines, setVaccines] = useState([]);
+  const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -14,6 +15,15 @@ function UpcomingEvent() {
     })
       .then((res) => res.json())
       .then((data) => setVaccines(data))
+      .catch((err) => console.error(err));
+
+    fetch("http://127.0.0.1:5000/upcoming-appointments", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setAppointments(data))
       .catch((err) => console.error(err));
   }, []);
 
@@ -82,7 +92,9 @@ function UpcomingEvent() {
                     {formatDate(vaccine.due_date)}
                   </div>
                   <div className={style.upcomingDate}>
-                    <i className={`bi bi-exclamation-triangle-fill ${style.exclamationIconCustom}`}></i>{" "}
+                    <i
+                      className={`bi bi-exclamation-triangle-fill ${style.exclamationIconCustom}`}
+                    ></i>{" "}
                     {vaccine.status === "missed"
                       ? "Missed"
                       : daysFromNow(vaccine.due_date)}
