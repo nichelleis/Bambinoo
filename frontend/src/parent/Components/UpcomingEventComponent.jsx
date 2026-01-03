@@ -5,6 +5,14 @@ function UpcomingEvent() {
   const [vaccines, setVaccines] = useState([]);
   const [appointments, setAppointments] = useState([]);
 
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState({
+    appointment_type: "",
+    doctor_name: "",
+    appointment_date: "",
+    appointment_time: "",
+  });
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -40,6 +48,44 @@ function UpcomingEvent() {
     const d = new Date(dateStr);
     const diff = Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24));
     return diff > 0 ? `In ${diff} day${diff > 1 ? "s" : ""}` : "Today";
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "appointment_type" && value.length > 50) return;
+    setForm({ ...form, [name]: value });
+  };
+
+  const Submit = () => {
+    const dateTime = form.appointment_date + "T" + form.appointment_time;
+    const payload = {
+      appointment_type: form.appointment_type,
+      doctor_name: form.doctor_name,
+      appointment_date: dateTime,
+      child_id: 1, // change according to session/user
+    };
+
+    const url = "http://127.0.0.1:5000/add-appointment";
+
+    const method = "POST";
+
+    fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (isEditing) {
+          setAppointments(
+            appointments.map((a) => (a.id === editingId ? data : a))
+          );
+        } else {
+          setAppointments([...appointments, data]);
+        }
+
+        resetModal();
+      });
   };
 
   return (
@@ -164,9 +210,68 @@ function UpcomingEvent() {
         </div>
       </div>
 
-      <button className="btn btn-outline-primary w-100">
+      <button
+        className="btn btn-outline-primary w-100"
+        onClick={() => setShowModal(true)}
+      >
         <i className="bi bi-plus-lg"></i> Add New Appointment
       </button>
+
+      {showModal && (
+        <div className="modal-backdrop-custom">
+          <div className="modal-card p-4">
+            <h5>Add Appointment</h5>
+            <hr />
+
+            <div className="mb-2 d-flex gap-2">
+              <input
+                type="text"
+                name="appointment_type"
+                placeholder="Appointment Type"
+                value={form.appointment_type}
+                onChange={handleChange}
+                maxLength={50}
+                className="form-control"
+              />
+            </div>
+
+            <input
+              type="text"
+              name="doctor_name"
+              placeholder="Doctor's Name"
+              value={form.doctor_name}
+              onChange={handleChange}
+              className="form-control mb-2"
+            />
+            <input
+              type="date"
+              name="appointment_date"
+              value={form.appointment_date}
+              onChange={handleChange}
+              className="form-control mb-2"
+            />
+            <input
+              type="time"
+              name="appointment_time"
+              value={form.appointment_time}
+              onChange={handleChange}
+              className="form-control mb-2"
+            />
+
+            <div className="d-flex justify-content-end gap-2 mt-3">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+              <button className="btn btn-primary" onClick={Submit}>
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
