@@ -66,9 +66,11 @@ function UpcomingEvent() {
       appointment_date: dateTime,
     };
 
-    const url = "http://127.0.0.1:5000/add-appointment";
+    const url = isEditing
+      ? `http://127.0.0.1:5000/update-appointment/${editingId}`
+      : "http://127.0.0.1:5000/add-appointment";
 
-    const method = "POST";
+    const method = isEditing ? "PUT" : "POST";
 
     fetch(url, {
       method,
