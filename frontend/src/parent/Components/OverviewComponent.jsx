@@ -1,8 +1,11 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
 import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
+import { useNavigate } from "react-router-dom";
 
 function Overview() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [trendData, setTrendData] = useState([]);
 
@@ -28,9 +31,17 @@ function Overview() {
       .then((res) => res.json())
       .then((data) => {
         setTrendData(data.trend);
+        setLoading(false);
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
+
+  if (loading || !data) {
+    return <div className="dashboard-card card p-4">Loading...</div>;
+  }
 
   const weightCurrent = data?.growth?.weight?.current ?? 0;
   const weightPrevious = data?.growth?.weight?.previous ?? 0;
@@ -62,7 +73,10 @@ function Overview() {
           </span>
           Growth Overview
         </div>
-        <button className="btn btn-sm text-primary">
+        <button
+          className="btn btn-sm text-primary"
+          onClick={() => navigate("/parent/analytics")}
+        >
           View Details <i className="bi bi-arrow-right"></i>
         </button>
       </div>
