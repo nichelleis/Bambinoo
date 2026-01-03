@@ -289,60 +289,75 @@ def growth_trend():
 @app.route("/vaccines-status")
 @jwt_required()
 def vaccines_status():
+    try:
+        user_id = get_jwt_identity()
+        child = Child.query.filter_by(parent_id=user_id).first()
+        
+        if not child:
+            return jsonify([])
 
-    user_id = get_jwt_identity()
+        if not child.date_of_birth:
+            return jsonify({"error": "Child date_of_birth not set"}), 400
 
-    child = Child.query.filter_by(parent_id=user_id).first()
-    
-    if not child:
-        return jsonify([])
+        today = datetime.today().date()
+        dob = child.date_of_birth
+        if isinstance(dob, datetime):
+            dob = dob.date() 
 
-    today = datetime.today().date()
-    dob = child.date_of_birth
+        age_in_months = (today.year - dob.year) * 12 + (today.month - dob.month)
 
-    age_in_months = (today.year - dob.year) * 12 + (today.month - dob.month)
+        completed = Vaccination.query.filter_by(child_id=child.id, status='completed').all()
+        completed_set = set((v.vaccine_name, v.dose_number) for v in completed)
 
-    completed = Vaccination.query.filter_by(child_id=child.id, status='completed').all()
-    completed_set = set((v.vaccine_name, v.dose_number) for v in completed)
+        vaccines_list = []
 
-    vaccines_list = []
-    with open("vaccine_schedule.csv", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            age_str = row['Age']
-            if "weeks" in age_str:
-                scheduled_months = int(int(age_str.split()[0]) / 4)
-            elif "months" in age_str:
-                scheduled_months = int(age_str.split()[0])
-            elif "years" in age_str:
-                scheduled_months = int(age_str.split()[0]) * 12
-            else:
-                continue
+        csv_path = os.path.join(os.path.dirname(__file__), "vaccine_schedule.csv")
+        if not os.path.exists(csv_path):
+            return jsonify({"error": "vaccine_schedule.csv not found"}), 500
 
-            if (row['Vaccine'], row['Dose']) in completed_set:
-                continue
+        with open(csv_path, newline="") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                age_str = row.get('Age')
+                if not age_str:
+                    continue
+                try:
+                    if "weeks" in age_str:
+                        scheduled_months = int(int(age_str.split()[0]) / 4)
+                    elif "months" in age_str:
+                        scheduled_months = int(age_str.split()[0])
+                    elif "years" in age_str:
+                        scheduled_months = int(age_str.split()[0]) * 12
+                    else:
+                        continue
+                except Exception as ex:
+                    print(f"Error parsing age '{age_str}':", ex)
+                    continue
 
-            due_date = dob + relativedelta(months=scheduled_months)
+                if (row['Vaccine'], row['Dose']) in completed_set:
+                    continue
 
-            if scheduled_months < age_in_months:
-                status = "missed"
-            elif age_in_months <= scheduled_months <= age_in_months + 16:    ## change 16 to like 6 months this is just for testing
-                status = "upcoming"
-            else:
-                continue 
+                due_date = dob + relativedelta(months=scheduled_months)
 
-            vaccines_list.append({
-                "vaccine_name": row['Vaccine'],
-                "dose_number": row['Dose'],
-                "due_date": due_date.isoformat(),
-                "status": status
-            })
+                if scheduled_months < age_in_months:
+                    status = "missed"
+                elif age_in_months <= scheduled_months <= age_in_months + 26: ## change 26 to like 6 months this is just for testing
+                    status = "upcoming"
+                else:
+                    continue
 
-    return jsonify(vaccines_list)
+                vaccines_list.append({
+                    "vaccine_name": row['Vaccine'],
+                    "dose_number": row['Dose'],
+                    "due_date": due_date.isoformat(),
+                    "status": status
+                })
 
+        return jsonify(vaccines_list)
 
-
-
+    except Exception as e:
+        print("Vaccines Status Error:", e)
+        return jsonify({"error": "Internal server error"}), 500
 
 
 
