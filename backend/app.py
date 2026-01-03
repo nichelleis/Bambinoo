@@ -537,7 +537,9 @@ def milestones_status():
     })
 
     try:
-        with open('final_milestones.csv', newline='', encoding='utf-8-sig') as f:
+        csv_path = os.path.join(BASE_DIR, "final_milestones.csv")
+
+        with open(csv_path, newline='', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
 
             for row in reader:
@@ -552,7 +554,7 @@ def milestones_status():
                         row['MilestoneDescription']
                     )
 
-        completed_milestones = Milestone.query.filter(Milestone.child_id == child.id, Milestone.min_age <= age_months, Milestone.max_age >= age_months ).all()
+        completed_milestones = Milestone.query.filter(Milestone.child_id == child.id, Milestone.min_age <= age_months, Milestone.max_age >= age_months, ).all()
 
         for m in completed_milestones:
             categories[m.category]["completed"] += 1
