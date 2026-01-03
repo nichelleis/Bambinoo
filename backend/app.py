@@ -361,6 +361,29 @@ def vaccines_status():
 
 
 
+@app.route("/upcoming-appointments")
+@jwt_required()
+def upcoming_appointments():
+
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+   
+    custom_date = datetime.today().date()
+   
+    appointments = Appointment.query.filter(
+        Appointment.child_id == child.id,
+        Appointment.appointment_date >= custom_date
+    ).order_by(Appointment.appointment_date.asc()).all()
+    return jsonify([
+        {"id": a.id,
+         "appointment_type": a.appointment_type,
+         "doctor_name": a.doctor_name,
+         "appointment_date": a.appointment_date.isoformat()
+         }
+        for a in appointments
+    ])
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
