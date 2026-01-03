@@ -250,6 +250,42 @@ def get_child():
     })
 
 
+@app.route('/growth-trend', methods=["GET"])
+@jwt_required()
+def growth_trend():
+
+    user_id = get_jwt_identity()
+
+    child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+        return jsonify({"message": "Child not found"}), 404
+    
+    one_year_ago = datetime.utcnow() - timedelta(days=730)     #  change this to one year (365) its 730 just for testing
+
+    records = GrowthRecord.query.filter(
+        GrowthRecord.child_id == child.id,
+        GrowthRecord.record_date >= one_year_ago
+    ).order_by(GrowthRecord.record_date.asc()).all()
+
+    trend = []
+    for r in records:
+        trend.append({
+            "date": r.record_date.isoformat(),
+            "weight": r.weight,
+        })
+
+    return jsonify({
+        "child_id": child.id,
+        "name": child.name,
+        "trend": trend
+    })
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
