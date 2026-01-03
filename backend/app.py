@@ -491,6 +491,26 @@ def update_appointment(appointment_id):
         print(f"Error updating appointment: {e}")
         return jsonify({'error': 'Failed to update appointment'}), 500
 
+@app.route('/delete-appointment/<int:appointment_id>', methods=['DELETE'])
+def delete_appointment(appointment_id):
+    try:
+        appointment = Appointment.query.get(appointment_id)
+
+        if not appointment:
+            return jsonify({'error': 'Appointment not found'}), 404
+
+        db.session.delete(appointment)
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Appointment deleted successfully',
+            'id': appointment_id
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting appointment: {e}")
+        return jsonify({'error': 'Failed to delete appointment'}), 500
 
 
 if __name__ == "__main__":
