@@ -1,0 +1,172 @@
+﻿id,AgeGroup,Category,MilestoneDescription,min_age,max_age
+1,0,Language,Startles blinks or widens eyes at a sudden loud noise,0,1
+2,1,Social,Looks at your face well,0,1
+3,1,Language,Listens quietly to sudden or continuous sounds,0,1
+4,1,Cognitive,Turns eyes toward light,0,1
+5,2,Social,Calms down when spoken to or picked up,1,2
+6,2,Social,Seems happy to see you when you walk up to her,1,2
+7,2,Social,Smiles when you talk to or smile at her,1,2
+8,2,Social,Smiles responsively when you turn your face towards them,1,2
+9,2,Language,Makes sounds other than crying,1,2
+10,2,Language,Reacts to loud sounds,1,2
+11,2,Cognitive,Watches you as you move,1,2
+12,2,Cognitive,Looks at a toy for several seconds,1,2
+13,2,Physical,Both eyes move together in coordination,1,2
+14,2,Physical,Holds head up when on tummy,1,2
+15,2,Physical,Moves both arms and both legs,1,2
+16,2,Physical,Opens hands briefly,1,2
+17,4,Social,Smiles on his own to get your attention,2,4
+18,4,Social,Chuckles when you try to make him laugh,2,4
+19,4,Social,Moves or makes sounds to keep your attention,2,4
+20,4,Social,Becomes quiet or smiles when hearing a caregivers voice without seeing them,2,4
+21,4,Language,Makes sounds like oooo aahh,2,4
+22,4,Language,Makes sounds back when you talk to him,2,4
+23,4,Language,Turns head towards the sound of your voice,2,4
+24,4,Cognitive,Opens mouth when he sees breast or bottle if hungry,2,4
+25,4,Cognitive,Looks at her hands with interest,2,4
+26,4,Physical,Holds head steady without support,2,4
+27,4,Physical,Holds a toy when put in his hand,2,4
+28,4,Physical,Uses his arm to swing at toys,2,4
+29,4,Physical,Brings hands to mouth,2,4
+30,4,Physical,Pushes up onto elbows when on tummy,2,4
+31,6,Social,Knows familiar people,4,6
+32,6,Social,Likes to look at self in a mirror,4,6
+33,6,Social,Laughs,4,6
+34,6,Language,Takes turns making sounds with you,4,6
+35,6,Language,Blows raspberries,4,6
+36,6,Language,Makes squealing noises,4,6
+37,6,Cognitive,Looks around curiously,4,6
+38,6,Cognitive,Puts things in mouth to explore them,4,6
+39,6,Cognitive,Closes lips to show she doesnt want more food,4,6
+40,6,Physical,Reaches out and tries to grab objects,4,6
+41,6,Physical,Rolls from tummy to back,4,6
+42,6,Physical,Pushes up with straight arms when on tummy,4,6
+43,6,Physical,Leans on hands to support herself when sitting,4,6
+44,7,Language,Turns immediately toward the mother caregiver when spoken to,6,7
+45,9,Social,Is shy clingy or fearful around strangers,7,9
+46,9,Social,Shows several facial expressions happy sad angry,7,9
+47,9,Social,Looks when you call her name,7,9
+48,9,Social,Reacts when you leave looks reaches or cries,7,9
+49,9,Social,Smiles or laughs when playing peeka boo,7,9
+50,9,Language,Makes sounds like mamamama or bababababa,7,9
+51,9,Language,Listens carefully to familiar everyday sounds,7,9
+52,9,Language,Lifts arms up to be picked up,7,9
+53,9,Language,Enjoys rhythmic or musical tones when spoken to,7,9
+54,9,Cognitive,Looks for objects when dropped out of sight,7,9
+55,9,Cognitive,Bangs two things together,7,9
+56,9,Cognitive,Looks for source of sound from an unseen place,7,9
+57,9,Physical,Gets to a sitting position by herself,7,9
+58,9,Physical,Moves things from one hand to the other,7,9
+59,9,Physical,Sits without support,7,9
+60,10,Physical,Picks up small objects using pincer grasp thumb and index finger,9,10
+61,12,Social,Plays games with you like pat a cake,10,12
+62,12,Social,Recognizes familiar people before they speak,10,12
+63,12,Language,Waves bye bye,10,12
+64,12,Language,Calls a parent mama or dada,10,12
+65,12,Language,Understands the word no,10,12
+66,12,Language,Responds to name and familiar sounds,10,12
+67,12,Language,Responds to Bye even without gestures,10,12
+68,12,Cognitive,Points at things to ask for them,10,12
+69,12,Cognitive,Puts something in a container,10,12
+70,12,Cognitive,Looks for things he sees you hide,10,12
+71,12,Physical,Pulls up to stand,10,12
+72,12,Physical,Walks holding on to furniture,10,12
+73,12,Physical,Drinks from a cup without a lid as you hold it,10,12
+74,15,Social,Copies other children while playing,12,15
+75,15,Social,Shows you an object she likes,12,15
+76,15,Social,Claps when excited,12,15
+77,15,Social,Hugs a stuffed doll or toy,12,15
+78,15,Social,Shows affection hugs cuddles kisses,12,15
+79,15,Language,Says 1 2 words besides mama dada,12,15
+80,15,Language,Looks at a familiar object when named,12,15
+81,15,Language,Follows directions with gestures and words,12,15
+82,15,Language,Points to ask for something or get help,12,15
+83,15,Cognitive,Tries to use things the right way phone cup book,12,15
+84,15,Cognitive,Stacks at least two small objects,12,15
+85,15,Physical,Takes a few steps on his own,12,15
+86,15,Physical,Uses fingers to feed herself,12,15
+87,18,Social,Moves away but checks that you are close,15,18
+88,18,Social,Points to show you something interesting,15,18
+89,18,Social,Puts hands out to be washed,15,18
+90,18,Social,Looks at pages in a book with you,15,18
+91,18,Social,Helps you dress him by pushing arm through sleeve,15,18
+92,18,Language,Says 3 or more words besides mama dada,15,18
+93,18,Language,Follows 1 step directions without gestures,15,18
+94,18,Cognitive,Copies you doing chores like sweeping,15,18
+95,18,Cognitive,Plays with toys in a simple way pushing a car,15,18
+96,18,Physical,Walks without holding on to anyone,15,18
+97,18,Physical,Scribbles,15,18
+98,18,Physical,Drinks from a cup and may spill,15,18
+99,18,Physical,Tries to use a spoon,15,18
+100,18,Physical,Climbs on and off furniture without help,15,18
+101,24,Social,Notices when others are hurt or upset,18,24
+102,24,Social,Looks at your face to see how to react in new situations,18,24
+103,24,Language,Points to things in a book when asked,18,24
+104,24,Language,Says at least two words together like More milk,18,24
+105,24,Language,Points to at least two body parts when asked,18,24
+106,24,Language,Uses gestures like nodding yes or blowing a kiss,18,24
+107,24,Cognitive,Holds something in one hand while using the other,18,24
+108,24,Cognitive,Tries to use switches knobs or buttons,18,24
+109,24,Cognitive,Plays with more than one toy at a time,18,24
+110,24,Physical,Kicks a ball,18,24
+111,24,Physical,Runs,18,24
+112,24,Physical,Walks up stairs,18,24
+113,24,Physical,Eats with a spoon,18,24
+114,30,Social,Plays next to and sometimes with other children,24,30
+115,30,Social,Says Look at me to show what she can do,24,30
+116,30,Social,Follows simple routines,24,30
+117,30,Cognitive,Follows two step instructions,24,30
+118,30,Cognitive,Knows at least one color,24,30
+119,30,Physical,Uses hands to twist things,24,30
+120,30,Physical,Takes some clothes off by himself,24,30
+121,30,Physical,Jumps off ground with both feet,24,30
+122,30,Physical,Turns book pages one at a time,24,30
+123,30,Language,Says about 50 words,24,30
+124,30,Language,Says two or more words together with an action word,24,30
+125,30,Language,Names things in a book when asked,24,30
+126,30,Language,Says words like I me or we,24,30
+127,30,Cognitive,Uses things to pretend,24,30
+128,30,Cognitive,Shows simple problem solving skills,24,30
+129,36,Social,Calms down within 10 minutes after you leave,30,36
+130,36,Social,Notices and joins other children to play,30,36
+131,36,Language,Conversation with at least two exchanges,30,36
+132,36,Language,Asks who what where or why,30,36
+133,36,Language,Identifies actions in pictures,30,36
+134,36,Language,Says first name when asked,30,36
+135,36,Language,Talks well enough for others to understand,30,36
+136,36,Cognitive,Draws a circle when shown how,30,36
+137,36,Cognitive,Avoids touching hot objects when warned,30,36
+138,36,Physical,Strings items together,30,36
+139,36,Physical,Puts on some clothes by himself,30,36
+140,36,Physical,Uses a fork,30,36
+141,48,Social,Pretends to be something else,36,48
+142,48,Social,Asks to play with other children,36,48
+143,48,Social,Comforts others who are hurt or sad,36,48
+144,48,Social,Avoids danger like tall heights,36,48
+145,48,Social,Likes to be a helper,36,48
+146,48,Social,Changes behavior based on location,36,48
+147,48,Language,Says sentences with 4 or more words,36,48
+148,48,Language,Sings songs or rhymes,36,48
+149,48,Language,Talks about her day,36,48
+150,48,Language,Answers simple questions,36,48
+151,48,Cognitive,Names a few colors,36,48
+152,48,Cognitive,Tells what comes next in a well known story,36,48
+153,48,Cognitive,Draws a person with 3 or more body parts,36,48
+154,48,Physical,Catches a large ball most of the time,36,48
+155,48,Physical,Serves herself food or pours water while supervised,36,48
+156,48,Physical,Unbuttons some buttons,36,48
+157,48,Physical,Holds crayon or pencil between fingers and thumb,36,48
+158,60,Social,Follows rules or takes turns,48,60
+159,60,Social,Sings dances or acts for you,48,60
+160,60,Social,Does simple chores at home,48,60
+161,60,Language,Tells a story with at least two events,48,60
+162,60,Language,Answers questions about a story,48,60
+163,60,Language,Keeps conversation going for 3 plus exchanges,48,60
+164,60,Language,Recognizes simple rhymes,48,60
+165,60,Cognitive,Counts to 10,48,60
+166,60,Cognitive,Names some numbers between 1 and 5,48,60
+167,60,Cognitive,Uses words about time like yesterday tomorrow,48,60
+168,60,Cognitive,Pays attention for 5 to 10 minutes,48,60
+169,60,Cognitive,Writes some letters in her name,48,60
+170,60,Physical,Buttons some buttons,48,60
+171,60,Physical,Hops on one foot,48,60
