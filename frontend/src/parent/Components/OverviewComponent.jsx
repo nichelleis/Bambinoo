@@ -1,11 +1,15 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
 import { useEffect, useState } from "react";
+import Plot from "react-plotly.js";
 
 function Overview() {
   const [data, setData] = useState(null);
+  const [trendData, setTrendData] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
+    // header data
     fetch("http://localhost:5000/header", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -13,6 +17,18 @@ function Overview() {
     })
       .then((res) => res.json())
       .then((data) => setData(data))
+      .catch(console.error);
+
+    // growth trend data
+    fetch("http://localhost:5000/growth-trend", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setTrendData(data.trend);
+      })
       .catch(console.error);
   }, []);
 
@@ -26,6 +42,14 @@ function Overview() {
   const weightDiff = Number((weightCurrent - weightPrevious).toFixed(2));
   const heightDiff = heightCurrent - heightPrevious;
   const headDiff = headCurrent - headPrevious;
+
+  const dates = trendData.map((d) =>
+    new Date(d.date).toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    })
+  );
+  const weights = trendData.map((d) => d.weight ?? 0);
 
   return (
     <div className={`card ${style.dashboardCard}`}>
@@ -82,6 +106,30 @@ function Overview() {
             </div>
           </div>
         </div>
+      </div>
+      <div className="p-3 rounded">
+        <div className="fw-semibold mb-3">Weight Trend (Last 12 Months)</div>
+        <Plot
+          data={[
+            {
+              x: dates,
+              y: weights,
+              type: "scatter",
+              mode: "lines+markers",
+              marker: { color: "#6b63ff" },
+              line: { shape: "spline", smoothing: 0.5, color: "#6b63ff" },
+              name: "Weight (kg)",
+            },
+          ]}
+          layout={{
+            autosize: true,
+            margin: { t: 20, b: 40, l: 40, r: 20 },
+            xaxis: { title: "Month" },
+            yaxis: { title: "Weight (kg)" },
+            showlegend: false,
+          }}
+          style={{ width: "100%", height: "250px" }}
+        />
       </div>
     </div>
   );
