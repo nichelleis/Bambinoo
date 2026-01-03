@@ -264,8 +264,8 @@ function UpcomingEvent() {
       </button>
 
       {showModal && (
-        <div className="modal-backdrop-custom">
-          <div className="modal-card p-4">
+        <div className={style.modalBackdropCustom}>
+          <div className={`${style.modalCard} p-4`}>
             <h5>Add Appointment</h5>
             <hr />
 
