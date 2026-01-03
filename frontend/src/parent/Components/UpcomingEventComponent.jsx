@@ -62,7 +62,6 @@ function UpcomingEvent() {
       appointment_type: form.appointment_type,
       doctor_name: form.doctor_name,
       appointment_date: dateTime,
-      child_id: 1, // change according to session/user
     };
 
     const url = "http://127.0.0.1:5000/add-appointment";
@@ -71,7 +70,10 @@ function UpcomingEvent() {
 
     fetch(url, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
       body: JSON.stringify(payload),
     })
       .then((res) => res.json())
