@@ -1,6 +1,21 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
+import { useEffect, useState } from "react";
 
 function DevelopmentMilestonesCard() {
+  const [milestones, setMilestones] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    fetch("http://127.0.0.1:5000/milestone-status", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setMilestones(data))
+      .catch((err) => console.error(err));
+  }, []);
+
   return (
     <div className={`card ${style.dashboardCard}`}>
       <div className={style.cardHeaderCustom}>
