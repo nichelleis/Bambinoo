@@ -134,21 +134,38 @@ class Milestone(db.Model):
     max_age = db.Column(db.Integer)  
     achieved_date = db.Column(db.Date)
 
-class Vaccination(db.Model):
-    __tablename__ = 'vaccination'
+class PendingRegistration(db.Model):
+    __tablename__ = 'pending_registration'
+
     id = db.Column(db.Integer, primary_key=True)
-    child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
-    vaccine_name = db.Column(db.String(100), nullable=False)  
-    dose_number = db.Column(db.String(20))  
-    due_date = db.Column(db.Date)
-    administered_date = db.Column(db.Date)
-    status = db.Column(db.String(20), default='scheduled') 
-    administered_by = db.Column(db.String(100)) 
-    location = db.Column(db.String(200))
-    batch_number = db.Column(db.String(50))
-    notes = db.Column(db.Text)
+
+    registration_number = db.Column(db.String(100), unique=True, nullable=False)
+    child_name = db.Column(db.String(255), nullable=False)
+    child_dob = db.Column(db.Date, nullable=False)
+    nationality = db.Column(db.String(100), nullable=False)
+    child_number = db.Column(db.String(10), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
+    mother_name = db.Column(db.String(255), nullable=False)
+    mother_dob = db.Column(db.Date, nullable=False)
+    birth_location = db.Column(db.String(255), nullable=False)
+    birth_hospital = db.Column(db.String(255), nullable=False)
+    delivery_type = db.Column(db.String(100), nullable=False)
+    surgery = db.Column(db.String(10), nullable=False)
+    birth_weight = db.Column(db.Float, nullable=False)
+    birth_length = db.Column(db.Float, nullable=False)
+    head_circumference = db.Column(db.Float, nullable=False)
+    personnel_type = db.Column(db.String(100), nullable=False)
+    personnel_name = db.Column(db.String(255), nullable=False)
+    living_address = db.Column(db.Text, nullable=False)
+    registration_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(20), default='pending')
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 
 
     
@@ -619,9 +636,53 @@ def total_vaccines_count():
 
     return jsonify({ "total": count })
 
+@app.route("/api/pending_registration", methods=["POST"])
+def pending_registration():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
 
+        child_dob = datetime.strptime(data["childDOB"], "%Y-%m-%d").date()
+        mother_dob = datetime.strptime(data["motherDOB"], "%Y-%m-%d").date()
+        registration_date = datetime.strptime(data["registrationDate"], "%Y-%m-%d").date()
+        birth_weight = float(data["birthWeight"])
+        birth_length = float(data["birthLength"])
+        head_circumference = float(data["headCircumference"])
 
+        pending_registration == PendingRegistration(
+            registration_number=data["registrationNumber"],
+            child_name=data["childName"],
+            child_dob=child_dob,
+            nationality=data["nationality"],
+            child_number=data["childNumber"],
+            language=data["language"],
+            mother_name=data["motherName"],
+            mother_dob=mother_dob,
+            birth_location=data["birthLocation"],
+            birth_hospital=data["birthHospital"],
+            delivery_type=data["deliveryType"],
+            surgery=data["surgery"],
+            birth_weight=birth_weight,
+            birth_length=birth_length,
+            head_circumference=head_circumference,
+            personnel_type=data["personnelType"],
+            personnel_name=data["personnelName"],
+            living_address=data["livingAddress"],
+            registration_date=registration_date,
+            status=data.get("status", "PENDING")
+        )
 
+        # Add to session and commit
+        db.session.add(pending_registration)
+        db.session.commit()
+
+        return jsonify({"message": "Registration submitted successfully!"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("Error saving registration:", e)
+        return jsonify({"message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
