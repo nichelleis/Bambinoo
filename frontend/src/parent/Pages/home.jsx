@@ -4,6 +4,7 @@ import Overview from "../Components/OverviewComponent";
 import UpcomingEvent from "../Components/UpcomingEventComponent";
 import DevelopmentMilestonesCard from "../Components/MilestoneSummary";
 import ImmunizationSummary from "../Components/ImmunizationSummary";
+import HealthNote from "../Components/HealthNote";
 
 function Home() {
   return (
@@ -24,7 +25,7 @@ function Home() {
           <DevelopmentMilestonesCard />
         </div>
         <div className="col-md-4 mb-4">
-          <DevelopmentMilestonesCard />
+          <HealthNote />
         </div>
       </div>
     </div>
