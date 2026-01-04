@@ -28,6 +28,10 @@ function ImmunizationSummary() {
     setTotalExpected(data.total);
   };
 
+  const completedCount = completedVaccines.length;
+  const progress =
+    totalExpected > 0 ? Math.round((completedCount / totalExpected) * 100) : 0;
+
   return (
     <div className={`card ${style.dashboardCard}`}>
       <div className={style.cardHeaderCustom}>
