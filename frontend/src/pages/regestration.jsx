@@ -1,4 +1,3 @@
-// Registration.jsx
 import React, { useState } from 'react';
 import style from '../assets/styleSheets/Registration.module.css';
 
@@ -126,7 +125,7 @@ const Registration = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/pending-registration", { // change the fetch link to the databse
+      const response = await fetch("http://127.0.0.1:5000/api/pending_registration", { // change the fetch link to the databse
         method: "POST",
         headers: {
           "Content-Type": "application/json"
