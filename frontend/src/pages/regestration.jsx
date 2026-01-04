@@ -114,12 +114,42 @@ const Registration = () => {
     document.getElementById('progressFill').style.width = `${progressPercentage}%`;
   };
 
-  const submitForm = () => {
+  const submitForm = async () => {
+    if (!confirmCorrect) return;
+
     const regNumber = generateRegistrationNumber();
-    setRegistrationNumber(regNumber);
-    setIsSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    const payload = {
+      registrationNumber: regNumber,
+      ...formData,
+      status: "PENDING"
+    };
+
+    try {
+      const response = await fetch("http://localhost:5000/api/pending-registration", { // change the fetch link to the databse
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Submission failed");
+      }
+
+      setRegistrationNumber(regNumber);
+      setIsSubmitted(true);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error) {
+      setPopupMessage(error.message);
+      setShowPopup(true);
+    }
   };
+
 
   const resetForm = () => {
     setCurrentStep(0);
