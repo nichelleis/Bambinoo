@@ -184,13 +184,11 @@ const Registration = () => {
     <div className={style.container}>
       {!isSubmitted && (
         <>
-          {/* Logo Section */}
           <div className={style.logoSection}>
             <div className={style.logoText}>Welcome to Bambinooo</div>
             <div className={style.subtitle}>Child Health & Development Registry</div>
           </div>
 
-          {/* Progress Bar */}
           <div className={style.progressBar}>
             <div className={style.steps}>
               <div className={style.progressLine}>
@@ -230,7 +228,6 @@ const Registration = () => {
       )}
 
       <div className={style.card}>
-        {/* Step 0: Agreement */}
         <div className={`${style.section} ${currentStep === 0 && !isSubmitted ? style.active : ''}`} id="section0">
           <h2 className={style.sectionTitle}>Terms & Conditions</h2>
           <p className={style.sectionDescription}>
@@ -271,7 +268,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 1: Child Information */}
         <div className={`${style.section} ${currentStep === 1 && !isSubmitted ? style.active : ''}`} id="section1">
           <h2 className={style.sectionTitle}>Child Information</h2>
           <p className={style.sectionDescription}>
@@ -358,7 +354,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 2: Mother Information */}
         <div className={`${style.section} ${currentStep === 2 && !isSubmitted ? style.active : ''}`} id="section2">
           <h2 className={style.sectionTitle}>Mother Information</h2>
           <p className={style.sectionDescription}>
@@ -398,7 +393,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 3: Birth Details */}
         <div className={`${style.section} ${currentStep === 3 && !isSubmitted ? style.active : ''}`} id="section3">
           <h2 className={style.sectionTitle}>Birth Details</h2>
           <p className={style.sectionDescription}>
@@ -526,7 +520,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 4: Medical Personnel */}
         <div className={`${style.section} ${currentStep === 4 && !isSubmitted ? style.active : ''}`} id="section4">
           <h2 className={style.sectionTitle}>Medical Personnel</h2>
           <p className={style.sectionDescription}>
@@ -570,7 +563,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 5: Address */}
         <div className={`${style.section} ${currentStep === 5 && !isSubmitted ? style.active : ''}`} id="section5">
           <h2 className={style.sectionTitle}>Contact Information</h2>
           <p className={style.sectionDescription}>Where can we reach you?</p>
@@ -606,7 +598,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 6: Review & Confirm */}
         <div className={`${style.section} ${currentStep === 6 && !isSubmitted ? style.active : ''}`} id="section6">
           <h2 className={style.sectionTitle}>Review Your Information</h2>
           <p className={style.sectionDescription}>
@@ -735,7 +726,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Success Screen */}
         <div className={`${style.successScreen} ${isSubmitted ? style.active : ''}`} id="successScreen">
           <div className={style.successIcon}>
             <svg viewBox="0 0 52 52">
