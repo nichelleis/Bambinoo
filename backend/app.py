@@ -583,7 +583,7 @@ def milestones_status():
 @app.route("/completed-vaccines")
 @jwt_required()
 def completed_vaccines():
-    
+
     user_id = get_jwt_identity()
     child = Child.query.filter_by(parent_id=user_id).first()
     if not child:
@@ -604,6 +604,19 @@ def completed_vaccines():
         }
         for v in vaccines
     ])
+
+
+@app.route("/total-vaccines-count")
+def total_vaccines_count():
+    count = 0
+    with open("vaccine_schedule.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for _ in reader:
+            count += 1
+
+    return jsonify({ "total": count })
+
+
 
 
 
