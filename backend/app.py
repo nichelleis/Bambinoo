@@ -636,7 +636,52 @@ def total_vaccines_count():
 
     return jsonify({ "total": count })
 
+@app.route("/api/pending_registration", methods=["POST"])
+def pending_registration():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
 
+        child_dob = datetime.strptime(data["childDOB"], "%Y-%m-%d").date()
+        mother_dob = datetime.strptime(data["motherDOB"], "%Y-%m-%d").date()
+        registration_date = datetime.strptime(data["registrationDate"], "%Y-%m-%d").date()
+        birth_weight = float(data["birthWeight"])
+        birth_length = float(data["birthLength"])
+        head_circumference = float(data["headCircumference"])
+
+        new_registration = PendingRegistration(
+            registration_number=data["registrationNumber"],
+            child_name=data["childName"],
+            child_dob=child_dob,
+            nationality=data["nationality"],
+            child_number=data["childNumber"],
+            language=data["language"],
+            mother_name=data["motherName"],
+            mother_dob=mother_dob,
+            birth_location=data["birthLocation"],
+            birth_hospital=data["birthHospital"],
+            delivery_type=data["deliveryType"],
+            surgery=data["surgery"],
+            birth_weight=birth_weight,
+            birth_length=birth_length,
+            head_circumference=head_circumference,
+            personnel_type=data["personnelType"],
+            personnel_name=data["personnelName"],
+            living_address=data["livingAddress"],
+            registration_date=registration_date,
+            status=data.get("status", "PENDING")
+        )
+
+        pending_registration.session.add(new_registration)
+        pending_registration.session.commit()
+
+        return jsonify({"message": "Registration submitted successfully!"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("Error saving registration:", e)
+        return jsonify({"message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
