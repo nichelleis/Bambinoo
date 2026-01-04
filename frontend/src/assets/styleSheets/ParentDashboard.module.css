@@ -428,3 +428,76 @@ nav {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
+
+.healthWheel {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  overflow: visible;
+  margin: auto;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.quadrant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 26px;
+  cursor: pointer;
+  transition: transform 0.25s ease-in-out, filter 0.25s ease;
+  margin: 2px;
+  position: relative;
+}
+
+.quadrant span {
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.quadrant:hover {
+  transform: scale(1.4);
+  z-index: 2;
+  filter: brightness(1.1);
+}
+
+.quadrant:hover span {
+  opacity: 1;
+}
+
+.temp {
+  background: #ff6b6b;
+  border-top-left-radius: 100px;
+  padding-top: 1.9rem;
+  padding-left: 0.7rem;
+}
+
+.meds {
+  background: #4dabf7;
+  border-top-right-radius: 100px;
+  padding-top: 1.9rem;
+  padding-right: 0.7rem;
+}
+
+.symptoms {
+  background: #51cf66;
+  border-bottom-left-radius: 100px;
+  padding-left: 1.4rem;
+}
+
+.symptoms-span {
+  padding-left: 0.5rem;
+}
+
+.notes {
+  background: #f59f00;
+  border-bottom-right-radius: 100px;
+  padding-right: 0.7rem;
+}
