@@ -650,7 +650,7 @@ def pending_registration():
         birth_length = float(data["birthLength"])
         head_circumference = float(data["headCircumference"])
 
-        new_registration = PendingRegistration(
+        pending_registration = PendingRegistration(
             registration_number=data["registrationNumber"],
             child_name=data["childName"],
             child_dob=child_dob,
@@ -673,8 +673,9 @@ def pending_registration():
             status=data.get("status", "PENDING")
         )
 
-        pending_registration.session.add(new_registration)
-        pending_registration.session.commit()
+        # Add to session and commit
+        db.session.add(pending_registration)
+        db.session.commit()
 
         return jsonify({"message": "Registration submitted successfully!"}), 200
 
