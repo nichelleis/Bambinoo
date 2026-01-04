@@ -650,7 +650,7 @@ def pending_registration():
         birth_length = float(data["birthLength"])
         head_circumference = float(data["headCircumference"])
 
-        pending_registration = PendingRegistration(
+        pending_registration == PendingRegistration(
             registration_number=data["registrationNumber"],
             child_name=data["childName"],
             child_dob=child_dob,

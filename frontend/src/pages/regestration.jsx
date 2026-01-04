@@ -113,13 +113,33 @@ const Registration = () => {
     document.getElementById('progressFill').style.width = `${progressPercentage}%`;
   };
 
+  const generateUsername = (childName) => {
+    const namePart = childName.replace(/\s+/g, '').toLowerCase().slice(0, 5);
+    const randomNumber = Math.floor(1000 + Math.random() * 9000);
+    return `${namePart}${randomNumber}`;
+  };
+
+  const generatePassword = () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+    let password = "";
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
+
   const submitForm = async () => {
     if (!confirmCorrect) return;
 
     const regNumber = generateRegistrationNumber();
+    const username = generateUsername(formData.childName);
+    const password = generatePassword();
 
     const payload = {
       registrationNumber: regNumber,
+      username,
+      password,
       ...formData,
       status: "PENDING"
     };
@@ -141,6 +161,10 @@ const Registration = () => {
 
       setRegistrationNumber(regNumber);
       setIsSubmitted(true);
+
+      setPopupMessage(`Registration Successful!\n\nUsername: ${username}\nPassword: ${password}`);
+      setShowPopup(true);
+
       window.scrollTo({ top: 0, behavior: "smooth" });
 
     } catch (error) {
@@ -148,7 +172,6 @@ const Registration = () => {
       setShowPopup(true);
     }
   };
-
 
   const resetForm = () => {
     setCurrentStep(0);
