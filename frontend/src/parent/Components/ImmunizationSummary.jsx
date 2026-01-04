@@ -1,9 +1,11 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function ImmunizationSummary() {
   const [completedVaccines, setCompletedVaccines] = useState([]);
   const [totalExpected, setTotalExpected] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCompletedVaccines();
@@ -92,7 +94,16 @@ function ImmunizationSummary() {
         </div>
       ))}
 
-      <button className="btn btn-outline-primary w-100">
+      {completedCount === 0 && (
+        <div className="text-muted text-center mt-3 mb-3">
+          No vaccines recorded yet
+        </div>
+      )}
+
+      <button
+        className="btn btn-outline-primary w-100"
+        onClick={() => navigate("/parent/analytics")}
+      >
         View All Vaccinations <i className="bi bi-arrow-right"></i>
       </button>
     </div>
