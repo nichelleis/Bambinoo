@@ -1,5 +1,5 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function HealthNote() {
   const getNow = () => {
@@ -20,6 +20,11 @@ function HealthNote() {
     setShowModal(false);
     setActiveForm(null);
   };
+
+  useEffect(() => {
+    document.body.style.overflow = showModal ? "hidden" : "auto";
+    return () => (document.body.style.overflow = "auto");
+  }, [showModal]);
 
   return (
     <div className={`card ${style.dashboardCard}`}>
