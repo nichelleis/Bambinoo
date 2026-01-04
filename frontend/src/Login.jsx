@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import style from "./assets/styleSheets/Login.module.css";
 import logo from "./assets/images/site icon.png";
+import { Link } from "react-router-dom";
 
 const API_URL = "http://127.0.0.1:5000";
 
@@ -106,11 +107,11 @@ const Login = () => {
       <div id="loginSection" className={style.containerWrapper}>
         <div className={style.logoSection}>
           <a href="http://bambinoo.net/">
-           <img src={logo} alt="Bambinoo Logo" className={style.logoImage} />
+            <img src={logo} alt="Bambinoo Logo" className={style.logoImage} />
             <h1 className={style.logoTitle}>Bambinoo</h1>
           </a>
           <p className={style.logoSubtitle}>
-            Digital Child Health and Development Record
+            Sri Lanka Digital Child Health and Development Record
           </p>
         </div>
 
@@ -173,9 +174,9 @@ const Login = () => {
           <div className={style.footerText}>
             <p>
               <a href="#">Forget Password?</a> Reset your password <br />
-              <a href="Patient_Registration.html">
+              <Link to="/register">
                 Don't have an account?
-              </a>{" "}
+              </Link>
               Visit your nearest clinic.
             </p>
             <a href="http://bambinoo.net/" className={style.footerLink}>

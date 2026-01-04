@@ -18,8 +18,8 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'bambinoo.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'bambinoo-secret-key'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=6)
+app.config['JWT_SECRET_KEY'] = '12E0C9DA3A6F965C'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
 
 
 app.secret_key = "3245567562534q4534635q"
