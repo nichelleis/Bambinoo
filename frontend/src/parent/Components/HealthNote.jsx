@@ -78,10 +78,10 @@ function HealthNote() {
       </div>
 
       {showModal && (
-        <div className="modal-backdrop-custom">
-          <div className="modal-card p-4">
+        <div className={style.modalBackdropCustom}>
+          <div className={`${style.modalCard} p-4`}>
             {activeForm === "symptoms" && (
-              <div className="record-form">
+              <div className={style.recordForm}>
                 <h4>Record Symptoms</h4>
                 <hr />
                 <label>Symptom Type</label>
@@ -104,14 +104,14 @@ function HealthNote() {
                   onChange={(e) => setNoticedAt(e.target.value)}
                 />
 
-                <button className="btn-primary-custom">
+                <button className={style.btnPrimaryCustom}>
                   <i className="bi bi-save p-2"></i>Save Weight
                 </button>
               </div>
             )}
 
             {activeForm === "medication" && (
-              <div className="record-form">
+              <div className={style.recordForm}>
                 <h4>Record Medication</h4>
                 <hr />
                 <label>Medication Name</label>
@@ -130,14 +130,14 @@ function HealthNote() {
                   onChange={(e) => setNoticedAt(e.target.value)}
                 />
 
-                <button className="btn-primary-custom">
+                <button className={style.btnPrimaryCustom}>
                   <i className="bi bi-save p-2"></i>Save Medication
                 </button>
               </div>
             )}
 
             {activeForm === "temperature" && (
-              <div className="record-form">
+              <div className={style.recordForm}>
                 <h4>Record Temperature</h4>
                 <hr />
                 <label>Temperature (°C)</label>
@@ -156,14 +156,14 @@ function HealthNote() {
                   placeholder="Any symptoms or observations..."
                 ></textarea>
 
-                <button className="btn-primary-custom">
+                <button className={style.btnPrimaryCustom}>
                   <i className="bi bi-save p-2"></i>Save Temperature
                 </button>
               </div>
             )}
 
             {activeForm === "note" && (
-              <div className="record-form">
+              <div className={style.recordForm}>
                 <h4>Add Health Note</h4>
                 <hr />
 
@@ -186,13 +186,13 @@ function HealthNote() {
                   onChange={(e) => setNoticedAt(e.target.value)}
                 />
 
-                <button className="btn-primary-custom">
+                <button className={style.btnPrimaryCustom}>
                   <i className="bi bi-save p-2"></i>Save Note
                 </button>
               </div>
             )}
             <button
-              className="record-close-btn btn btn-secondary"
+              className={`${style.recordCloseBtn} btn btn-secondary`}
               onClick={closeModal}
             >
               Cancel
