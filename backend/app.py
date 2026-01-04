@@ -609,7 +609,10 @@ def completed_vaccines():
 @app.route("/total-vaccines-count")
 def total_vaccines_count():
     count = 0
-    with open("vaccine_schedule.csv", newline="") as csvfile:
+
+    csv_path = os.path.join(BASE_DIR, "vaccine_schedule.csv")
+
+    with open(csv_path, newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for _ in reader:
             count += 1

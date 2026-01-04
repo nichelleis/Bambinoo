@@ -1,6 +1,33 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
+import { useEffect, useState } from "react";
 
 function ImmunizationSummary() {
+  const [completedVaccines, setCompletedVaccines] = useState([]);
+  const [totalExpected, setTotalExpected] = useState(0);
+
+  useEffect(() => {
+    fetchCompletedVaccines();
+    fetchTotalExpected();
+  }, []);
+
+  const fetchCompletedVaccines = async () => {
+    const token = localStorage.getItem("token");
+    const completedRes = await fetch("http://127.0.0.1:5000/milestone-status", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const completedData = await completedRes.json();
+
+    setCompletedVaccines(completedData);
+  };
+
+  const fetchTotalExpected = async () => {
+    const res = await fetch("http://127.0.0.1:5000/total-vaccines-count");
+    const data = await res.json();
+    setTotalExpected(data.total);
+  };
+
   return (
     <div className={`card ${style.dashboardCard}`}>
       <div className={style.cardHeaderCustom}>
