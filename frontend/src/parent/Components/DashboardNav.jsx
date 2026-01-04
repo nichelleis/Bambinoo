@@ -68,10 +68,16 @@ function SideNav() {
 
         <ul className={style.logout}>
           <li>
-            <NavLink to="/logout">
+            <button
+              onClick={() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                window.location.href = "/";
+              }}
+            >
               <i className="bi bi-box-arrow-left"></i>
               <span className={style.navText}>Logout</span>
-            </NavLink>
+            </button>
           </li>
         </ul>
       </div>
