@@ -580,6 +580,46 @@ def milestones_status():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route("/completed-vaccines")
+@jwt_required()
+def completed_vaccines():
+
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+        return jsonify([])
+
+    vaccines = (
+        Vaccination.query
+        .filter_by(child_id=child.id, status="completed")
+        .order_by(Vaccination.administered_date.desc())
+        .all()
+    )
+
+    return jsonify([
+        {
+            "vaccine_name": v.vaccine_name,
+            "dose_number": v.dose_number,
+            "administered_date": v.administered_date.isoformat()
+        }
+        for v in vaccines
+    ])
+
+
+@app.route("/total-vaccines-count")
+def total_vaccines_count():
+    count = 0
+
+    csv_path = os.path.join(BASE_DIR, "vaccine_schedule.csv")
+
+    with open(csv_path, newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for _ in reader:
+            count += 1
+
+    return jsonify({ "total": count })
+
+
 
 
 
