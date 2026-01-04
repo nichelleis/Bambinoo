@@ -260,6 +260,11 @@ nav {
   background-color: rgba(254, 192, 99, 0.155);
 }
 
+.iconPurple {
+  color: #4f46e5;
+  background-color: #4e46e540;
+}
+
 .shieldIconCustom {
   background: rgba(78, 205, 196, 0.15);
   width: 44px;
@@ -359,4 +364,36 @@ nav {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+.badgeStatus {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badgeCompleted {
+  background: rgba(46, 204, 113, 0.15);
+  color: var(--success);
+}
+
+.immunizationHeading {
+  font-size: 0.9rem;
+}
+
+.completedVaccineCard {
+  padding: 0.8rem;
+  background-color: #a1e3b11e;
+  border-radius: 12px;
+}
+
+.completedVaccineCardMainText {
+  font-size: 01rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+.completedVaccineCardText {
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
