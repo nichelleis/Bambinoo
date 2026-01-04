@@ -580,6 +580,30 @@ def milestones_status():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route("/completed-vaccines")
+@jwt_required()
+def completed_vaccines():
+    
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+        return jsonify([])
+
+    vaccines = (
+        Vaccination.query
+        .filter_by(child_id=child.id, status="completed")
+        .order_by(Vaccination.administered_date.desc())
+        .all()
+    )
+
+    return jsonify([
+        {
+            "vaccine_name": v.vaccine_name,
+            "dose_number": v.dose_number,
+            "administered_date": v.administered_date.isoformat()
+        }
+        for v in vaccines
+    ])
 
 
 
