@@ -1,4 +1,3 @@
-// Registration.jsx
 import React, { useState } from 'react';
 import style from '../assets/styleSheets/Registration.module.css';
 
@@ -114,11 +113,64 @@ const Registration = () => {
     document.getElementById('progressFill').style.width = `${progressPercentage}%`;
   };
 
-  const submitForm = () => {
+  const generateUsername = (childName) => {
+    const namePart = childName.replace(/\s+/g, '').toLowerCase().slice(0, 5);
+    const randomNumber = Math.floor(1000 + Math.random() * 9000);
+    return `${namePart}${randomNumber}`;
+  };
+
+  const generatePassword = () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+    let password = "";
+    for (let i = 0; i < 8; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
+
+  const submitForm = async () => {
+    if (!confirmCorrect) return;
+
     const regNumber = generateRegistrationNumber();
-    setRegistrationNumber(regNumber);
-    setIsSubmitted(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const username = generateUsername(formData.childName);
+    const password = generatePassword();
+
+    const payload = {
+      registrationNumber: regNumber,
+      username,
+      password,
+      ...formData,
+      status: "PENDING"
+    };
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/pending_registration", { // change the fetch link to the databse
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Submission failed");
+      }
+
+      setRegistrationNumber(regNumber);
+      setIsSubmitted(true);
+
+      setPopupMessage(`Registration Successful!\n\nUsername: ${username}\nPassword: ${password}`);
+      setShowPopup(true);
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+    } catch (error) {
+      setPopupMessage(error.message);
+      setShowPopup(true);
+    }
   };
 
   const resetForm = () => {
@@ -154,13 +206,11 @@ const Registration = () => {
     <div className={style.container}>
       {!isSubmitted && (
         <>
-          {/* Logo Section */}
           <div className={style.logoSection}>
             <div className={style.logoText}>Welcome to Bambinooo</div>
             <div className={style.subtitle}>Child Health & Development Registry</div>
           </div>
 
-          {/* Progress Bar */}
           <div className={style.progressBar}>
             <div className={style.steps}>
               <div className={style.progressLine}>
@@ -200,7 +250,6 @@ const Registration = () => {
       )}
 
       <div className={style.card}>
-        {/* Step 0: Agreement */}
         <div className={`${style.section} ${currentStep === 0 && !isSubmitted ? style.active : ''}`} id="section0">
           <h2 className={style.sectionTitle}>Terms & Conditions</h2>
           <p className={style.sectionDescription}>
@@ -241,7 +290,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 1: Child Information */}
         <div className={`${style.section} ${currentStep === 1 && !isSubmitted ? style.active : ''}`} id="section1">
           <h2 className={style.sectionTitle}>Child Information</h2>
           <p className={style.sectionDescription}>
@@ -328,7 +376,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 2: Mother Information */}
         <div className={`${style.section} ${currentStep === 2 && !isSubmitted ? style.active : ''}`} id="section2">
           <h2 className={style.sectionTitle}>Mother Information</h2>
           <p className={style.sectionDescription}>
@@ -368,7 +415,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 3: Birth Details */}
         <div className={`${style.section} ${currentStep === 3 && !isSubmitted ? style.active : ''}`} id="section3">
           <h2 className={style.sectionTitle}>Birth Details</h2>
           <p className={style.sectionDescription}>
@@ -496,7 +542,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 4: Medical Personnel */}
         <div className={`${style.section} ${currentStep === 4 && !isSubmitted ? style.active : ''}`} id="section4">
           <h2 className={style.sectionTitle}>Medical Personnel</h2>
           <p className={style.sectionDescription}>
@@ -540,7 +585,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 5: Address */}
         <div className={`${style.section} ${currentStep === 5 && !isSubmitted ? style.active : ''}`} id="section5">
           <h2 className={style.sectionTitle}>Contact Information</h2>
           <p className={style.sectionDescription}>Where can we reach you?</p>
@@ -576,7 +620,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Step 6: Review & Confirm */}
         <div className={`${style.section} ${currentStep === 6 && !isSubmitted ? style.active : ''}`} id="section6">
           <h2 className={style.sectionTitle}>Review Your Information</h2>
           <p className={style.sectionDescription}>
@@ -705,7 +748,6 @@ const Registration = () => {
           </div>
         </div>
 
-        {/* Success Screen */}
         <div className={`${style.successScreen} ${isSubmitted ? style.active : ''}`} id="successScreen">
           <div className={style.successIcon}>
             <svg viewBox="0 0 52 52">
