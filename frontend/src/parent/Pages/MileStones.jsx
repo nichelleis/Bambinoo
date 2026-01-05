@@ -35,6 +35,20 @@ function Milestones() {
     setSelectedGroup(group);
   };
 
+  const getProgressData = () => {
+    const progress = {};
+
+    Object.entries(milestones).forEach(([category, items]) => {
+      const total = items.length;
+      const completed = items.filter((m) => m.completed).length;
+      const percentage = total ? Math.round((completed / total) * 100) : 0;
+
+      progress[category] = { total, completed, percentage };
+    });
+
+    return progress;
+  };
+
   const categoryConfig = {
     Motor: {
       icon: <i className="bi bi-person-walking"></i>,
@@ -115,6 +129,7 @@ function Milestones() {
           ) : (
             Object.entries(milestones).map(([category, items]) => {
               const config = categoryConfig[category] || categoryConfig.Motor;
+              const progressData = getProgressData()[category];
 
               return (
                 <div key={category} className={style.categoryCard}>
@@ -138,7 +153,7 @@ function Milestones() {
                         color: config.color,
                       }}
                     >
-                      4/10
+                      {progressData.completed}/{progressData.total}
                     </div>
                   </div>
 
@@ -146,7 +161,7 @@ function Milestones() {
                     <div
                       className={style.categoryProgressFill}
                       style={{
-                        width: `45%`,
+                        width: `${progressData.percentage}%`,
                         backgroundColor: config.color,
                       }}
                     ></div>
