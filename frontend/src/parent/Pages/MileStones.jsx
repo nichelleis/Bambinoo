@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 function Milestones() {
   const [ageGroups, setAgeGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("all");
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/age-groups")
@@ -51,7 +52,13 @@ function Milestones() {
         </div>
         <div className={style.ageGroupButtons}>
           {ageGroups.map((group) => (
-            <button key={group.id} className={style.ageBtn}>
+            <button
+              key={group.id}
+              onClick={() => setSelectedGroup(group.id)}
+              className={`${style.ageBtn} ${
+                selectedGroup === group.id ? style.active : ""
+              }`}
+            >
               {group.text}
             </button>
           ))}
