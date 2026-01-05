@@ -236,15 +236,16 @@ function Milestones() {
                 Progress Breakdown
               </h3>
             </div>
-            <div>
+            <div className={style.progressStats}>
               {Object.entries(getProgressData()).map(([category, data]) => {
                 const config = categoryConfig[category] || categoryConfig.Motor;
 
                 return (
-                  <div key={category}>
-                    <div>
-                      <div>
+                  <div key={category} className={style.progressStatItem}>
+                    <div className={style.statHeader}>
+                      <div className={style.statLabel}>
                         <span
+                          className={style.statIcon}
                           style={{
                             backgroundColor: config.bgColor,
                             color: config.color,
@@ -252,15 +253,19 @@ function Milestones() {
                         >
                           {config.icon}
                         </span>
-                        <span>{category}</span>
+                        <span className={style.statName}>{category}</span>
                       </div>
-                      <span style={{ color: config.color }}>
+                      <span
+                        className={style.statPercentage}
+                        style={{ color: config.color }}
+                      >
                         {data.percentage}%
                       </span>
                     </div>
 
-                    <div>
+                    <div className={style.statBar}>
                       <div
+                        className={style.statBarFill}
                         style={{
                           width: `${data.percentage}%`,
                           backgroundColor: config.color,
@@ -268,7 +273,7 @@ function Milestones() {
                       ></div>
                     </div>
 
-                    <div>
+                    <div className={style.statCount}>
                       {data.completed} of {data.total} completed
                     </div>
                   </div>
