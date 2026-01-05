@@ -69,6 +69,20 @@ function Milestones() {
     return progress;
   };
 
+  const getOverallProgress = () => {
+    let totalMilestones = 0;
+    let completedMilestones = 0;
+
+    Object.values(milestones).forEach((items) => {
+      totalMilestones += items.length;
+      completedMilestones += items.filter((m) => m.completed).length;
+    });
+
+    return totalMilestones
+      ? Math.round((completedMilestones / totalMilestones) * 100)
+      : 0;
+  };
+
   const categoryConfig = {
     Motor: {
       icon: <i className="bi bi-person-walking"></i>,
@@ -236,6 +250,23 @@ function Milestones() {
                 Progress Breakdown
               </h3>
             </div>
+
+            <div className={style.overallProgressCard}>
+              <div
+                className={style.progressCircle}
+                style={{
+                  background: `conic-gradient(#6C63FF ${getOverallProgress()}%, #e0e0e0 0)`,
+                }}
+              >
+                <div className={style.progressInner}>
+                  <span className={style.progressNumber}>
+                    {getOverallProgress()}%
+                  </span>
+                  <span className={style.progressLabel}>Complete</span>
+                </div>
+              </div>
+            </div>
+
             <div className={style.progressStats}>
               {Object.entries(getProgressData()).map(([category, data]) => {
                 const config = categoryConfig[category] || categoryConfig.Motor;
