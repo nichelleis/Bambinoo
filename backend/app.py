@@ -714,6 +714,43 @@ def pending_registration():
         print("Error saving registration:", e)
         return jsonify({"message": str(e)}), 500
 
+
+
+
+@app.route("/age-groups", methods=["GET"])
+def get_age_groups():
+   
+    age_groups = []
+    seen = set()
+    
+    with open("final_milestones.csv", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            group_id = int(row["AgeGroup"])
+            if group_id not in seen:
+                seen.add(group_id)
+                age_groups.append({
+                    "id": group_id,
+                    "text": f"{row['min_age']}-{row['max_age']}"
+                })
+
+    age_groups.sort(key=lambda x: x["id"])
+    
+    age_groups = [{"id": "all", "text": "All"}] + age_groups
+
+    return jsonify(age_groups)
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
