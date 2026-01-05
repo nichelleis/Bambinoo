@@ -714,6 +714,137 @@ def pending_registration():
         print("Error saving registration:", e)
         return jsonify({"message": str(e)}), 500
 
+
+
+
+@app.route("/age-groups", methods=["GET"])
+def get_age_groups():
+   
+    age_groups = []
+    seen = set()
+    
+    csv_path = os.path.join(BASE_DIR, "final_milestones.csv")
+
+    with open(csv_path, encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            group_id = int(row["AgeGroup"])
+            if group_id not in seen:
+                seen.add(group_id)
+                age_groups.append({
+                    "id": group_id,
+                    "text": f"{row['min_age']}-{row['max_age']}"
+                })
+
+    age_groups.sort(key=lambda x: x["id"])
+    
+    age_groups = [{"id": "all", "text": "All"}] + age_groups
+
+    return jsonify(age_groups)
+
+
+
+@app.route("/milestones", methods=["GET"])
+@jwt_required()
+def get_milestones():
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+        return jsonify({})
+
+    age_group = request.args.get("age_group", "all")
+
+    completed_ids = {
+        m.milestone_id
+        for m in Milestone.query.filter_by(child_id=child.id).all()
+    }
+
+    grouped = defaultdict(list)
+
+    csv_path = os.path.join(BASE_DIR, "final_milestones.csv")
+
+    with open(csv_path, encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            row_group = int(row["AgeGroup"])
+            category = row["Category"]
+            milestone_id = int(row["id"])
+
+
+            if age_group != "all" and row_group != int(age_group):
+                continue
+
+            grouped[category].append({
+                "id": milestone_id,
+                "description": row["MilestoneDescription"],
+                "min_age": int(row["min_age"]),
+                "max_age": int(row["max_age"]),
+                "age_group": row_group,
+                "completed": milestone_id in completed_ids
+            })
+
+    return jsonify(grouped)
+
+
+
+
+@app.route("/milestones/toggle", methods=["POST"])
+@jwt_required()
+def toggle_milestone():
+
+    data = request.get_json()
+
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+        return jsonify({})
+
+    milestone_id = data["milestone_id"]
+    category = data["category"]
+
+    existing = Milestone.query.filter_by(
+        child_id=child.id,
+        milestone_id=milestone_id
+    ).first()
+
+    if existing:
+        db.session.delete(existing)
+    else:
+        min_age = max_age = None
+        description = None
+
+
+        csv_path = os.path.join(BASE_DIR, "final_milestones.csv")
+
+
+        with open(csv_path, encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if int(row["id"]) == milestone_id:
+                    min_age = int(row["min_age"])
+                    max_age = int(row["max_age"])
+                    description = row["MilestoneDescription"]
+                    break
+
+        db.session.add(Milestone(
+            child_id=child.id,
+            milestone_id=milestone_id,
+            category=category,
+            description=description,
+            min_age=min_age,
+            max_age=max_age,
+            achieved_date=date.today()
+        ))
+
+    db.session.commit()
+    return jsonify({"success": True})
+
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
