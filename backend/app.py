@@ -134,6 +134,20 @@ class Milestone(db.Model):
     max_age = db.Column(db.Integer)  
     achieved_date = db.Column(db.Date)
 
+class Vaccination(db.Model):
+    __tablename__ = 'vaccination'
+    id = db.Column(db.Integer, primary_key=True)
+    child_id = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
+    vaccine_name = db.Column(db.String(100), nullable=False)  
+    dose_number = db.Column(db.String(20))  
+    due_date = db.Column(db.Date)
+    administered_date = db.Column(db.Date)
+    status = db.Column(db.String(20), default='scheduled') 
+    administered_by = db.Column(db.String(100)) 
+    location = db.Column(db.String(200))
+    batch_number = db.Column(db.String(50))
+    notes = db.Column(db.Text)
+    
 class PendingRegistration(db.Model):
     __tablename__ = 'pending_registration'
 
@@ -167,8 +181,6 @@ class PendingRegistration(db.Model):
         onupdate=datetime.utcnow
     )
 
-
-    
 
 with app.app_context():
     db.create_all()
@@ -636,7 +648,7 @@ def total_vaccines_count():
 
     return jsonify({ "total": count })
 
-@app.route("/api/pending_registration", methods=["POST"])
+@app.route("/pending_registration", methods=["POST"])
 def pending_registration():
     try:
         data = request.get_json()
@@ -650,7 +662,7 @@ def pending_registration():
         birth_length = float(data["birthLength"])
         head_circumference = float(data["headCircumference"])
 
-        pending_registration == PendingRegistration(
+        pending_registration = PendingRegistration(
             registration_number=data["registrationNumber"],
             child_name=data["childName"],
             child_dob=child_dob,
