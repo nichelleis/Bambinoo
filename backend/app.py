@@ -744,6 +744,48 @@ def get_age_groups():
 
 
 
+@app.route("/milestones", methods=["GET"])
+@jwt_required()
+def get_milestones():
+    user_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=user_id).first()
+    if not child:
+        return jsonify({})
+
+    age_group = request.args.get("age_group", "all")
+
+    completed_ids = {
+        m.milestone_id
+        for m in Milestone.query.filter_by(child_id=child.id).all()
+    }
+
+    grouped = defaultdict(list)
+
+    csv_path = os.path.join(BASE_DIR, "final_milestones.csv")
+
+    with open(csv_path, encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            row_group = int(row["AgeGroup"])
+            category = row["Category"]
+            milestone_id = int(row["id"])
+
+
+            if age_group != "all" and row_group != int(age_group):
+                continue
+
+            grouped[category].append({
+                "id": milestone_id,
+                "description": row["MilestoneDescription"],
+                "min_age": int(row["min_age"]),
+                "max_age": int(row["max_age"]),
+                "age_group": row_group,
+                "completed": milestone_id in completed_ids
+            })
+
+    return jsonify(grouped)
+
+
 
 
 
