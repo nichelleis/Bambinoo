@@ -466,7 +466,6 @@
     line-height: 1.6;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .container {
         padding: 20px 10px;

@@ -23,8 +23,6 @@ with app.app_context():
     db.session.add_all([boy, girl])
     db.session.commit()
 
-    
-
     db.session.add_all([
     GrowthRecord(
         child_id=boy.id,
