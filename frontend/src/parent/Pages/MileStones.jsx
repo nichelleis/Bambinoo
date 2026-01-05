@@ -34,7 +34,7 @@ function Milestones() {
           <button className={style.ageBtn}>10 months</button>
           <button className={style.ageBtn}>1 year</button>
           <button className={style.ageBtn}>15 months</button>
-          <button> className={style.ageBtn}18 months</button>
+          <button className={style.ageBtn}> 18 months</button>
           <button className={style.ageBtn}>2years</button>
           <button className={style.ageBtn}>30 months</button>
           <button className={style.ageBtn}>3years</button>

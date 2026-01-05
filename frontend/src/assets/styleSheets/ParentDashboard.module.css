@@ -664,3 +664,53 @@ nav {
   opacity: 0.95;
   margin: 0;
 }
+
+.filterLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.ageGroupButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ageBtn {
+  padding: 8px 16px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.ageBtn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #ff63e81a, transparent);
+  transition: left 0.5s ease;
+}
+
+.ageBtn:hover::before {
+  left: 100%;
+}
+
+.ageBtn:hover {
+  border-color: #ff63f2dc;
+  color: #ff63f2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px #ff63f25c;
+}
