@@ -5,6 +5,7 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 from dateutil.relativedelta import relativedelta
 import csv
 from collections import defaultdict
@@ -34,7 +35,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20))
     role = db.Column(db.String(50), nullable=False, default='parent')
 
@@ -147,11 +148,42 @@ class Vaccination(db.Model):
     location = db.Column(db.String(200))
     batch_number = db.Column(db.String(50))
     notes = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-
     
+class PendingRegistration(db.Model):
+    __tablename__ = 'pending_registration'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    registration_number = db.Column(db.String(100), unique=True, nullable=False)
+    child_name = db.Column(db.String(255), nullable=False)
+    child_dob = db.Column(db.Date, nullable=False)
+    nationality = db.Column(db.String(100), nullable=False)
+    child_number = db.Column(db.String(10), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
+    mother_name = db.Column(db.String(255), nullable=False)
+    mother_dob = db.Column(db.Date, nullable=False)
+    mother_email = db.Column(db.String, nullable=False)
+    mother_phone = db.Column(db.String, nullable=False)
+    birth_location = db.Column(db.String(255), nullable=False)
+    birth_hospital = db.Column(db.String(255), nullable=False)
+    delivery_type = db.Column(db.String(100), nullable=False)
+    surgery = db.Column(db.String(10), nullable=False)
+    birth_weight = db.Column(db.Float, nullable=False)
+    birth_length = db.Column(db.Float, nullable=False)
+    head_circumference = db.Column(db.Float, nullable=False)
+    personnel_type = db.Column(db.String(100), nullable=False)
+    personnel_name = db.Column(db.String(255), nullable=False)
+    living_address = db.Column(db.Text, nullable=False)
+    registration_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(20), default='pending')
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
 
 with app.app_context():
     db.create_all()
@@ -619,9 +651,68 @@ def total_vaccines_count():
 
     return jsonify({ "total": count })
 
+@app.route("/pending_registration", methods=["POST"])
+def pending_registration():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
+        
+        password_hash=generate_password_hash(data["password"])
 
+        new_user = User(
+            username=data["username"],
+            password_hash=password_hash,
+            email=data["motherEmail"],
+            phone=data["motherPhone"],
+            role="parent"
+        )
 
+        db.session.add(new_user)
+        db.session.flush()
 
+        child_dob = datetime.strptime(data["childDOB"], "%Y-%m-%d").date()
+        mother_dob = datetime.strptime(data["motherDOB"], "%Y-%m-%d").date()
+        registration_date = datetime.strptime(data["registrationDate"], "%Y-%m-%d").date()
+        birth_weight = float(data["birthWeight"])
+        birth_length = float(data["birthLength"])
+        head_circumference = float(data["headCircumference"])
+
+        pending_registration = PendingRegistration(
+            registration_number=data["registrationNumber"],
+            child_name=data["childName"],
+            child_dob=child_dob,
+            nationality=data["nationality"],
+            child_number=data["childNumber"],
+            language=data["language"],
+            mother_name=data["motherName"],
+            mother_dob=mother_dob,
+            mother_email=data["motherEmail"],
+            mother_phone=data["motherPhone"],
+            birth_location=data["birthLocation"],
+            birth_hospital=data["birthHospital"],
+            delivery_type=data["deliveryType"],
+            surgery=data["surgery"],
+            birth_weight=birth_weight,
+            birth_length=birth_length,
+            head_circumference=head_circumference,
+            personnel_type=data["personnelType"],
+            personnel_name=data["personnelName"],
+            living_address=data["livingAddress"],
+            registration_date=registration_date,
+            status=data.get("status", "PENDING")
+        )
+
+        # Add to session and commit
+        db.session.add(pending_registration)
+        db.session.commit()
+
+        return jsonify({"message": "Registration submitted successfully!"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("Error saving registration:", e)
+        return jsonify({"message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
