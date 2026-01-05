@@ -19,6 +19,8 @@ const Registration = () => {
     language: '',
     motherName: '',
     motherDOB: '',
+    motherEmail: '',
+    motherPhone: '',
     birthLocation: '',
     birthHospital: '',
     deliveryType: '',
@@ -59,7 +61,12 @@ const Registration = () => {
         );
 
       case 2:
-        return formData.motherName && formData.motherDOB;
+        return (
+          formData.motherName &&
+          formData.motherDOB &&
+          formData.motherEmail &&
+          formData.motherPhone
+        );
 
       case 3:
         return (
@@ -186,6 +193,8 @@ const Registration = () => {
       language: '',
       motherName: '',
       motherDOB: '',
+      motherEmail: '',
+      motherPhone: '',
       birthLocation: '',
       birthHospital: '',
       deliveryType: '',
@@ -400,6 +409,31 @@ const Registration = () => {
               name="motherDOB"
               value={formData.motherDOB}
               onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className={style.formGroup}>
+            <label>Email Address <span className={style.required}>*</span></label>
+            <input
+              type="email"
+              name="motherEmail"
+              value={formData.motherEmail}
+              onChange={handleInputChange}
+              placeholder="example@email.com"
+              required
+            />
+          </div>
+
+          <div className={style.formGroup}>
+            <label>Phone Number <span className={style.required}>*</span></label>
+            <input
+              type="tel"
+              name="motherPhone"
+              value={formData.motherPhone}
+              onChange={handleInputChange}
+              placeholder="07XXXXXXXX"
+              pattern="[0-9]{10}"
               required
             />
           </div>
@@ -656,6 +690,12 @@ const Registration = () => {
                 <div className={style.reviewItem}>
                   <strong>Date of Birth:</strong> {formData.motherDOB}
                 </div>
+                <div className={style.reviewItem}>
+                  <strong>Email:</strong> {formData.motherEmail}
+                </div>
+                <div className={style.reviewItem}>
+                  <strong>Phone Number:</strong> {formData.motherPhone}
+                </div>
               </div>
             </div>
 
@@ -778,22 +818,24 @@ const Registration = () => {
           </button>
         </div>
       </div>
-      {showPopup && (
-        <div className={style.popupOverlay}>
-          <div className={style.popupBox}>
-            <h3 className={style.popupTitle}>⚠ Required Fields</h3>
-            <p className={style.popupMessage}>{popupMessage}</p>
-            <button
-              className={`${style.btn} ${style.btnPrimary}`}
-              onClick={() => setShowPopup(false)}
-            >
-              OK
-            </button>
+      {
+        showPopup && (
+          <div className={style.popupOverlay}>
+            <div className={style.popupBox}>
+              <h3 className={style.popupTitle}>⚠ Required Fields</h3>
+              <p className={style.popupMessage}>{popupMessage}</p>
+              <button
+                className={`${style.btn} ${style.btnPrimary}`}
+                onClick={() => setShowPopup(false)}
+              >
+                OK
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+    </div >
   );
 };
 
