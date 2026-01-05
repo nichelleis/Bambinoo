@@ -35,7 +35,6 @@ function Milestones() {
     setSelectedGroup(group);
   };
 
-
   const categoryConfig = {
     Motor: {
       icon: <i className="bi bi-person-walking"></i>,
@@ -106,10 +105,10 @@ function Milestones() {
           ))}
         </div>
       </div>
-      <div className="milestone-grid">
-        <div className="milestones-section">
+      <div className={style.milestoneGrid}>
+        <div className={style.milestonesSection}>
           {Object.keys(milestones).length === 0 ? (
-            <div className="empty-state">
+            <div className={style.emptyState}>
               <h3>No milestones for this age group</h3>
               <p>Could not find any milestones</p>
             </div>
@@ -118,14 +117,14 @@ function Milestones() {
               const config = categoryConfig[category] || categoryConfig.Motor;
 
               return (
-                <div key={category} className="category-card">
+                <div key={category} className={style.categoryCard}>
                   <div
-                    className="category-header"
+                    className={style.categoryHeader}
                     style={{ borderLeftColor: config.color }}
                   >
-                    <div className="category-title">
+                    <div className={style.categoryTitle}>
                       <span
-                        className="category-icon"
+                        className={style.categoryIcon}
                         style={{ color: config.color }}
                       >
                         {config.icon}
@@ -133,19 +132,19 @@ function Milestones() {
                       <h3>{category} Skills</h3>
                     </div>
                     <div
-                      className="category-badge"
+                      className={style.categoryBadge}
                       style={{
                         backgroundColor: config.bgColor,
                         color: config.color,
                       }}
                     >
-                
+                      4/10
                     </div>
                   </div>
 
-                  <div className="category-progress-bar">
+                  <div className={style.categoryProgressBar}>
                     <div
-                      className="category-progress-fill"
+                      className={style.categoryProgressFill}
                       style={{
                         width: `45%`,
                         backgroundColor: config.color,
@@ -153,30 +152,30 @@ function Milestones() {
                     ></div>
                   </div>
 
-                  <div className="milestone-list">
+                  <div className={style.milestoneList}>
                     {items.map((m) => (
                       <div
                         key={m.id}
-                        className={`milestone-item ${
-                          m.completed ? "completed" : ""
-                        } `}
+                        className={`${style.milestoneItem} ${
+                          m.completed ? style.completed : ""
+                        }`}
                       >
-                        <label className="milestone-checkbox">
+                        <label className={style.milestoneCheckbox}>
                           <input type="checkbox" checked={m.completed} />
                           <span
-                            className="checkbox-custom"
+                            className={style.checkboxCustom}
                             style={{ borderColor: config.color }}
                           >
                             <i className="bi bi-check-lg"></i>
                           </span>
                         </label>
 
-                        <div className="milestone-content">
-                          <span className="milestone-text">
+                        <div className={style.milestoneContent}>
+                          <span className={style.milestoneText}>
                             {m.description}
                           </span>
                           {m.completed && (
-                            <span className="completion-badge">
+                            <span className={style.completionBadge}>
                               <i className="bi bi-trophy-fill me-1"></i>
                               Achieved!
                             </span>
