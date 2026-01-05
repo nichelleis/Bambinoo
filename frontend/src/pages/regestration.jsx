@@ -128,7 +128,6 @@ const Registration = () => {
     return password;
   };
 
-
   const submitForm = async () => {
     if (!confirmCorrect) return;
 
@@ -145,7 +144,7 @@ const Registration = () => {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/pending_registration", { // change the fetch link to the databse
+      const response = await fetch("http://127.0.0.1:5000/pending_registration", { // change the fetch link to the databse
         method: "POST",
         headers: {
           "Content-Type": "application/json"
