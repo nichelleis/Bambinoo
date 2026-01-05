@@ -228,6 +228,55 @@ function Milestones() {
             })
           )}
         </div>
+        <div className={style.progressSidebar}>
+          <div className={style.dashboardCard}>
+            <div className={style.progressCardHeader}>
+              <h3>
+                <i className="bi bi-pie-chart-fill me-2"></i>
+                Progress Breakdown
+              </h3>
+            </div>
+            <div>
+              {Object.entries(getProgressData()).map(([category, data]) => {
+                const config = categoryConfig[category] || categoryConfig.Motor;
+
+                return (
+                  <div key={category}>
+                    <div>
+                      <div>
+                        <span
+                          style={{
+                            backgroundColor: config.bgColor,
+                            color: config.color,
+                          }}
+                        >
+                          {config.icon}
+                        </span>
+                        <span>{category}</span>
+                      </div>
+                      <span style={{ color: config.color }}>
+                        {data.percentage}%
+                      </span>
+                    </div>
+
+                    <div>
+                      <div
+                        style={{
+                          width: `${data.percentage}%`,
+                          backgroundColor: config.color,
+                        }}
+                      ></div>
+                    </div>
+
+                    <div>
+                      {data.completed} of {data.total} completed
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
