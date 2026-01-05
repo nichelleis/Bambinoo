@@ -35,6 +35,26 @@ function Milestones() {
     setSelectedGroup(group);
   };
 
+  const toggleMilestone = (milestone, category) => {
+    const token = localStorage.getItem("token");
+
+    fetch("http://127.0.0.1:5000/milestones/toggle", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        milestone_id: milestone.id,
+        category: category,
+      }),
+    })
+      .then(() => {
+        fetchMilestones(selectedGroup);
+      })
+      .catch((err) => console.error(err));
+  };
+
   const getProgressData = () => {
     const progress = {};
 
@@ -176,7 +196,11 @@ function Milestones() {
                         }`}
                       >
                         <label className={style.milestoneCheckbox}>
-                          <input type="checkbox" checked={m.completed} />
+                          <input
+                            type="checkbox"
+                            checked={m.completed}
+                            onChange={() => toggleMilestone(m, category)}
+                          />
                           <span
                             className={style.checkboxCustom}
                             style={{ borderColor: config.color }}
