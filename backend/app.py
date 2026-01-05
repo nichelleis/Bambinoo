@@ -723,7 +723,9 @@ def get_age_groups():
     age_groups = []
     seen = set()
     
-    with open("final_milestones.csv", encoding="utf-8-sig") as f:
+    csv_path = os.path.join(BASE_DIR, "final_milestones.csv")
+
+    with open(csv_path, encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
             group_id = int(row["AgeGroup"])
