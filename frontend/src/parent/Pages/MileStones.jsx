@@ -1,9 +1,8 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
 
-
 function Milestones() {
   return (
-    <div>
+    <div className={style.milestoneContainer}>
       <div className={style.milestoneHeader}>
         <div className={style.headerContent}>
           <div className={style.headerText}>
