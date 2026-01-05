@@ -5,6 +5,7 @@ import os
 from flask_cors import CORS
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash
 from dateutil.relativedelta import relativedelta
 import csv
 from collections import defaultdict
@@ -34,7 +35,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20))
     role = db.Column(db.String(50), nullable=False, default='parent')
 
@@ -161,6 +162,8 @@ class PendingRegistration(db.Model):
     language = db.Column(db.String(50), nullable=False)
     mother_name = db.Column(db.String(255), nullable=False)
     mother_dob = db.Column(db.Date, nullable=False)
+    mother_email = db.Column(db.String, nullable=False)
+    mother_phone = db.Column(db.String, nullable=False)
     birth_location = db.Column(db.String(255), nullable=False)
     birth_hospital = db.Column(db.String(255), nullable=False)
     delivery_type = db.Column(db.String(100), nullable=False)
@@ -654,6 +657,19 @@ def pending_registration():
         data = request.get_json()
         if not data:
             return jsonify({"message": "No data provided"}), 400
+        
+        password_hash=generate_password_hash(data["password"])
+
+        new_user = User(
+            username=data["username"],
+            password_hash=password_hash,
+            email=data["motherEmail"],
+            phone=data["motherPhone"],
+            role="parent"
+        )
+
+        db.session.add(new_user)
+        db.session.flush()
 
         child_dob = datetime.strptime(data["childDOB"], "%Y-%m-%d").date()
         mother_dob = datetime.strptime(data["motherDOB"], "%Y-%m-%d").date()
@@ -671,6 +687,8 @@ def pending_registration():
             language=data["language"],
             mother_name=data["motherName"],
             mother_dob=mother_dob,
+            mother_email=data["motherEmail"],
+            mother_phone=data["motherPhone"],
             birth_location=data["birthLocation"],
             birth_hospital=data["birthHospital"],
             delivery_type=data["deliveryType"],
