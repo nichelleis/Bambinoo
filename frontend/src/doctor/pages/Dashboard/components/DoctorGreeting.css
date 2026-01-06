@@ -1,0 +1,22 @@
+.doctor-greeting {
+  background: #eef6f7;
+  padding: 20px 24px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+.doctor-greeting h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.doctor-greeting h2 span {
+  color: #000000;
+}
+
+.doctor-greeting p {
+  font-size: 14px;
+  color: #6b7280;
+}
