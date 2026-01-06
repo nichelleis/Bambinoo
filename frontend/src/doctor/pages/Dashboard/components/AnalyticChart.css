@@ -1,0 +1,10 @@
+.chart-container {
+  background: #f1f5f9;
+  height: 220px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 14px;
+}
