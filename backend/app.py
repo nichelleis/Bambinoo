@@ -850,8 +850,9 @@ def get_growth_records():
         if not child:
             return jsonify({"message": "Child not found"}), 404
 
-        records = GrowthRecord.query.filter_by(parent_id=user_id)\
-            .order_by(GrowthRecord.record_date.asc()).all()
+        records = GrowthRecord.query.filter_by(child_id=child.id)\
+    .order_by(GrowthRecord.record_date.asc()).all()
+
 
         measurements = []
         for r in records:
@@ -883,7 +884,8 @@ def get_vaccination_data():
         if not child:
             return jsonify({"message": "Child not found"}), 404
 
-        vaccines = Vaccination.query.filter_by(child_id=child.id).order_by(Vaccination.due_date.asc()).all()
+        vaccines = Vaccination.query.filter_by(child_id=child.id)\
+            .order_by(Vaccination.due_date.asc()).all()
 
         result = []
         for v in vaccines:
@@ -891,7 +893,7 @@ def get_vaccination_data():
                 "id": v.id,
                 "vaccine": v.vaccine_name,
                 "date": v.administered_date.strftime("%Y-%m-%d") if v.administered_date else "-",
-                "status": v.status,
+                "status": v.status if v.status else "Pending",
                 "nextDue": v.due_date.strftime("%Y-%m-%d") if v.due_date else "-"
             })
 

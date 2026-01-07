@@ -58,186 +58,38 @@ function Analytics() {
   };
 
   useEffect(() => {
-    if (!childData || !childData.measurements) return;
+    if (!childData?.measurements?.length) return;
 
     const dates = childData.measurements.map(m => m.date);
     const heights = childData.measurements.map(m => m.height);
     const weights = childData.measurements.map(m => m.weight);
-    const bmis = childData.measurements.map(m =>
-      calculateBMI(m.weight, m.height)
-    );
+    const bmis = childData.measurements.map(m => calculateBMI(m.weight, m.height));
+    const bmiColors = bmis.map(bmi => getBMIRiskLevel(parseFloat(bmi), childData.age).color);
 
-    const heightChart = {
-      data: [
-        {
-          x: dates,
-          y: heights,
-          type: 'scatter',
-          mode: 'lines+markers',
-          name: 'Child Height',
-          line: { color: '#3b82f6', width: 3 },
-          marker: { size: 10, color: '#3b82f6' }
-        },
-        {
-          x: dates,
-          y: dates.map(() => 115),
-          type: 'scatter',
-          mode: 'lines',
-          name: '95th Percentile',
-          line: { color: '#10b981', dash: 'dash', width: 2 }
-        },
-        {
-          x: dates,
-          y: dates.map(() => 107),
-          type: 'scatter',
-          mode: 'lines',
-          name: '50th Percentile',
-          line: { color: '#f59e0b', dash: 'dot', width: 2 }
-        },
-        {
-          x: dates,
-          y: dates.map(() => 100),
-          type: 'scatter',
-          mode: 'lines',
-          name: '5th Percentile',
-          line: { color: '#dc2626', dash: 'dash', width: 2 }
-        }
-      ],
-      layout: {
-        title: 'Height Growth Chart (cm)',
-        xaxis: { title: 'Date' },
-        yaxis: { title: 'Height (cm)' },
-        hovermode: 'closest',
-        showlegend: true,
-        plot_bgcolor: '#f9fafb',
-        paper_bgcolor: '#ffffff'
-      }
-    };
+    Plotly.react('heightChart', [
+      { x: dates, y: heights, type: 'scatter', mode: 'lines+markers', name: 'Child Height', line: { color: '#3b82f6', width: 3 }, marker: { size: 10, color: '#3b82f6' } },
+      { x: dates, y: dates.map(() => 115), type: 'scatter', mode: 'lines', name: '95th Percentile', line: { color: '#10b981', dash: 'dash', width: 2 } },
+      { x: dates, y: dates.map(() => 107), type: 'scatter', mode: 'lines', name: '50th Percentile', line: { color: '#f59e0b', dash: 'dot', width: 2 } },
+      { x: dates, y: dates.map(() => 100), type: 'scatter', mode: 'lines', name: '5th Percentile', line: { color: '#dc2626', dash: 'dash', width: 2 } }
+    ], { title: 'Height Growth Chart (cm)', xaxis: { title: 'Date' }, yaxis: { title: 'Height (cm)' }, hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff' }, { responsive: true });
 
-    const weightChart = {
-      data: [
-        {
-          x: dates,
-          y: weights,
-          type: 'scatter',
-          mode: 'lines+markers',
-          name: 'Child Weight',
-          line: { color: '#8b5cf6', width: 3 },
-          marker: { size: 10, color: '#8b5cf6' }
-        },
-        {
-          x: dates,
-          y: dates.map(() => 20),
-          type: 'scatter',
-          mode: 'lines',
-          name: '95th Percentile',
-          line: { color: '#10b981', dash: 'dash', width: 2 }
-        },
-        {
-          x: dates,
-          y: dates.map(() => 17),
-          type: 'scatter',
-          mode: 'lines',
-          name: '50th Percentile',
-          line: { color: '#f59e0b', dash: 'dot', width: 2 }
-        },
-        {
-          x: dates,
-          y: dates.map(() => 14),
-          type: 'scatter',
-          mode: 'lines',
-          name: '5th Percentile',
-          line: { color: '#dc2626', dash: 'dash', width: 2 }
-        }
-      ],
-      layout: {
-        title: 'Weight Growth Chart (kg)',
-        xaxis: { title: 'Date' },
-        yaxis: { title: 'Weight (kg)' },
-        hovermode: 'closest',
-        showlegend: true,
-        plot_bgcolor: '#f9fafb',
-        paper_bgcolor: '#ffffff'
-      }
-    };
+    Plotly.react('weightChart', [
+      { x: dates, y: weights, type: 'scatter', mode: 'lines+markers', name: 'Child Weight', line: { color: '#8b5cf6', width: 3 }, marker: { size: 10, color: '#8b5cf6' } },
+      { x: dates, y: dates.map(() => 20), type: 'scatter', mode: 'lines', name: '95th Percentile', line: { color: '#10b981', dash: 'dash', width: 2 } },
+      { x: dates, y: dates.map(() => 17), type: 'scatter', mode: 'lines', name: '50th Percentile', line: { color: '#f59e0b', dash: 'dot', width: 2 } },
+      { x: dates, y: dates.map(() => 14), type: 'scatter', mode: 'lines', name: '5th Percentile', line: { color: '#dc2626', dash: 'dash', width: 2 } }
+    ], { title: 'Weight Growth Chart (kg)', xaxis: { title: 'Date' }, yaxis: { title: 'Weight (kg)' }, hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff' }, { responsive: true });
 
-    const bmiColors = bmis.map(bmi => {
-      const risk = getBMIRiskLevel(parseFloat(bmi), childData.age);
-      return risk.color;
-    });
-
-    const bmiChart = {
-      data: [
-        {
-          x: dates,
-          y: bmis,
-          type: 'scatter',
-          mode: 'lines+markers',
-          name: 'BMI',
-          line: { color: '#ec4899', width: 3 },
-          marker: {
-            size: 12,
-            color: bmiColors,
-            line: { color: '#fff', width: 2 }
-          }
-        },
-        {
-          x: dates,
-          y: dates.map(() => 18),
-          type: 'scatter',
-          mode: 'lines',
-          name: 'Obese (>18)',
-          line: { color: '#dc2626', dash: 'dash', width: 2 },
-          fill: 'tonexty',
-          fillcolor: 'rgba(220, 38, 38, 0.1)'
-        },
-        {
-          x: dates,
-          y: dates.map(() => 17),
-          type: 'scatter',
-          mode: 'lines',
-          name: 'Overweight (17-18)',
-          line: { color: '#f59e0b', dash: 'dash', width: 2 },
-          fill: 'tonexty',
-          fillcolor: 'rgba(245, 158, 11, 0.1)'
-        },
-        {
-          x: dates,
-          y: dates.map(() => 15),
-          type: 'scatter',
-          mode: 'lines',
-          name: 'Normal (15-17)',
-          line: { color: '#10b981', dash: 'dash', width: 2 },
-          fill: 'tonexty',
-          fillcolor: 'rgba(16, 185, 129, 0.1)'
-        },
-        {
-          x: dates,
-          y: dates.map(() => 14),
-          type: 'scatter',
-          mode: 'lines',
-          name: 'Underweight (<15)',
-          line: { color: '#f59e0b', dash: 'dash', width: 2 },
-          fill: 'tonexty',
-          fillcolor: 'rgba(245, 158, 11, 0.1)'
-        }
-      ],
-      layout: {
-        title: 'BMI Chart with Risk Levels',
-        xaxis: { title: 'Date' },
-        yaxis: { title: 'BMI' },
-        hovermode: 'closest',
-        showlegend: true,
-        plot_bgcolor: '#f9fafb',
-        paper_bgcolor: '#ffffff'
-      }
-    };
-
-    Plotly.newPlot('heightChart', heightChart.data, heightChart.layout, { responsive: true });
-    Plotly.newPlot('weightChart', weightChart.data, weightChart.layout, { responsive: true });
-    Plotly.newPlot('bmiChart', bmiChart.data, bmiChart.layout, { responsive: true });
+    Plotly.react('bmiChart', [
+      { x: dates, y: bmis, type: 'scatter', mode: 'lines+markers', name: 'BMI', line: { color: '#ec4899', width: 3 }, marker: { size: 12, color: bmiColors, line: { color: '#fff', width: 2 } } },
+      { x: dates, y: dates.map(() => 18), type: 'scatter', mode: 'lines', name: 'Obese (>18)', line: { color: '#dc2626', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(220,38,38,0.1)' },
+      { x: dates, y: dates.map(() => 17), type: 'scatter', mode: 'lines', name: 'Overweight (17-18)', line: { color: '#f59e0b', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(245,158,11,0.1)' },
+      { x: dates, y: dates.map(() => 15), type: 'scatter', mode: 'lines', name: 'Normal (15-17)', line: { color: '#10b981', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(16,185,129,0.1)' },
+      { x: dates, y: dates.map(() => 14), type: 'scatter', mode: 'lines', name: 'Underweight (<15)', line: { color: '#f59e0b', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(245,158,11,0.1)' }
+    ], { title: 'BMI Chart with Risk Levels', xaxis: { title: 'Date' }, yaxis: { title: 'BMI' }, hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff' }, { responsive: true });
 
   }, [childData]);
+
 
   if (loading) {
     return (
@@ -248,7 +100,7 @@ function Analytics() {
     );
   }
 
-  const latestMeasurement = childData?.measurements[childData?.measurements?.length || 0 - 1];
+  const latestMeasurement = childData?.measurements?.length ? childData.measurements[childData.measurements.length - 1] : null;
   const latestBMI = latestMeasurement ? calculateBMI(latestMeasurement.weight, latestMeasurement.height) : 0;
   const riskLevel = latestMeasurement ? getBMIRiskLevel(parseFloat(latestBMI), childData.age) : null;
 
