@@ -31,7 +31,7 @@ function Analytics() {
           { date: "2025-01", height: 112, weight: 18.5 }
         ]
       };
-      
+
       setChildData(mockData);
       setSelectedChild(mockData.id);
     } catch (error) {
@@ -53,7 +53,7 @@ function Analytics() {
         { id: 6, vaccine: "Varicella", date: "2021-08-10", status: "Completed", nextDue: "-" },
         { id: 7, vaccine: "HPV", date: "-", status: "Pending", nextDue: "2025-06-15" }
       ];
-      
+
       setVaccineRecords(mockVaccines);
     } catch (error) {
       console.error("Error fetching vaccine records:", error);
@@ -79,7 +79,7 @@ function Analytics() {
     const dates = childData.measurements.map(m => m.date);
     const heights = childData.measurements.map(m => m.height);
     const weights = childData.measurements.map(m => m.weight);
-    const bmis = childData.measurements.map(m => 
+    const bmis = childData.measurements.map(m =>
       calculateBMI(m.weight, m.height)
     );
 
@@ -191,8 +191,8 @@ function Analytics() {
           mode: 'lines+markers',
           name: 'BMI',
           line: { color: '#ec4899', width: 3 },
-          marker: { 
-            size: 12, 
+          marker: {
+            size: 12,
             color: bmiColors,
             line: { color: '#fff', width: 2 }
           }
@@ -249,9 +249,9 @@ function Analytics() {
       }
     };
 
-    Plotly.newPlot('heightChart', heightChart.data, heightChart.layout, {responsive: true});
-    Plotly.newPlot('weightChart', weightChart.data, weightChart.layout, {responsive: true});
-    Plotly.newPlot('bmiChart', bmiChart.data, bmiChart.layout, {responsive: true});
+    Plotly.newPlot('heightChart', heightChart.data, heightChart.layout, { responsive: true });
+    Plotly.newPlot('weightChart', weightChart.data, weightChart.layout, { responsive: true });
+    Plotly.newPlot('bmiChart', bmiChart.data, bmiChart.layout, { responsive: true });
 
   }, [childData]);
 
@@ -271,22 +271,39 @@ function Analytics() {
   return (
     <div className={styles.analyticsContainer}>
       <div className="container-fluid">
-        <div className={`card ${styles.headerCard}`}>
-          <div className="card-body">
-            <h1 className={styles.mainTitle}>CHDR Analytics Dashboard</h1>
+        <div className={styles.headerCard}>
+          <div className={styles.animatedBackground}>
+            <div className={styles.floatingCircle} style={{ top: '10%', left: '15%' }}></div>
+            <div className={styles.floatingCircle} style={{ top: '60%', right: '10%' }}></div>
+            <div className={styles.floatingCircle} style={{ bottom: '15%', left: '40%' }}></div>
+          </div>
+          <div className={styles.headerContent}>
             <div className="row align-items-center">
               <div className="col-md-8">
-                <p className={styles.childInfo}>
-                  Child: <span className={styles.childName}>{childData?.name}</span>
-                </p>
-                <p className={styles.childInfo}>
-                  Age: <span className={styles.childDetail}>{childData?.age} years</span> | 
-                  Gender: <span className={styles.childDetail}>{childData?.gender}</span>
-                </p>
+                <div className={styles.headerIconWrapper}>
+                  <span className={styles.headerIcon}>✨</span>
+                </div>
+                <h1 className={styles.mainTitle}>Analytics Dashboard</h1>
+                <p className={styles.subtitle}>Track {childData?.name}'s amazing growth</p>
+                <div className={styles.childDetails}>
+                  <span className={styles.detailBadge}>
+                    <i className="bi bi-person-fill me-2"></i>
+                    {childData?.age} years old
+                  </span>
+                  <span className={styles.detailBadge}>
+                    <i className="bi bi-gender-ambiguous me-2"></i>
+                    {childData?.gender}
+                  </span>
+                </div>
               </div>
-              <div className="col-md-4 text-end">
-                <p className={styles.updateLabel}>Last Updated</p>
-                <p className={styles.updateDate}>{latestMeasurement?.date}</p>
+              <div className="col-md-4">
+                <div className={styles.updateInfo}>
+                  <div className={styles.updateIconCircle}>
+                    <i className="bi bi-clock-history"></i>
+                  </div>
+                  <p className={styles.updateLabel}>Last Updated</p>
+                  <p className={styles.updateDate}>{latestMeasurement?.date}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -352,9 +369,9 @@ function Analytics() {
                   {riskLevel?.level}
                 </p>
                 <div className={styles.progressBar}>
-                  <div 
+                  <div
                     className={styles.progressFill}
-                    style={{ 
+                    style={{
                       backgroundColor: riskLevel?.color,
                       width: riskLevel?.level === "Normal" ? "80%" : "40%"
                     }}
@@ -392,7 +409,7 @@ function Analytics() {
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className={styles.sectionTitle}>Vaccination Records</h2>
             </div>
-            
+
             <div className="table-responsive">
               <table className={`table ${styles.vaccineTable}`}>
                 <thead>
@@ -409,11 +426,10 @@ function Analytics() {
                       <td className={styles.vaccineName}>{record.vaccine}</td>
                       <td>{record.date}</td>
                       <td>
-                        <span className={`badge ${
-                          record.status === 'Completed' 
-                            ? styles.badgeCompleted 
+                        <span className={`badge ${record.status === 'Completed'
+                            ? styles.badgeCompleted
                             : styles.badgePending
-                        }`}>
+                          }`}>
                           {record.status}
                         </span>
                       </td>
