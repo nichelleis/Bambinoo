@@ -139,7 +139,6 @@
   color: white;
 }
 
-/* Header Icon */
 .headerIconWrapper {
   display: inline-block;
   margin-bottom: 0.75rem;
@@ -199,7 +198,6 @@
   }
 }
 
-/* Child Details Badges */
 .childDetails {
   display: flex;
   gap: 1rem;
@@ -235,7 +233,6 @@
   font-size: 1.1rem;
 }
 
-/* Update Info Card */
 .updateInfo {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(25px);
@@ -309,7 +306,6 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .headerContent {
     padding: 1.75rem 1.25rem;
@@ -346,7 +342,6 @@
     height: 100px;
   }
 }
-
 
 .statCard {
   border: none;
