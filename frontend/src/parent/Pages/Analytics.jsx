@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Plot from 'plotly.js-basic-dist';
+import * as Plotly from 'plotly';
 import styles from './Analytics.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
