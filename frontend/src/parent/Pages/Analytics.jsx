@@ -365,4 +365,85 @@ function Analytics() {
             </div>
           </div>
         </div>
-    
+        <div className="row g-4 mb-4">
+          <div className="col-lg-6">
+            <div className={`card ${styles.chartCard}`}>
+              <div className="card-body">
+                <div id="heightChart" className={styles.chartContainer}></div>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-6">
+            <div className={`card ${styles.chartCard}`}>
+              <div className="card-body">
+                <div id="weightChart" className={styles.chartContainer}></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={`card ${styles.chartCard} mb-4`}>
+          <div className="card-body">
+            <div id="bmiChart" className={styles.chartContainer}></div>
+          </div>
+        </div>
+
+        <div className={`card ${styles.vaccineCard}`}>
+          <div className="card-body">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h2 className={styles.sectionTitle}>Vaccination Records</h2>
+              <button className={`btn btn-primary ${styles.addButton}`}>
+                <i className="bi bi-plus-circle me-2"></i>
+                Add Record
+              </button>
+            </div>
+            
+            <div className="table-responsive">
+              <table className={`table ${styles.vaccineTable}`}>
+                <thead>
+                  <tr>
+                    <th>Vaccine</th>
+                    <th>Date Given</th>
+                    <th>Status</th>
+                    <th>Next Due</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vaccineRecords.map((record) => (
+                    <tr key={record.id}>
+                      <td className={styles.vaccineName}>{record.vaccine}</td>
+                      <td>{record.date}</td>
+                      <td>
+                        <span className={`badge ${
+                          record.status === 'Completed' 
+                            ? styles.badgeCompleted 
+                            : styles.badgePending
+                        }`}>
+                          {record.status}
+                        </span>
+                      </td>
+                      <td className={record.nextDue === '-' ? styles.noDueDate : styles.dueDate}>
+                        {record.nextDue}
+                      </td>
+                      <td>
+                        <button className={`btn btn-sm ${styles.btnEdit}`}>
+                          <i className="bi bi-pencil-square"></i>
+                        </button>
+                        <button className={`btn btn-sm ${styles.btnDelete}`}>
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Analytics;
