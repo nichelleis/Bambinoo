@@ -4,61 +4,45 @@ import styles from '../../assets/styleSheets/Analytics.module.css';
 
 
 function Analytics() {
-  const [childData, setChildData] = useState(null);
+  const [childData, setChildData] = useState({
+    measurements: []
+  });
   const [vaccineRecords, setVaccineRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedChild, setSelectedChild] = useState(null);
-  
+
   useEffect(() => {
-    fetchChildData();
-    fetchVaccineRecords();
+    const loadData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const [childRes, vaccineRes] = await Promise.all([
+          fetch("http://127.0.0.1:5000/analize", {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          fetch("http://127.0.0.1:5000/vaccine", {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
+
+        const child = await childRes.json();
+        const vaccines = await vaccineRes.json();
+
+        setChildData(child);
+        setVaccineRecords(vaccines);
+
+        setSelectedChild(child.id);
+
+      } catch (err) {
+        console.error("Failed to load analytics:", err);
+      }
+
+      setLoading(false);
+    };
+
+    loadData();
   }, []);
 
-  const fetchChildData = async () => {
-    try {
-
-      // Mock data
-      const mockData = {
-        id: 1,
-        name: "John Doe",
-        age: 5,
-        gender: "Male",
-        measurements: [
-          { date: "2024-01", height: 100, weight: 15 },
-          { date: "2024-04", height: 105, weight: 16.5 },
-          { date: "2024-07", height: 108, weight: 17.2 },
-          { date: "2024-10", height: 110, weight: 18 },
-          { date: "2025-01", height: 112, weight: 18.5 }
-        ]
-      };
-
-      setChildData(mockData);
-      setSelectedChild(mockData.id);
-    } catch (error) {
-      console.error("Error fetching child data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchVaccineRecords = async () => {
-    try {
-      // Mock data 
-      const mockVaccines = [
-        { id: 1, vaccine: "BCG", date: "2020-02-15", status: "Completed", nextDue: "-" },
-        { id: 2, vaccine: "Hepatitis B", date: "2020-03-10", status: "Completed", nextDue: "-" },
-        { id: 3, vaccine: "DTP", date: "2020-05-20", status: "Completed", nextDue: "2025-05-20" },
-        { id: 4, vaccine: "Polio", date: "2020-05-20", status: "Completed", nextDue: "2025-05-20" },
-        { id: 5, vaccine: "MMR", date: "2021-02-15", status: "Completed", nextDue: "2026-02-15" },
-        { id: 6, vaccine: "Varicella", date: "2021-08-10", status: "Completed", nextDue: "-" },
-        { id: 7, vaccine: "HPV", date: "-", status: "Pending", nextDue: "2025-06-15" }
-      ];
-
-      setVaccineRecords(mockVaccines);
-    } catch (error) {
-      console.error("Error fetching vaccine records:", error);
-    }
-  };
 
   const calculateBMI = (weight, height) => {
     const heightInMeters = height / 100;
@@ -264,7 +248,7 @@ function Analytics() {
     );
   }
 
-  const latestMeasurement = childData?.measurements[childData.measurements.length - 1];
+  const latestMeasurement = childData?.measurements[childData?.measurements?.length || 0 - 1];
   const latestBMI = latestMeasurement ? calculateBMI(latestMeasurement.weight, latestMeasurement.height) : 0;
   const riskLevel = latestMeasurement ? getBMIRiskLevel(parseFloat(latestBMI), childData.age) : null;
 
@@ -284,7 +268,7 @@ function Analytics() {
                   <span className={styles.headerIcon}>✨</span>
                 </div>
                 <h1 className={styles.mainTitle}>Analytics Dashboard</h1>
-                <p className={styles.subtitle}>Track {childData?.name}'s amazing growth</p>
+                <p className={styles.subtitle}>Track your little one's growth</p>
                 <div className={styles.childDetails}>
                   <span className={styles.detailBadge}>
                     <i className="bi bi-person-fill me-2"></i>
@@ -427,8 +411,8 @@ function Analytics() {
                       <td>{record.date}</td>
                       <td>
                         <span className={`badge ${record.status === 'Completed'
-                            ? styles.badgeCompleted
-                            : styles.badgePending
+                          ? styles.badgeCompleted
+                          : styles.badgePending
                           }`}>
                           {record.status}
                         </span>

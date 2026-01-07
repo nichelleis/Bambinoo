@@ -313,5 +313,6 @@ with app.app_context():
     ])
 
     db.session.commit()
+    
 
     print("Dummy data Successfully added")
