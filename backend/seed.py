@@ -78,7 +78,7 @@ with app.app_context():
     GrowthRecord(
         child_id=girl.id,
         weight=11.9,
-        height=90,
+        height=50,
         head_circumference=49,
         bmi=17.3,
         age_at_record=360,
@@ -313,5 +313,6 @@ with app.app_context():
     ])
 
     db.session.commit()
+    
 
     print("Dummy data Successfully added")

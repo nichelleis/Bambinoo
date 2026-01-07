@@ -1,0 +1,575 @@
+.analyticsContainer {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2rem 0;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.spinner {
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #0d6efd;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  color: #6c757d;
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+
+.headerCard {
+  position: relative;
+  margin-bottom: 2.5rem;
+  border-radius: 24px;
+  overflow: hidden;
+  min-height: 200px;
+  box-shadow: 
+    0 20px 60px rgba(102, 126, 234, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.animatedBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #4facfe 75%,
+    #00f2fe 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientFlow 15s ease infinite;
+  z-index: 0;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 100%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 0%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.floatingCircle {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+.floatingCircle:nth-child(2) {
+  animation-delay: 2s;
+  width: 120px;
+  height: 120px;
+}
+
+.floatingCircle:nth-child(3) {
+  animation-delay: 4s;
+  width: 100px;
+  height: 100px;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px) scale(1.1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(0) translateX(20px) scale(0.9);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateY(20px) translateX(10px) scale(1.05);
+    opacity: 0.6;
+  }
+}
+
+.headerContent {
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem;
+  color: white;
+}
+
+.headerIconWrapper {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.headerIcon {
+  font-size: 3rem;
+  display: inline-block;
+  animation: sparkleRotate 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes sparkleRotate {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.15) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.25) rotate(10deg);
+  }
+  75% {
+    transform: scale(1.15) rotate(-5deg);
+  }
+}
+
+.mainTitle {
+  font-size: 2.75rem;
+  font-weight: 800;
+  color: white;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.05);
+  letter-spacing: -0.5px;
+  animation: fadeInUp 0.8s ease;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 1.5rem 0;
+  font-weight: 400;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.childDetails {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease 0.4s both;
+}
+
+.detailBadge {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 0.65rem 1.25rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.detailBadge:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.detailBadge i {
+  font-size: 1.1rem;
+}
+
+.updateInfo {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  padding: 1.75rem;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: fadeInRight 0.8s ease 0.3s both;
+  transition: all 0.4s ease;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.updateInfo:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.updateIconCircle {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+}
+
+.updateLabel {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.updateDate {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .mainTitle {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .headerIcon {
+    font-size: 2.5rem;
+  }
+
+  .childDetails {
+    gap: 0.75rem;
+  }
+
+  .detailBadge {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .updateInfo {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .floatingCircle {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+.statCard {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.statCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.heightCard {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.weightCard {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+}
+
+.bmiCard {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+}
+
+.statusCard {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+}
+
+.statLabel {
+  color: #495057;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+  line-height: 1;
+}
+
+.statUnit {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.iconContainer {
+  font-size: 2.5rem;
+  opacity: 0.3;
+}
+
+.iconContainer i {
+  color: #212529;
+}
+
+.riskLevel {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.progressFill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  border-radius: 4px;
+}
+
+
+.chartCard {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.chartContainer {
+  width: 100%;
+  height: 400px;
+}
+
+
+.vaccineCard {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #212529;
+  margin: 0;
+}
+
+.addButton {
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.addButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+}
+
+
+.vaccineTable {
+  margin: 0;
+}
+
+.vaccineTable thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.vaccineTable thead th {
+  color: #495057;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  border: none;
+}
+
+.vaccineTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.vaccineTable tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.vaccineTable tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.vaccineName {
+  font-weight: 600;
+  color: #212529;
+}
+
+.badgeCompleted {
+  background-color: #d1e7dd;
+  color: #0a3622;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.badgePending {
+  background-color: #fff3cd;
+  color: #664d03;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.noDueDate {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.dueDate {
+  font-weight: 600;
+  color: #212529;
+}
+
+.btnEdit {
+  color: #0d6efd;
+  margin-right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btnEdit:hover {
+  color: #0a58ca;
+  background-color: #e7f1ff;
+}
+
+.btnDelete {
+  color: #dc3545;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btnDelete:hover {
+  color: #b02a37;
+  background-color: #f8d7da;
+}
+
+
+@media (max-width: 768px) {
+  .analyticsContainer {
+    padding: 1rem 0;
+  }
+
+  .mainTitle {
+    font-size: 1.5rem;
+  }
+
+  .statValue {
+    font-size: 2rem;
+  }
+
+  .chartContainer {
+    height: 300px;
+  }
+
+  .vaccineTable {
+    font-size: 0.875rem;
+  }
+}
