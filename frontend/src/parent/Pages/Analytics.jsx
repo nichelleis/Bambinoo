@@ -178,3 +178,191 @@ function Analytics() {
       }
     };
 
+    const bmiColors = bmis.map(bmi => {
+      const risk = getBMIRiskLevel(parseFloat(bmi), childData.age);
+      return risk.color;
+    });
+
+    const bmiChart = {
+      data: [
+        {
+          x: dates,
+          y: bmis,
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: 'BMI',
+          line: { color: '#ec4899', width: 3 },
+          marker: { 
+            size: 12, 
+            color: bmiColors,
+            line: { color: '#fff', width: 2 }
+          }
+        },
+        {
+          x: dates,
+          y: dates.map(() => 18),
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Obese (>18)',
+          line: { color: '#dc2626', dash: 'dash', width: 2 },
+          fill: 'tonexty',
+          fillcolor: 'rgba(220, 38, 38, 0.1)'
+        },
+        {
+          x: dates,
+          y: dates.map(() => 17),
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Overweight (17-18)',
+          line: { color: '#f59e0b', dash: 'dash', width: 2 },
+          fill: 'tonexty',
+          fillcolor: 'rgba(245, 158, 11, 0.1)'
+        },
+        {
+          x: dates,
+          y: dates.map(() => 15),
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Normal (15-17)',
+          line: { color: '#10b981', dash: 'dash', width: 2 },
+          fill: 'tonexty',
+          fillcolor: 'rgba(16, 185, 129, 0.1)'
+        },
+        {
+          x: dates,
+          y: dates.map(() => 14),
+          type: 'scatter',
+          mode: 'lines',
+          name: 'Underweight (<15)',
+          line: { color: '#f59e0b', dash: 'dash', width: 2 },
+          fill: 'tonexty',
+          fillcolor: 'rgba(245, 158, 11, 0.1)'
+        }
+      ],
+      layout: {
+        title: 'BMI Chart with Risk Levels',
+        xaxis: { title: 'Date' },
+        yaxis: { title: 'BMI' },
+        hovermode: 'closest',
+        showlegend: true,
+        plot_bgcolor: '#f9fafb',
+        paper_bgcolor: '#ffffff'
+      }
+    };
+
+    Plotly.newPlot('heightChart', heightChart.data, heightChart.layout, {responsive: true});
+    Plotly.newPlot('weightChart', weightChart.data, weightChart.layout, {responsive: true});
+    Plotly.newPlot('bmiChart', bmiChart.data, bmiChart.layout, {responsive: true});
+
+  }, [childData]);
+
+  if (loading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
+        <p className={styles.loadingText}>Loading analytics data...</p>
+      </div>
+    );
+  }
+
+  const latestMeasurement = childData?.measurements[childData.measurements.length - 1];
+  const latestBMI = latestMeasurement ? calculateBMI(latestMeasurement.weight, latestMeasurement.height) : 0;
+  const riskLevel = latestMeasurement ? getBMIRiskLevel(parseFloat(latestBMI), childData.age) : null;
+
+  return (
+    <div className={styles.analyticsContainer}>
+      <div className="container-fluid">
+        <div className={`card ${styles.headerCard}`}>
+          <div className="card-body">
+            <h1 className={styles.mainTitle}>CHDR Analytics Dashboard</h1>
+            <div className="row align-items-center">
+              <div className="col-md-8">
+                <p className={styles.childInfo}>
+                  Child: <span className={styles.childName}>{childData?.name}</span>
+                </p>
+                <p className={styles.childInfo}>
+                  Age: <span className={styles.childDetail}>{childData?.age} years</span> | 
+                  Gender: <span className={styles.childDetail}>{childData?.gender}</span>
+                </p>
+              </div>
+              <div className="col-md-4 text-end">
+                <p className={styles.updateLabel}>Last Updated</p>
+                <p className={styles.updateDate}>{latestMeasurement?.date}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="row g-4 mb-4">
+          <div className="col-md-3">
+            <div className={`card ${styles.statCard} ${styles.heightCard}`}>
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p className={styles.statLabel}>Current Height</p>
+                    <p className={styles.statValue}>{latestMeasurement?.height}</p>
+                    <p className={styles.statUnit}>cm</p>
+                  </div>
+                  <div className={styles.iconContainer}>
+                    <i className="bi bi-arrow-up-circle-fill"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className={`card ${styles.statCard} ${styles.weightCard}`}>
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p className={styles.statLabel}>Current Weight</p>
+                    <p className={styles.statValue}>{latestMeasurement?.weight}</p>
+                    <p className={styles.statUnit}>kg</p>
+                  </div>
+                  <div className={styles.iconContainer}>
+                    <i className="bi bi-speedometer2"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className={`card ${styles.statCard} ${styles.bmiCard}`}>
+              <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <p className={styles.statLabel}>Current BMI</p>
+                    <p className={styles.statValue}>{latestBMI}</p>
+                    <p className={styles.statUnit}>kg/m²</p>
+                  </div>
+                  <div className={styles.iconContainer}>
+                    <i className="bi bi-bar-chart-fill"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className={`card ${styles.statCard} ${styles.statusCard}`}>
+              <div className="card-body">
+                <p className={styles.statLabel}>Health Status</p>
+                <p className={styles.riskLevel} style={{ color: riskLevel?.color }}>
+                  {riskLevel?.level}
+                </p>
+                <div className={styles.progressBar}>
+                  <div 
+                    className={styles.progressFill}
+                    style={{ 
+                      backgroundColor: riskLevel?.color,
+                      width: riskLevel?.level === "Normal" ? "80%" : "40%"
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
