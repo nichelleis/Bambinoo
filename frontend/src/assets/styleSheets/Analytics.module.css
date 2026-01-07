@@ -219,4 +219,88 @@
 .vaccineTable tbody tr:hover {
   background-color: #f8f9fa;
 }
+.vaccineTable tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
 
+.vaccineName {
+  font-weight: 600;
+  color: #212529;
+}
+
+.badgeCompleted {
+  background-color: #d1e7dd;
+  color: #0a3622;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.badgePending {
+  background-color: #fff3cd;
+  color: #664d03;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.813rem;
+  font-weight: 600;
+}
+
+.noDueDate {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.dueDate {
+  font-weight: 600;
+  color: #212529;
+}
+
+.btnEdit {
+  color: #0d6efd;
+  margin-right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btnEdit:hover {
+  color: #0a58ca;
+  background-color: #e7f1ff;
+}
+
+.btnDelete {
+  color: #dc3545;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btnDelete:hover {
+  color: #b02a37;
+  background-color: #f8d7da;
+}
+
+
+@media (max-width: 768px) {
+  .analyticsContainer {
+    padding: 1rem 0;
+  }
+
+  .mainTitle {
+    font-size: 1.5rem;
+  }
+
+  .statValue {
+    font-size: 2rem;
+  }
+
+  .chartContainer {
+    height: 300px;
+  }
+
+  .vaccineTable {
+    font-size: 0.875rem;
+  }
+}
