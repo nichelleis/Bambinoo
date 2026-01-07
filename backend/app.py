@@ -840,11 +840,61 @@ def toggle_milestone():
     return jsonify({"success": True})
 
 
-
-
+@app.route("/analize", methods=["GET"])
+@jwt_required()
+def get_growth_records():
+    try:
+        user_id = get_jwt_identity()
+        child = Child.query.filter_by(parent_id=user_id).first()
+        if not child:
+            return jsonify({"message": "Child not found"}), 404
+        records = GrowthRecord.query.filter_by(child_id=child.id)\
+            .order_by(GrowthRecord.record_date.asc()).all()
+        today = date.today()
+        age = today.year - child.date_of_birth.year - ((today.month, today.day) < (child.date_of_birth.month, child.date_of_birth.day))
+        measurements = []
+        for r in records:
+            measurements.append({
+                "date": r.record_date.strftime("%Y-%m"), # "2025-01"
+                "height": r.height,
+                "weight": r.weight
+            })
+        return jsonify({
+            "id": child.id,
+            "name": child.name,
+            "age": age,
+            "gender": child.gender,
+            "measurements": measurements
+        }), 200
+   
+    except Exception as e:
+        return jsonify({"message": "Server Error", "error": str(e)}), 500
+   
+@app.route("/vaccine", methods=["GET"])
+@jwt_required()
+def get_vaccination_data():
+    try:
+        user_id = get_jwt_identity()
+        child = Child.query.filter_by(parent_id=user_id).first()
+        if not child:
+            return jsonify({"message": "Child not found"}), 404
+        vaccines = Vaccination.query.filter_by(child_id=child.id)\
+            .order_by(Vaccination.due_date.asc()).all()
+        result = []
+        for v in vaccines:
+            result.append({
+                "id": v.id,
+                "vaccine": v.vaccine_name,
+                "date": v.administered_date.strftime("%Y-%m-%d") if v.administered_date else "-",
+                "status": v.status if v.status else "Pending",
+                "nextDue": v.due_date.strftime("%Y-%m-%d") if v.due_date else "-"
+            })
+        return jsonify(result), 200
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"message": "Server Error"}), 500
 
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-

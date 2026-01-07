@@ -2,7 +2,6 @@
   margin-bottom: 1rem;
 }
 
-/* Login Page Container */
 .loginPage {
   min-height: 100vh;
   display: flex;
@@ -26,10 +25,6 @@
   min-height: 600px;
 }
 
-/* ============================================
-   LEFT SECTION - REIMAGINED HERO DESIGN
-   ============================================ */
-
 .logoSection {
   background: #ffffff;
   padding: 80px 60px;
@@ -41,7 +36,6 @@
   overflow: hidden;
 }
 
-/* Colorful blob shapes in background */
 .logoSection::before {
   content: '';
   position: absolute;
@@ -68,7 +62,7 @@
   animation: morphBlob 10s ease-in-out infinite reverse;
 }
 
-/* Morphing blob animation */
+
 @keyframes morphBlob {
   0%, 100% {
     border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
@@ -95,7 +89,7 @@
   text-align: center;
 }
 
-/* Logo with modern card effect */
+
 .logoImage {
   max-width: 180px;
   height: auto;
@@ -140,7 +134,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
-/* Title with gradient */
+
 .logoTitle {
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
@@ -163,7 +157,7 @@
   50% { background-position: 100% center; }
 }
 
-/* Subtitle with modern card */
+
 .logoSubtitle {
   font-family: 'Roboto', sans-serif;
   color: #4a5568;
@@ -192,7 +186,7 @@
   background: linear-gradient(90deg, transparent, #667eea, transparent);
 }
 
-/* Right Section - Login Card */
+
 .loginCard {
   padding: 60px;
   display: flex;
@@ -218,7 +212,7 @@
   font-weight: 400;
 }
 
-/* Form Elements */
+
 .formLabel {
   font-family: 'Roboto', sans-serif;
   display: block;
@@ -251,7 +245,7 @@
   color: #999;
 }
 
-/* Alert/Error Message */
+
 .alert {
   background-color: #ffebee;
   border: 1px solid #ef9a9a;
@@ -263,7 +257,7 @@
   font-family: 'Roboto', sans-serif;
 }
 
-/* Login Button */
+
 .btnLogin {
   font-family: 'Roboto', sans-serif;
   width: 100%;
@@ -295,7 +289,7 @@
   transform: none;
 }
 
-/* Footer Text */
+
 .footerText {
   font-family: 'Roboto', sans-serif;
   margin-top: 32px;
@@ -333,7 +327,7 @@
   text-decoration: underline;
 }
 
-/* Responsive Design */
+
 @media (max-width: 968px) {
   .containerWrapper {
     grid-template-columns: 1fr;
