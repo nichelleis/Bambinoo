@@ -7,6 +7,7 @@ function Analytics() {
   const [childData, setChildData] = useState(null);
   const [vaccineRecords, setVaccineRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedChild, setSelectedChild] = useState(null);
 
   // Fetch data from backend
   useEffect(() => {
