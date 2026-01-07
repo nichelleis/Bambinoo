@@ -391,10 +391,6 @@ function Analytics() {
           <div className="card-body">
             <div className="d-flex justify-content-between align-items-center mb-4">
               <h2 className={styles.sectionTitle}>Vaccination Records</h2>
-              <button className={`btn btn-primary ${styles.addButton}`}>
-                <i className="bi bi-plus-circle me-2"></i>
-                Add Record
-              </button>
             </div>
             
             <div className="table-responsive">
@@ -405,7 +401,6 @@ function Analytics() {
                     <th>Date Given</th>
                     <th>Status</th>
                     <th>Next Due</th>
-                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -424,14 +419,6 @@ function Analytics() {
                       </td>
                       <td className={record.nextDue === '-' ? styles.noDueDate : styles.dueDate}>
                         {record.nextDue}
-                      </td>
-                      <td>
-                        <button className={`btn btn-sm ${styles.btnEdit}`}>
-                          <i className="bi bi-pencil-square"></i>
-                        </button>
-                        <button className={`btn btn-sm ${styles.btnDelete}`}>
-                          <i className="bi bi-trash"></i>
-                        </button>
                       </td>
                     </tr>
                   ))}
