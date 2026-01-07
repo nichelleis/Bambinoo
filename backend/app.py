@@ -839,8 +839,30 @@ def toggle_milestone():
     db.session.commit()
     return jsonify({"success": True})
 
+@app.route("/child/<int:child_id>", methods=["GET"])
+def get_child(child_id):
+    child = Child.query.get(child_id)
 
+    if not child:
+        return jsonify({"error": "Child not found"}), 404
 
+    measurements = []
+    for record in child.growth_records:
+        measurements.append({
+            "date": record.date.strftime("%Y-%m"),
+            "height": record.height,
+            "weight": record.weight
+        })
+
+    response = {
+        "id": child.id,
+        "name": child.name,
+        "age": calculate_age(child.date_of_birth),
+        "gender": child.gender,
+        "measurements": measurements
+    }
+
+    return jsonify(response), 200
 
 
 
