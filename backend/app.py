@@ -1,8 +1,9 @@
+import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta,datetime,date
 import os
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
@@ -190,6 +191,7 @@ with app.app_context():
 
 # Login route
 @app.route('/login', methods=['POST'])
+@cross_origin()
 def login():
     try:
         data = request.get_json()
@@ -894,7 +896,179 @@ def get_vaccination_data():
         print("Error:", e)
         return jsonify({"message": "Server Error"}), 500
 
+# This allows react to talk to python
+CORS(app) 
 
+# --- AI Configuration ---
+# Set up google gemini API
+# os.environ["GEMINI_API_KEY"] = "AIzaSyCWDoDwinnh2-LdT9Im2pUH9RkYjI5-zlA"
+genai.configure(api_key="AIzaSyCWDoDwinnh2-LdT9Im2pUH9RkYjI5-zlA")
+# genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+MODEL_NAME = 'models/gemini-flash-latest'
+
+# Removes Markdown wrapper (```html) from AI response so we get pure code
+def clean_ai_response(text):
+    return text.replace("```html", "").replace("```", "")
+
+# 1. MEAL PLAN API 
+# React calls this to generate a meal plan
+@app.route('/generate-plan', methods=['POST'])
+def generate_plan():
+    try:
+        # Get user input from react
+        data = request.json 
+        child_age = data.get('age')
+        weight = data.get('weight')
+
+
+        # Prompt engineering for meal plan generation
+        # Instructs AI to act as a Nutritionist and strictly output HTML for the frontend
+        prompt = f"""
+        Act as a highly intelligent Sri Lankan Pediatric Nutritionist.
+        
+        PATIENT DATA:
+        - Age: {child_age} months
+        - Weight: {weight} kg
+        
+        STEP 1: ANALYSIS
+        - Calculate if the weight is low, normal, or high for this age.
+        - If Low Weight: Focus on "Calorie Boosting" (adding Coconut Milk, Ghee, Oil).
+        - If Normal/High: Focus on "Balanced Nutrition" (Vegetables, Fiber).
+        
+        STEP 2: CREATE A DYNAMIC MEAL PLAN
+        - Do NOT use a generic template. Customize the food based on the analysis above.
+        - STARCH: Rotate between Red Rice, Sweet Potato (Bathala), or String Hoppers based on age.
+        - PROTEIN: Use Dhal, Sprats (Haalmasso), or Egg based on age safety.
+        - FRUIT: Select ONE specific vitamin-rich local fruit (Papaya, Mango, Avocado, or Banana) - do NOT always choose Banana.
+        - VEGETABLE: Select ONE specific local vegetable (Pumpkin, Spinach, Carrots).
+        
+        STEP 3: FORMATTING (CRITICAL)
+        - Return ONLY raw HTML code (No Markdown).
+        - Use the exact structure below.
+        
+        STRUCTURE:
+        <div class="summary-card">
+            <h3>Patient Analysis</h3>
+            <p><strong>Status:</strong> (Insert specific analysis: e.g., "Weight is slightly low. We added healthy fats.")</p>
+            <p><strong>Calorie Goal:</strong> (Estimate daily calories) | <strong>Texture:</strong> (e.g. Puree / Mashed / Finger Food)</p>
+        </div>
+
+        <table class="meal-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Time</th>
+                    <th style="width: 30%;">Menu Item</th>
+                    <th>Portion & Instructions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Breakfast</strong><br><span class="time">8:00 AM</span></td>
+                    <td>(Insert appropriate Starch dish)</td>
+                    <td>(Specific portion size in tbsp/cups based on {weight}kg)</td>
+                </tr>
+                <tr>
+                    <td><strong>Lunch</strong><br><span class="time">12:00 PM</span></td>
+                    <td>(Insert Rice & Curry combo)</td>
+                    <td>(Specific instructions: e.g., "Add 1 tsp Coconut Oil for weight gain")</td>
+                </tr>
+                <tr>
+                    <td><strong>Snack</strong><br><span class="time">3:00 PM</span></td>
+                    <td>(Insert Specific Fruit)</td>
+                    <td>(Portion size)</td>
+                </tr>
+                <tr>
+                    <td><strong>Dinner</strong><br><span class="time">6:00 PM</span></td>
+                    <td>(Insert Light Dinner)</td>
+                    <td>(Preparation method)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="tips-card">
+            <h4> Personalized Advice:</h4>
+            <ul>
+                <li>(Tip specifically for {child_age} month old)</li>
+                <li>(Tip specifically about the weight of {weight} kg)</li>
+            </ul>
+        </div>
+        """
+        
+        # Specific AI call and clean up
+        model = genai.GenerativeModel(MODEL_NAME)
+        response = model.generate_content(prompt)
+        html_content = clean_ai_response(response.text)
+        
+        # Send the clean HTML back to React as JSON
+        return jsonify({"success": True, "html": html_content})
+
+    # Catch any server errors (like API failures) and return the error message
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+# 2. RESOURCE API 
+# React calls this to get book/video recommendations
+@app.route('/get-resources', methods=['POST'])
+def get_resources():
+    try:
+        # Extract the user's data (age and specific concern) from the request
+        data = request.json
+        age = data.get('age')
+        concern = data.get('concern')
+
+        # Prompt engineering for educational content generation
+        # Ask AI to curate books/videos based on the specific parenting concern
+        prompt = f"""
+    Act as a Pediatric Media Curator.
+    User: Parent of a {age} month old. Topic: "{concern}".
+
+    TASK:
+    1. Recommend 3 Verified Books (Amazon Search Links).
+    2. Recommend 3 Verified YouTube Videos.
+
+    FORMATTING RULES:
+    - Return ONLY raw HTML.
+    - LINKS: Titles must be clickable search links.
+    - IMAGES: Use https://loremflickr.com/320/180/baby,{concern.split()[0]}?random=(UniqueNumber)
+    
+    REQUIRED HTML STRUCTURE (SIMPLIFIED):
+
+    <h2 class="section-title"> Verified Reading</h2>
+    <div class="media-grid">
+        <div class="book-card">
+            <h4><a href="https://www.amazon.com/s?k=(Insert Book Title)" target="_blank">📖 (Insert Book Title)</a></h4>
+            <p class="author">by (Author)</p>
+            <p class="desc">(Brief summary)</p>
+        </div>
+        </div>
+
+    <h2 class="section-title"> Expert Watchlist</h2>
+    <div class="media-grid">
+        <div class="video-card">
+            <div class="video-thumb">
+                <img src="https://loremflickr.com/320/180/parenting,{concern.split()[0]}?random=1" alt="Video Thumbnail">
+                <span class="play-icon">▶</span>
+            </div>
+            <div class="video-info">
+                <h4><a href="https://www.youtube.com/results?search_query=(Insert Video Title)" target="_blank">(Insert Video Title)</a></h4>
+                <p class="channel">(Channel Name)</p>
+            </div>
+        </div>
+        </div>
+    """
+
+        # Specific AI call and clean up
+        model = genai.GenerativeModel(MODEL_NAME)
+        response = model.generate_content(prompt)
+        html_content = clean_ai_response(response.text)
+
+        # Send the clean HTML back to React as JSON
+        return jsonify({"success": True, "html": html_content})
+
+    # Catch any server errors (like API failures) and return the error message
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)  
+    # Start the Flask development server on Port 5000
