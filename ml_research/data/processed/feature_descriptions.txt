@@ -1,0 +1,77 @@
+FEATURE CATEGORIES
+================================================================================
+
+Identifiers:
+  - child_id
+  - hh_id
+
+Demographics:
+  - gender
+  - gender_numeric
+  - dob
+
+Geography:
+  - district
+  - upazila
+  - union
+  - village
+
+Raw Measurements:
+  - date
+  - height
+  - weight
+  - cbmi
+
+Age Features:
+  - age_days
+  - age_weeks
+  - age_months
+  - age_years
+  - age_category
+
+Z-Scores:
+  - zlen
+  - zwei
+  - zwfl
+  - zbmi
+
+Z-Score Changes:
+  - zlen_change
+  - zwei_change
+  - zwfl_change
+  - zbmi_change
+
+Growth Velocities:
+  - height_velocity_monthly
+  - weight_velocity_monthly
+
+Cumulative Growth:
+  - height_growth_total
+  - weight_growth_total
+
+Measurement Patterns:
+  - measurement_number
+  - num_measurements_so_far
+  - days_since_first_measurement
+  - avg_measurement_interval
+
+Temporal:
+  - measurement_month
+  - measurement_quarter
+  - measurement_year
+  - month_sin
+  - month_cos
+
+Malnutrition Indicators:
+  - is_stunted
+  - is_underweight
+  - is_wasted
+  - is_overweight
+
+Ratios:
+  - weight_height_ratio
+  - ponderal_index
+
+Quality:
+  - has_who_flag
+
