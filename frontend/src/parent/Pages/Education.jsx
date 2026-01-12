@@ -70,7 +70,48 @@ function Education() {
         }
         setLoading(false);
     };
+
+        <div className="container">
+            <h1>Parenting Resource Hub</h1>
+            <p className="subtitle">Books and videos for the journey</p>
+
+            <form onSubmit={handleSearch} className="input-section">
+                <input
+                    type="number"
+                    placeholder="Child Age (Months)"
+                    required
+                    value={formData.age}
+                    onChange={(e) => setFormData({ ...formData, age: e.target.value })} />
+                <select
+                    required
+                    value={formData.concern}
+                    onChange={(e) => setFormData({ ...formData, concern: e.target.value })}
+                >
+                    <option value="" disabled>Select Topic</option>
+                    <option>Sleep Training</option>
+                    <option>Starting Solids</option>
+                    <option>Tantrums</option>
+                    <option>Speech Development</option>
+                </select>
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Searching...' : 'Find Resources'}
+                </button>
+            </form>
+
+            {loading && <p style={{ textAlign: 'center' }}>Searching...</p>}
+            
+            {result && <div dangerouslySetInnerHTML={{ __html: result }} />}
+        </div>
+    
 }
+
+
+
+
+
+
+
+
 
 
 
