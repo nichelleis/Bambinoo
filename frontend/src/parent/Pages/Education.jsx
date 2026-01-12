@@ -47,8 +47,15 @@ const DEFAULT_CONTENT = `
 
 function Education() {
     const [result, setResult] = useState(DEFAULT_CONTENT);
+    
     const [formData, setFormData] = useState({ age: '', concern: '' });
     const [loading, setLoading] = useState(false);
-    };
+
+    
+}
+
+
+
+
 
 export default Education;
