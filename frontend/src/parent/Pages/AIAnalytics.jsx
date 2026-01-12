@@ -74,6 +74,12 @@ const AIAnalytics = () => {
         }
         button:hover { background: var(--primary-hover); }
 
+        .meal-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        .meal-table th { background: var(--primary); color: white; padding: 16px; text-align: left; }
+        .meal-table td { border-bottom: 1px solid #e2e8f0; padding: 16px; color: var(--text); }
+        .summary-card { background: #eff6ff; border: 1px solid #bfdbfe; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
+        .tips-card { background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 12px; margin-top: 25px; }
+                    
         
       
       ` }} />
