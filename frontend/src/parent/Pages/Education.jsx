@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+// Default HTML content displayed initially with trending books and videos
 const DEFAULT_CONTENT = `
   <h2 class="section-title">Trending this Week</h2>
   <div class="media-grid">
@@ -46,15 +47,20 @@ const DEFAULT_CONTENT = `
 `;
 
 function Education() {
+    // Initialize result with default content to show trending items on load
     const [result, setResult] = useState(DEFAULT_CONTENT);
     
+    // Manages the search form data - child's age and selected concern topic
     const [formData, setFormData] = useState({ age: '', concern: '' });
+    // Controls the loading state during the API request
     const [loading, setLoading] = useState(false);
 
+    // Function to handle form submission and fetch personalized resources from backend
     const handleSearch = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
+            // Send POST request to backend API with search criteria
             const res = await fetch('http://127.0.0.1:5000/get-resources', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -62,10 +68,12 @@ function Education() {
             });
             const data = await res.json();
             
+            // Replace default content with AI-generated recommendations if successful
             if (data.success) setResult(data.html);
             else alert(data.error);
             
         } catch (err) {
+            // Alert user if backend server is not running
             alert("Error: Python server not running on port 5000");
         }
         setLoading(false);
@@ -172,6 +180,7 @@ function Education() {
             <h1>Parenting Resource Hub</h1>
             <p className="subtitle">Books and videos for the journey</p>
 
+            {/* Form for searching resources by child's age and topic */}
             <form onSubmit={handleSearch} className="input-section">
                 <input
                     type="number"
@@ -195,8 +204,10 @@ function Education() {
                 </button>
             </form>
 
+            {/* Show loading message while fetching results */}
             {loading && <p style={{ textAlign: 'center' }}>Searching...</p>}
             
+            {/* Render the resource content (default or AI-generated) */}
             {result && <div dangerouslySetInnerHTML={{ __html: result }} />}
         </div>
          </>
