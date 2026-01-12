@@ -5,7 +5,7 @@ import RegistrationForm from "./pages/regestration";
 import ParentLayout from "./layouts/ParentLayout";
 import NurseLayout from "./layouts/NurseLayout";
 import AdminLayout from "./layouts/AdminLayout";
-import DoctorLayout from "./layouts/DoctorLayour";
+import DoctorLayout from "./layouts/DoctorLayout";
 
 function App() {
   return (
