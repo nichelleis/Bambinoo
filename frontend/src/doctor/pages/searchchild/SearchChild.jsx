@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import "../../../assets/styleSheets/SearchChild.module.css";
 const SearchChild = ({ selectedChild, setSelectedChild }) => {
   const [query, setQuery] = useState("");
   const [childrenData, setChildrenData] = useState([]);
