@@ -3,12 +3,12 @@ import { useState } from "react";
 
 import Sidebar from "../doctor/pages/sidebar/Sidebar";
 import Dashboard from "../doctor/pages/Dashboard/Dashboard";
-import SearchChild from "./pages/SearchChild/SearchChild";
-import CHDRView from "./pages/CHDRView/CHDRView";
-import Growth from"./pages/Growth/Growth";
-import Immunizations from "./pages/Immunizations/Immunizations";
-import MedicalHistory from "./pages/MedicalHistory/MedicalHistory";
-import Medicines from "./pages/Medicines/Medicines";
+import SearchChild from "../doctor/pages/searchchild/SearchChild";
+import CHDRView from "../doctor/pages/CHDRView/CHDRView";
+import Growth from"../doctor/pages/Growth/Growth";
+import Immunizations from "../doctor/pages/Immunizations/Immunizations";
+import MedicalHistory from "../doctor/pages/MedicalHistory/MedicalHistory";
+import Medicines from "../doctor/pages/Medicines/Medicines";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
