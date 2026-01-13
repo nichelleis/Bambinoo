@@ -12,7 +12,7 @@ const Immunizations = ({ selectedChild }) => {
 
   return (
     <div className="immunization-page">
-      {/* HEADER */}
+     
       <div className="immunization-header">
         <h3>Immunization Records</h3>
         <p>
@@ -21,7 +21,7 @@ const Immunizations = ({ selectedChild }) => {
       </div>
 
       <div className="immunization-layout">
-        {/* ADD IMMUNIZATION */}
+       
         <div className="card">
           <h4>➕ Record New Immunization</h4>
 
@@ -61,7 +61,6 @@ const Immunizations = ({ selectedChild }) => {
           <button className="saveing-btn">Record Immunization</button>
         </div>
 
-        {/* IMMUNIZATION HISTORY */}
         <div className="card">
           <h4>Immunization History</h4>
 
