@@ -1,0 +1,130 @@
+.immunization-page {
+  padding: 20px;
+}
+
+.immunization-header {
+  background: linear-gradient(90deg, #e9f7f3, #f4fbf9);
+  padding: 18px 22px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.immunization-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.immunization-header p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.immunization-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card h4 {
+  margin-bottom: 14px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 10px;
+  display: block;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  margin-top: 6px;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.saveing-btn {
+  margin-top: 16px;
+  width: 100%;
+  background: #2aa198;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.saveing-btn:hover {
+  background: #238b84;
+}
+
+.immunization-item {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+  background: #fafafa;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dose-badge {
+  background: #e6f6f3;
+  color: #2aa198;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.next-dose {
+  color: #d97706;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.empty-medical {
+  text-align: center;
+  padding: 80px 20px;
+  color: #64748b;
+}
+
+.empty-medical h2 {
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.no-data {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.empty-immunization {
+  text-align: center;
+  margin-top: 80px;
+}
