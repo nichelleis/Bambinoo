@@ -1072,3 +1072,18 @@ def get_resources():
 if __name__ == "__main__":
     app.run(debug=True, port=5000)  
     # Start the Flask development server on Port 5000
+
+
+#Doctor Layout Backend
+from datetime import date
+
+def calculate_age(date_of_birth):
+    if isinstance(date_of_birth, str):
+        dob = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+    else:
+        dob = date_of_birth
+    
+    today = date.today()
+    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+    return age
+
