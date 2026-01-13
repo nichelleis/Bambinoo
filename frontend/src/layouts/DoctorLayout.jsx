@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
 
-import Sidebar from "../doctor/pages/sidebar/Sidebar";
+import DoctorSideNav from "../doctor/components/DoctorSideNav";
 import Dashboard from "../doctor/pages/Dashboard/Dashboard";
 import SearchChild from "../doctor/pages/searchchild/SearchChild";
 import CHDRView from "../doctor/pages/CHDRView/CHDRView";
@@ -20,7 +20,7 @@ function DoctorLayout() {
   return (
     <>
       <div className="d-flex">
-        <Sidebar />
+        <DoctorSideNav />
 
         <main className="flex-grow-1 p-4 main-content">
           <Routes>
