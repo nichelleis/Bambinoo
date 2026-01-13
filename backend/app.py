@@ -1068,12 +1068,7 @@ def get_resources():
     # Catch any server errors (like API failures) and return the error message
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)  
-    # Start the Flask development server on Port 5000
-
-
+    
 #Doctor Layout Backend
 from datetime import date
 
@@ -1300,3 +1295,9 @@ def get_doctor_child_detail(child_code):
     except Exception as e:
         print(f"Error fetching child detail: {str(e)}")
         return jsonify({"error": "Failed to fetch child details"})
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)  
+    # Start the Flask development server on Port 5000
+
+
