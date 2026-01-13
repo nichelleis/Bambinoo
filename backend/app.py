@@ -1087,3 +1087,216 @@ def calculate_age(date_of_birth):
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
     return age
 
+@app.route("/api/doctor/children", methods=["GET"])
+def get_doctor_children():
+    try:
+        children = Child.query.all()
+        result = []
+
+        for child in children:
+            parent = User.query.get(child.parent_id)
+            
+            latest_growth = (
+                GrowthRecord.query
+                .filter_by(child_id=child.id)
+                .order_by(GrowthRecord.record_date.desc())
+                .first()
+            )
+            
+            growth_history = (
+                GrowthRecord.query
+                .filter_by(child_id=child.id)
+                .order_by(GrowthRecord.record_date.asc())
+                .all()
+            )
+            
+            vaccinations = Vaccination.query.filter_by(child_id=child.id).all()
+            health_records = HealthRecord.query.filter_by(child_id=child.id).all()
+            
+            medications = HealthNote.query.filter(
+                HealthNote.child_id == child.id,
+                HealthNote.medication_name.isnot(None)
+            ).all()
+            
+            age = calculate_age(child.date_of_birth)
+            
+            child_data = {
+                "id": f"CH{str(child.id).zfill(3)}",
+                "name": child.name,
+                "age": age,
+                "gender": child.gender,
+                "blood": "Unknown",
+                "parent": parent.username if parent else "Unknown",
+                "phone": parent.phone if parent and parent.phone else "N/A",
+                
+                "allergies": [
+                    note.title for note in HealthNote.query.filter_by(
+                        child_id=child.id,
+                        record_type="Allergy"
+                    ).all()
+                ] or ["None"],
+                
+                "activeConditions": [
+                    record.diagnosis for record in health_records 
+                    if record.diagnosis and record.diagnosis != "Healthy"
+                ] or ["None"],
+                
+                "growth": {
+                    "height": f"{latest_growth.height} cm" if latest_growth and latest_growth.height else "N/A",
+                    "weight": f"{latest_growth.weight} kg" if latest_growth and latest_growth.weight else "N/A",
+                    "head": f"{latest_growth.head_circumference} cm" if latest_growth and latest_growth.head_circumference else "N/A",
+                    "recordedOn": latest_growth.record_date.strftime("%Y-%m-%d") if latest_growth else "N/A"
+                } if latest_growth else None,
+                
+                "immunizations": [
+                    {
+                        "name": v.vaccine_name,
+                        "status": "Completed" if v.status == "completed" else "Pending"
+                    }
+                    for v in vaccinations
+                ],
+                
+                "medicalHistory": [
+                    {
+                        "condition": record.diagnosis or record.title,
+                        "since": record.record_date.strftime("%Y"),
+                        "date": record.record_date.strftime("%d/%m/%Y"),
+                        "status": "Active" if record.follow_up_date else "Resolved",
+                        "notes": record.notes or record.treatment or ""
+                    }
+                    for record in health_records
+                ],
+                
+                "medications": [
+                    {
+                        "name": med.medication_name,
+                        "dosage": med.medication_dosage or "As prescribed"
+                    }
+                    for med in medications
+                ],
+                
+                "growthHistory": [
+                    {
+                        "date": g.record_date.strftime("%d/%m/%Y"),
+                        "weight": g.weight,
+                        "height": g.height,
+                        "head": g.head_circumference
+                    }
+                    for g in growth_history
+                ]
+            }
+            
+            result.append(child_data)
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        print(f"Error in get_doctor_children: {str(e)}")
+        return jsonify({"error": "Failed to fetch children data"})
+
+@app.route("/api/doctor/children/<child_code>", methods=["GET"])
+def get_doctor_child_detail(child_code):
+    try:
+        child_id = int(child_code.replace("CH", "").lstrip("0"))
+        
+        child = Child.query.get(child_id)
+        if not child:
+            return jsonify({"error": "Child not found"})
+        
+        parent = User.query.get(child.parent_id)
+        
+        latest_growth = (
+            GrowthRecord.query
+            .filter_by(child_id=child.id)
+            .order_by(GrowthRecord.record_date.desc())
+            .first()
+        )
+        
+        growth_history = (
+            GrowthRecord.query
+            .filter_by(child_id=child.id)
+            .order_by(GrowthRecord.record_date.asc())
+            .all()
+        )
+        
+        vaccinations = Vaccination.query.filter_by(child_id=child.id).all()
+        health_records = HealthRecord.query.filter_by(child_id=child.id).all()
+        
+        medications = HealthNote.query.filter(
+            HealthNote.child_id == child.id,
+            HealthNote.medication_name.isnot(None)
+        ).all()
+        
+        age = calculate_age(child.date_of_birth)
+        
+        child_data = {
+            "id": child_code,
+            "name": child.name,
+            "age": age,
+            "gender": child.gender,
+            "blood": "Unknown",
+            "parent": parent.username if parent else "Unknown",
+            "phone": parent.phone if parent and parent.phone else "N/A",
+            
+            "allergies": [
+                note.title for note in HealthNote.query.filter_by(
+                    child_id=child.id,
+                    record_type="Allergy"
+                ).all()
+            ] or ["None"],
+            
+            "activeConditions": [
+                record.diagnosis for record in health_records 
+                if record.diagnosis and record.diagnosis != "Healthy"
+            ] or ["None"],
+            
+            "growth": {
+                "height": f"{latest_growth.height} cm" if latest_growth and latest_growth.height else "N/A",
+                "weight": f"{latest_growth.weight} kg" if latest_growth and latest_growth.weight else "N/A",
+                "head": f"{latest_growth.head_circumference} cm" if latest_growth and latest_growth.head_circumference else "N/A",
+                "recordedOn": latest_growth.record_date.strftime("%Y-%m-%d") if latest_growth else "N/A"
+            } if latest_growth else None,
+            
+            "immunizations": [
+                {
+                    "name": v.vaccine_name,
+                    "status": "Completed" if v.status == "completed" else "Pending"
+                }
+                for v in vaccinations
+            ],
+            
+            "medicalHistory": [
+                {
+                    "condition": record.diagnosis or record.title,
+                    "since": record.record_date.strftime("%Y"),
+                    "date": record.record_date.strftime("%d/%m/%Y"),
+                    "status": "Active" if record.follow_up_date else "Resolved",
+                    "notes": record.notes or record.treatment or ""
+                }
+                for record in health_records
+            ],
+            
+            "medications": [
+                {
+                    "name": med.medication_name,
+                    "dosage": med.medication_dosage or "As prescribed"
+                }
+                for med in medications
+            ],
+            
+            "growthHistory": [
+                {
+                    "date": g.record_date.strftime("%d/%m/%Y"),
+                    "weight": g.weight,
+                    "height": g.height,
+                    "head": g.head_circumference
+                }
+                for g in growth_history
+            ]
+        }
+        
+        return jsonify(child_data), 200
+        
+    except Exception as e:
+        print(f"Error fetching child detail: {str(e)}")
+        return jsonify({"error": "Failed to fetch child details"})
