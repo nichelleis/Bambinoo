@@ -5,95 +5,78 @@ const SearchChild = ({ selectedChild, setSelectedChild }) => {
   const [query, setQuery] = useState("");
   const [childrenData, setChildrenData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // FETCH FROM BACKEND
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/children")
+    fetch("http://127.0.0.1:5000/api/doctor/children")
       .then((res) => res.json())
       .then((data) => {
-        setChildrenData(data);
+        if (Array.isArray(data)) {
+          setChildrenData(data);
+        } else {
+          setError("No patients found");
+        }
         setLoading(false);
       })
-      .catch((err) => {
-        console.error("Failed to fetch children:", err);
+      .catch(() => {
+        setError("Backend not reachable");
         setLoading(false);
       });
   }, []);
 
-  const filteredChildren = childrenData.filter(
-    (child) =>
-      child.name.toLowerCase().includes(query.toLowerCase()) ||
-      child.id.toLowerCase().includes(query.toLowerCase())
-  );
-
   if (loading) {
-    return <p style={{ padding: "24px" }}>Loading patients...</p>;
+    return <p style={{ padding: 24 }}>Loading patients...</p>;
   }
 
+  if (error) {
+    return <p style={{ padding: 24, color: "red" }}>{error}</p>;
+  }
+
+  const filteredChildren = childrenData.filter(
+    (child) =>
+      child.name?.toLowerCase().includes(query.toLowerCase()) ||
+      child.code?.toLowerCase().includes(query.toLowerCase())
+  );
+
   return (
-    <div className="search-child-page">
-      <h2 className="page-title">Search Patient</h2>
+    <div style={{ padding: 24 }}>
+      <h2>Search Patient</h2>
 
-      {/* SEARCH BAR */}
-      <div className="search-box">
-        <input
-          type="text"
-          placeholder="Search by child name or ID..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <span className="result-count">
-          {filteredChildren.length} patient
-          {filteredChildren.length !== 1 && "s"} found
-        </span>
-      </div>
+      <input
+        style={{ padding: 10, width: "100%", marginBottom: 16 }}
+        type="text"
+        placeholder="Search by child name or code..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
 
-      {/* SELECTED CHILD */}
       {selectedChild && (
-        <div className="selected-child">
-          <span>Currently Selected</span>
-          <strong>{selectedChild.name}</strong>
-          <span className="status">Active</span>
+        <div style={{ marginBottom: 16 }}>
+          <strong>Selected:</strong> {selectedChild.name}
         </div>
       )}
 
-      {/* CHILD LIST */}
-      <div className="child-grid">
-        {filteredChildren.map((child) => (
-          <div
-            key={child.id}
-            className={`child-card ${
-              selectedChild?.id === child.id ? "active" : ""
-            }`}
-            onClick={() => setSelectedChild(child)}
-          >
-            <h3>{child.name}</h3>
-            <p>
-              {child.age} years • {child.gender}
-            </p>
-
-            <div className="divider" />
-
-            <p>
-              <strong>Parent:</strong> {child.parent}
-            </p>
-            <p>
-              <strong>Phone:</strong> {child.phone}
-            </p>
-            <p>
-              <strong>Blood Type:</strong> {child.blood}
-            </p>
-
-            {child.allergies.length > 0 && (
-              <div className="allergy-tags">
-                {child.allergies.map((a) => (
-                  <span key={a}>{a}</span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {filteredChildren.map((child) => (
+        <div
+          key={child.id}
+          onClick={() => setSelectedChild(child)}
+          style={{
+            border: "1px solid #ccc",
+            padding: 16,
+            marginBottom: 12,
+            cursor: "pointer",
+            background:
+              selectedChild?.id === child.id ? "#eef2ff" : "white",
+          }}
+        >
+          <h3>{child.name}</h3>
+          <p>
+            {child.age} years • {child.gender}
+          </p>
+          <p>Parent: {child.parent}</p>
+          <p>Phone: {child.phone}</p>
+        </div>
+      ))}
     </div>
   );
 };
