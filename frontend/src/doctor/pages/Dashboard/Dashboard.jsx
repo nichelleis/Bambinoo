@@ -2,7 +2,7 @@ import "./Dashboard.css";
 import StatCard from "./components/StatCard";
 import RecentActivity from "./components/RecentActivity";
 import AnalyticChart from "./components/AnalyticChart";
-import DoctorGreeting from"./components/DoctorGreeting";
+import DashboardHeader from "./components/DoctorDashboardHeader";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
@@ -10,9 +10,13 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <DoctorGreeting doctorName="Dr. Smith" />
+     
+      <DashboardHeader
+        doctorName="Dr. Sarah Mitchell"
+        specialization="Pediatric Specialist"
+      />
 
-      {/* TOP STAT CARDS */}
+    
       <div className="stat-grid">
         <StatCard
           title="Quick Patient Search"
@@ -39,12 +43,12 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* MIDDLE SECTION */}
+      
       <div className="middle-grid">
         <RecentActivity />
       </div>
 
-      {/* BOTTOM SECTION */}
+    
       <div className="chart-section">
         <AnalyticChart />
       </div>
