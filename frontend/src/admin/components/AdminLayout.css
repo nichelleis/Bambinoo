@@ -1,0 +1,47 @@
+.admin-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 220px;
+    background: #1e293b;
+    color: white;
+    padding: 20px;
+}
+
+.admin-title {
+    margin-bottom: 20px;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admin-link {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.admin-link:hover {
+    opacity: 0.8;
+}
+
+.admin-logout {
+    margin-top: auto;
+    padding: 8px;
+    background: linear-gradient(90deg, #3b82f6, #f472b6);
+    color: #ffffff;
+    border: none;
+    border-radius: px;
+    cursor: pointer;
+}
+
+.admin-content {
+    flex-grow: 1;
+    padding: 30px;
+    background: #f1f5f9;
+}
