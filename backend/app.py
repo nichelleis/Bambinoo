@@ -10,21 +10,26 @@ from werkzeug.security import generate_password_hash
 from dateutil.relativedelta import relativedelta
 import csv
 from collections import defaultdict
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+CORS( app, resources={r"/*": {"origins": os.getenv("FRONTEND_URL")}}, supports_credentials=True)
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'bambinoo.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = '12E0C9DA3A6F965C'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
 
 
-app.secret_key = "3245567562534q4534635q"
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_HOURS", 2)))
+
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 
 db = SQLAlchemy(app)
@@ -896,17 +901,13 @@ def get_vaccination_data():
         print("Error:", e)
         return jsonify({"message": "Server Error"}), 500
 
-# This allows react to talk to python
-CORS(app) 
 
-# --- AI Configuration ---
-# Set up google gemini API
-# os.environ["GEMINI_API_KEY"] = "AIzaSyCWDoDwinnh2-LdT9Im2pUH9RkYjI5-zlA"
-genai.configure(api_key="AIzaSyCWDoDwinnh2-LdT9Im2pUH9RkYjI5-zlA")
-# genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+
 MODEL_NAME = 'models/gemini-flash-latest'
 
-# Removes Markdown wrapper (```html) from AI response so we get pure code
+
 def clean_ai_response(text):
     return text.replace("```html", "").replace("```", "")
 
@@ -1168,7 +1169,6 @@ def get_child_chdr(child_id):
         return jsonify({"error": "Failed to fetch CHDR"}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)  
-    # Start the Flask development server on Port 5000
+    app.run(debug=os.getenv("FLASK_DEBUG") == "1", port=int(os.getenv("PORT", 5000)))
 
 
