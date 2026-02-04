@@ -1,5 +1,5 @@
 from app import app, db
-from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination)
+from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination,Allergy, ActiveCondition)
 from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash
 
@@ -310,6 +310,19 @@ with app.app_context():
             administered_by="Dr. Sarah Mitchell",
             location="City Clinic"
         ),
+    ])
+    
+    db.session.add_all([
+        Allergy(child_id=boy.id, name="Peanuts"),
+        Allergy(child_id=boy.id, name="Dust"),
+        Allergy(child_id=girl.id, name="Dairy"),
+        Allergy(child_id=girl.id, name="Shellfish"),
+    ])
+
+    
+    db.session.add_all([
+        ActiveCondition(child_id=boy.id, name="Eczema"),
+        ActiveCondition(child_id=girl.id, name="Asthma"),
     ])
 
     db.session.commit()

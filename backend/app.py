@@ -1071,46 +1071,68 @@ def get_resources():
         return jsonify({"success": False, "error": str(e)})
     
 #Doctor Layout Backend
-from datetime import date, datetime
 
-def calculate_age(date_of_birth):
-    if isinstance(date_of_birth, str):
-        dob = datetime.strptime(date_of_birth, "%Y-%m-%d").date()
-    else:
-        dob = date_of_birth
+
+class User(db.Model):
+    __tablename__ = "user"
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    password_hash = db.Column(db.String(255))
+    role = db.Column(db.String(20))
+
+    children = db.relationship("Child", backref="parent", lazy=True)
+
+
+
+
+ 
+
+
+class Allergy(db.Model):
+    __tablename__ = "allergy"
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    child_id = db.Column(db.Integer, db.ForeignKey("child.id"), nullable=False)
+
+    child = db.relationship("Child", backref="allergies")
+
+
+class ActiveCondition(db.Model):
+    __tablename__ = "active_condition"
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    child_id = db.Column(db.Integer, db.ForeignKey("child.id"), nullable=False)
+
+    child = db.relationship("Child", backref="active_conditions")
+
+
+
+
+def calculate_age(dob):
     today = date.today()
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 
-@app.route("/api/doctor/children", methods=["GET"])
-def get_doctor_children():
-    try:
-        children = Child.query.all()
-        result = []
-
-        for child in children:
-            parent = User.query.get(child.parent_id)
-            age = calculate_age(child.date_of_birth)
-
-            result.append({
-                "id": child.id,
-                "code": f"CH{str(child.id).zfill(3)}",
-                "name": child.name,
-                "age": age,
-                "gender": child.gender,
-                "parent": parent.username if parent else "Unknown",
-                "phone": parent.phone if parent and parent.phone else "N/A"
-            })
-
-        return jsonify(result), 200
-    except Exception:
-        return jsonify({"error": "Failed to fetch children"}), 500
 
 
-@app.route("/api/doctor/children/<int:child_id>/chdr", methods=["GET"])
-def get_child_chdr(child_id):
-    try:
-        child = Child.query.get_or_404(child_id)
+@app.route("/", methods=["GET"])
+def home():
+    return "Flask is running"
+
+
+@app.route("/children", methods=["GET"])
+def get_children():
+    children = Child.query.all()
+    response = []
+
+    for child in children:
         parent = User.query.get(child.parent_id)
 
         latest_growth = (
@@ -1120,54 +1142,30 @@ def get_child_chdr(child_id):
             .first()
         )
 
-        growth_history = GrowthRecord.query.filter_by(child_id=child.id).all()
-        vaccinations = Vaccination.query.filter_by(child_id=child.id).all()
-        health_records = HealthRecord.query.filter_by(child_id=child.id).all()
-
-        age = calculate_age(child.date_of_birth)
-
-        return jsonify({
-            "id": child.id,
+        response.append({
+            "id": f"CH{child.id:03d}",
             "name": child.name,
-            "age": age,
+            "age": calculate_age(child.date_of_birth),
             "gender": child.gender,
+            "parent": parent.username if parent else None,
+            "phone": parent.email if parent else None,
             "blood": "Unknown",
-            "allergies": [],
-            "activeConditions": [
-                r.diagnosis for r in health_records
-                if r.diagnosis and r.diagnosis != "Healthy"
-            ],
+            "allergies": [a.name for a in child.allergies],
+            "activeConditions": [c.name for c in child.active_conditions],
             "growth": {
-                "height": f"{latest_growth.height} cm",
-                "weight": f"{latest_growth.weight} kg",
-                "head": f"{latest_growth.head_circumference} cm",
-                "recorded": latest_growth.record_date.strftime("%Y-%m-%d")
-            } if latest_growth else None,
-            "immunizations": [
-                {
-                    "name": v.vaccine_name,
-                    "status": v.status
-                } for v in vaccinations
-            ],
-            "medicalHistory": [
-                {
-                    "condition": r.diagnosis or r.title,
-                    "status": "Active"
-                } for r in health_records
-            ],
-            "medications": [],
-            "growthHistory": [
-                {
-                    "date": g.record_date.strftime("%Y-%m-%d"),
-                    "weight": g.weight,
-                    "height": g.height,
-                    "head": g.head_circumference
-                } for g in growth_history
-            ]
-        }), 200
-    except Exception:
-        return jsonify({"error": "Failed to fetch CHDR"}), 500
+                "height": latest_growth.height if latest_growth else None,
+                "weight": latest_growth.weight if latest_growth else None,
+                "head": latest_growth.head_circumference if latest_growth else None,
+            } if latest_growth else None
+        })
 
+    return jsonify(response)
+
+
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
 if __name__ == "__main__":
     app.run(debug=os.getenv("FLASK_DEBUG") == "1", port=int(os.getenv("PORT", 5000)))
 
