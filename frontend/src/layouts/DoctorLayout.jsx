@@ -4,7 +4,7 @@ import { useState } from "react";
 import Sidebar from "../doctor/components/DoctorSideNav";
 
 import Dashboard from "../doctor/pages/Dashboard/Dashboard";
-import SearchChild from "../doctor/pages/searchchild";
+import SearchChild from "../doctor/pages/searchchild/SearchChild";
 import CHDRView from "../doctor/pages/CHDRView/CHDRView";
 import Growth from "../doctor/pages/Growth/Growth";
 import Immunizations from "../doctor/pages/Immunizations/Immunizations";
