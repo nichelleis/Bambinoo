@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-
+import "./DoctorSideNav.css";
 
 export default function Sidebar() {
   return (
