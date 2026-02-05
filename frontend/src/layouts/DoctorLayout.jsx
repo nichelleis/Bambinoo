@@ -36,26 +36,16 @@ export default function DoctorLayout() {
             }
           />
 
-          <Route
-            path="chdr"
-            element={<CHDRView selectedChild={selectedChild} />}
-          />
-
-          <Route
-            path="growth"
-            element={<Growth selectedChild={selectedChild} />}
-          />
-
+          <Route path="chdr" element={<CHDRView selectedChild={selectedChild} />} />
+          <Route path="growth" element={<Growth selectedChild={selectedChild} />} />
           <Route
             path="immunizations"
             element={<Immunizations selectedChild={selectedChild} />}
           />
-
           <Route
             path="medicalhistory"
             element={<MedicalHistory selectedChild={selectedChild} />}
           />
-
           <Route
             path="medicines"
             element={<Medicines selectedChild={selectedChild} />}
