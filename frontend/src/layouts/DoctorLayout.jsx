@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
-
+import "../assets/styleSheets/DoctorLayout.module.css";
 import Sidebar from "../doctor/components/DoctorSideNav";
 
 import Dashboard from "../doctor/pages/Dashboard/Dashboard";
