@@ -22,3 +22,6 @@ ml_research/data/models/*.h5
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
+
+venv/
+

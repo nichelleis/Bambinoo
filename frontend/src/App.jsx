@@ -5,7 +5,7 @@ import RegistrationForm from "./pages/regestration";
 import ParentLayout from "./layouts/ParentLayout";
 import NurseLayout from "./layouts/NurseLayout";
 import AdminLayout from "./layouts/AdminLayout";
-import DoctorLayout from "./layouts/DoctorLayour";
+import DoctorLayout from "./layouts/DoctorLayout";
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<RegistrationForm />} />
       <Route path="/admin" element={<AdminLayout />} />
-      <Route path="/doctor" element={<DoctorLayout />} />
+      <Route path="/doctor/*" element={<DoctorLayout />} />
       <Route path="/nurse" element={<NurseLayout />} />
       <Route path="/parent/*" element={<ParentLayout />} />
     </Routes>

@@ -10,21 +10,26 @@ from werkzeug.security import generate_password_hash
 from dateutil.relativedelta import relativedelta
 import csv
 from collections import defaultdict
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+CORS( app, resources={r"/*": {"origins": os.getenv("FRONTEND_URL")}}, supports_credentials=True)
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'bambinoo.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = '12E0C9DA3A6F965C'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=2)
 
 
-app.secret_key = "3245567562534q4534635q"
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_HOURS", 2)))
+
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 
 db = SQLAlchemy(app)
@@ -896,17 +901,13 @@ def get_vaccination_data():
         print("Error:", e)
         return jsonify({"message": "Server Error"}), 500
 
-# This allows react to talk to python
-CORS(app) 
 
-# --- AI Configuration ---
-# Set up google gemini API
-# os.environ["GEMINI_API_KEY"] = "AIzaSyCWDoDwinnh2-LdT9Im2pUH9RkYjI5-zlA"
-genai.configure(api_key="AIzaSyCWDoDwinnh2-LdT9Im2pUH9RkYjI5-zlA")
-# genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+
 MODEL_NAME = 'models/gemini-flash-latest'
 
-# Removes Markdown wrapper (```html) from AI response so we get pure code
+
 def clean_ai_response(text):
     return text.replace("```html", "").replace("```", "")
 
@@ -1068,7 +1069,86 @@ def get_resources():
     # Catch any server errors (like API failures) and return the error message
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
+    
+#Doctor Layout Backend
+
+
+class Allergy(db.Model):
+    __tablename__ = "allergy"
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    child_id = db.Column(db.Integer, db.ForeignKey("child.id"), nullable=False)
+
+    child = db.relationship("Child", backref="allergies")
+
+
+class ActiveCondition(db.Model):
+    __tablename__ = "active_condition"
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    child_id = db.Column(db.Integer, db.ForeignKey("child.id"), nullable=False)
+
+    child = db.relationship("Child", backref="active_conditions")
+
+
+
+
+def calculate_age(dob):
+    today = date.today()
+    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+
+
+
+
+@app.route("/", methods=["GET"])
+def home():
+    return "Flask is running"
+
+
+@app.route("/children", methods=["GET"])
+def get_children():
+    children = Child.query.all()
+    response = []
+
+    for child in children:
+        parent = User.query.get(child.parent_id)
+
+        latest_growth = (
+            GrowthRecord.query
+            .filter_by(child_id=child.id)
+            .order_by(GrowthRecord.record_date.desc())
+            .first()
+        )
+
+        response.append({
+            "id": f"CH{child.id:03d}",
+            "name": child.name,
+            "age": calculate_age(child.date_of_birth),
+            "gender": child.gender,
+            "parent": parent.username if parent else None,
+            "phone": parent.email if parent else None,
+            "blood": "Unknown",
+            "allergies": [a.name for a in child.allergies],
+            "activeConditions": [c.name for c in child.active_conditions],
+            "growth": {
+                "height": latest_growth.height if latest_growth else None,
+                "weight": latest_growth.weight if latest_growth else None,
+                "head": latest_growth.head_circumference if latest_growth else None,
+            } if latest_growth else None
+        })
+
+    return jsonify(response)
+
+
+
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)  
-    # Start the Flask development server on Port 5000
+    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=os.getenv("FLASK_DEBUG") == "1", port=int(os.getenv("PORT", 5000)))
+
+
