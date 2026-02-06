@@ -12,10 +12,6 @@ node_modules/
 __pycache__/
 *.pyc
 
-# ML Datasets
-ml_research/data/raw/*.csv
-ml_research/data/processed/*.npz
-ml_research/data/processed/*.csv
 
 # heavy model
 ml_research/data/models/*.h5
