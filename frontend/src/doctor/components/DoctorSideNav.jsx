@@ -1,93 +1,66 @@
 import { NavLink } from "react-router-dom";
-import styles from "../../assets/styleSheets/DoctorDashboard.module.css";
+import "./DoctorSideNav.css";
 
-function DoctorSideNav() {
+export default function Sidebar() {
   return (
-    <aside className={styles.sidebar}>
-      <h2 className={styles.logo}>Doctor Portal</h2>
+    <aside className="sidebar">
+      <h2 className="logo">Doctor Portal</h2>
 
-      <nav className={styles.sidebarContent}>
-        <div className={styles.menuSection}>
-          <p className={styles.sectionTitle}>MAIN</p>
+      <div className="menu-section">
+        <p className="section-title">MAIN</p>
+        <NavLink to="/doctor" end data-icon="🏠">
+          Overview
+        </NavLink>
+        <NavLink to="/doctor/search" data-icon="🔍">
+          Search Child
+        </NavLink>
+      </div>
 
-          <NavLink end to="" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Overview
-          </NavLink>
+      <div className="menu-section">
+        <p className="section-title">PATIENT DATA</p>
+        <NavLink to="/doctor/chdr" data-icon="📄">
+          CHDR View
+        </NavLink>
+        <NavLink to="/doctor/growth" data-icon="📈">
+          Growth Data
+        </NavLink>
+        <NavLink to="/doctor/immunizations" data-icon="💉">
+          Immunizations
+        </NavLink>
+        <NavLink to="/doctor/medicalhistory" data-icon="🩺">
+          Medical History
+        </NavLink>
+        <NavLink to="/doctor/development" data-icon="🧠">
+          Development
+        </NavLink>
+        <NavLink to="/doctor/medicines" data-icon="💊">
+          Medicines
+        </NavLink>
+      </div>
 
-          <NavLink to="search" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Search Child
-          </NavLink>
-        </div>
+      <div className="menu-section">
+        <p className="section-title">COMMUNICATION</p>
+        <NavLink to="/doctor/doctor-notes" data-icon="📝">
+          Doctor Notes
+        </NavLink>
+        <NavLink to="/doctor/messaging" data-icon="💬">
+          Messaging
+        </NavLink>
+      </div>
 
-        <div className={styles.menuSection}>
-          <p className={styles.sectionTitle}>PATIENT DATA</p>
+      <div className="menu-section">
+        <p className="section-title">ANALYTICS</p>
+        <NavLink to="/doctor/ai-analytics" data-icon="📊">
+          AI Analytics
+        </NavLink>
+      </div>
 
-          <NavLink to="chdr" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            CHDR View
-          </NavLink>
-
-          <NavLink to="growth" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Growth Data
-          </NavLink>
-
-          <NavLink to="immunizations" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Immunizations
-          </NavLink>
-
-          <NavLink to="medicalhistory" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Medical History
-          </NavLink>
-
-          <NavLink to="development" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Development
-          </NavLink>
-
-          <NavLink to="medicines" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Medicines
-          </NavLink>
-        </div>
-
-        <div className={styles.menuSection}>
-          <p className={styles.sectionTitle}>COMMUNICATION</p>
-
-          <NavLink to="doctor-notes" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Doctor Notes
-          </NavLink>
-
-          <NavLink to="messaging" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            Messaging
-          </NavLink>
-        </div>
-
-        <div className={styles.menuSection}>
-          <p className={styles.sectionTitle}>ANALYTICS</p>
-
-          <NavLink to="ai-analytics" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            AI Analytics
-          </NavLink>
-        </div>
-
-        <div className={styles.menuSection}>
-          <p className={styles.sectionTitle}>ADMISSION</p>
-
-          <NavLink to="auth" className={({ isActive }) => isActive ? `${styles.navLink} ${styles.active}` : styles.navLink}>
-            User Auth
-          </NavLink>
-        </div>
-      </nav>
-
-      <button
-        className={styles.logout}
-        onClick={() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          window.location.href = "/";
-        }}
-      >
-        Logout
-      </button>
+      <div className="menu-section">
+        <p className="section-title">ADMISSION</p>
+        <NavLink to="/doctor/auth" data-icon="🔐">
+          User Auth
+        </NavLink>
+      </div>
     </aside>
   );
 }
-
-export default DoctorSideNav;
