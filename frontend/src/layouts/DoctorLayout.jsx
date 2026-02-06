@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { useState } from "react";
-import "../assets/styleSheets/DoctorLayout.module.css";
+
 import Sidebar from "../doctor/components/DoctorSideNav";
 
 import Dashboard from "../doctor/pages/Dashboard/Dashboard";
@@ -10,7 +10,7 @@ import Growth from "../doctor/pages/Growth/Growth";
 import Immunizations from "../doctor/pages/Immunizations/Immunizations";
 import MedicalHistory from "../doctor/pages/MedicalHistory/MedicalHistory";
 import Medicines from "../doctor/pages/Medicines/Medicines";
-
+import "../doctor/components/DoctorLayout.css";
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
 }
