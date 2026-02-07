@@ -1,5 +1,6 @@
 import "../admin/components/AdminLayout.css";
-import { Outlet, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
+import AdminDashboard from "../admin/pages/AdminDashboard"; 
 
 export default function AdminLayout() {
   const handleLogout = () => {
@@ -8,27 +9,24 @@ export default function AdminLayout() {
   };
 
   return (
-  <div className="admin-container">
-    <div className="admin-sidebar">
-      <h2 className="admin-title">Admin Panel</h2>
+    <div className="admin-container">
+      <div className="admin-sidebar">
+        <h2 className="admin-title">Admin Panel</h2>
+        <nav className="admin-nav">
+          <Link to="/admin" className="admin-link">Dashboard</Link>
+          <Link to="/admin/users" className="admin-link">Manage Users</Link>
+          <Link to="/admin/reports" className="admin-link">Reports</Link>
+        </nav>
+        <button onClick={handleLogout} className="admin-logout">
+          Logout
+        </button>
+      </div>
 
-      <nav className="admin-nav">
-        <Link to="/admin" className="admin-link">Dashboard</Link>
-        <Link to="/admin/users" className="admin-link">Manage Users</Link>
-        <Link to="/admin/reports" className="admin-link">Reports</Link>
-      </nav>
-
-      <button onClick={handleLogout} className="admin-logout">
-        Logout
-      </button>
+      <div className="admin-content">
+        <Routes>
+          <Route index element={<AdminDashboard />} />
+        </Routes>
+      </div>
     </div>
-
-    <div className="admin-content">
-      <Outlet />
-    </div>
-  </div>
-);
-
+  );
 }
-
-
