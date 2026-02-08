@@ -1,124 +1,203 @@
+import React, { useState } from "react";
+import "./Medicines.css";
 
-import "../../../assets/styleSheets/Medicines.module.css";
+export default function Medicines({ selectedChild }) {
+  const [formData, setFormData] = useState({
+    medicineName: "",
+    dosage: "",
+    frequency: "",
+    startDate: "",
+    endDate: "",
+    longTerm: false,
+    notes: "",
+  });
 
-const Medicines = ({ selectedChild }) => {
+  const longTermMedicines = [
+    {
+      name: "Cetirizine",
+      dosage: "5ml",
+      frequency: "Once daily",
+    },
+  ];
+
+  const prescriptionHistory = [
+    {
+      name: "Cetirizine",
+      dosage: "5ml",
+      frequency: "Once daily",
+      start: "9/1/2023",
+      notes: "For allergy management",
+      longTerm: true,
+    },
+  ];
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Prescription saved:", formData);
+  };
+
+
   if (!selectedChild) {
     return (
-      <div className="empty-medicine">
-        <h2>No Patient Selected</h2>
-        <p>Please search and select a patient first.</p>
+      <div className="medicines-empty">
+        <div className="empty-card">
+          <i className="ri-capsule-line"></i>
+          <h2>No Patient Selected</h2>
+          <p>
+            Please search and select a patient to
+            <br />
+            manage prescribed medicines.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="medicine-page">
-    
-      <div className="medicine-header">
-        <div>
-          <h2>Prescribed Medicines</h2>
-          <p>
-            Managing for: <strong>{selectedChild.name}</strong>
-          </p>
+    <div className="medicines-page">
+      {/* HEADER */}
+      <div className="medicines-header">
+        <div className="child-info">
+          <div className="avatar">{selectedChild.name[0]}</div>
+          <div>
+            <h2>Prescribed Medicines</h2>
+            <p>Managing for {selectedChild.name}</p>
+          </div>
         </div>
       </div>
 
-    
-      {selectedChild.medications?.length > 0 && (
-        <div className="long-term-box">
-          <h4>⏱ Long-Term Critical Medicines</h4>
 
-          {selectedChild.medications.map((med, index) => (
-            <div className="long-term-item" key={index}>
-              <div>
-                <strong>{med.name}</strong>
-                <p>{med.dosage}</p>
-              </div>
-              <span className="tag">Long-term</span>
-            </div>
-          ))}
+      <div className="critical-box">
+        <div className="critical-title">
+          <i className="ri-alert-line"></i>
+          <span>Long-Term Critical Medicines</span>
         </div>
-      )}
 
-      <div className="medicine-layout">
-        
-        <div className="medicine-card">
+        {longTermMedicines.map((med, index) => (
+          <div key={index} className="critical-item">
+            <div>
+              <strong>{med.name}</strong>
+              <p>
+                {med.dosage} • {med.frequency}
+              </p>
+            </div>
+            <span className="pill warning">Long-term</span>
+          </div>
+        ))}
+      </div>
+
+
+      <div className="medicines-layout">
+
+        <form className="medicine-form" onSubmit={handleSubmit}>
           <h3>+ Prescribe Medicine</h3>
 
-          <div className="form-group">
-            <label>Medicine Name</label>
-            <input placeholder="e.g. Amoxicillin, Ibuprofen" />
-          </div>
+          <label>Medicine Name</label>
+          <input
+            type="text"
+            name="medicineName"
+            placeholder="e.g. Amoxicillin, Ibuprofen"
+            onChange={handleChange}
+          />
 
           <div className="form-row">
-            <div className="form-group">
-              <label>Dosage</label>
-              <input placeholder="e.g. 250mg, 5ml" />
-            </div>
-            <div className="form-group">
-              <label>Frequency</label>
-              <input placeholder="e.g. Twice daily" />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>Start Date</label>
-              <input type="date" defaultValue="2026-01-04" />
-            </div>
-            <div className="form-group">
-              <label>End Date</label>
-              <input type="date" placeholder="mm/dd/yyyy" />
-            </div>
-          </div>
-
-          <div className="toggle-row">
             <div>
-              <strong>Long-term / Critical Medicine</strong>
-              <p>Mark if this is an ongoing prescription</p>
+              <label>Dosage</label>
+              <input
+                type="text"
+                name="dosage"
+                placeholder="e.g. 250mg, 5ml"
+                onChange={handleChange}
+              />
             </div>
-            <label className="toggle-switch">
-              <input type="checkbox" />
-              <span className="slider"></span>
+
+            <div>
+              <label>Frequency</label>
+              <input
+                type="text"
+                name="frequency"
+                placeholder="e.g. Twice daily"
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div>
+              <label>Start Date</label>
+              <input
+                type="date"
+                name="startDate"
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <label>End Date</label>
+              <input
+                type="date"
+                name="endDate"
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="checkbox-row">
+            <label>
+              <input
+                type="checkbox"
+                name="longTerm"
+                onChange={handleChange}
+              />
+              <span>
+                Long-term / Critical Medicine
+                <small>Mark if this is an ongoing prescription</small>
+              </span>
             </label>
           </div>
 
-          <div className="form-group">
-            <label>Prescription Notes</label>
-            <textarea
-              rows="3"
-              placeholder="Administration instructions, warnings, interactions..."
-            />
-          </div>
+          <label>Prescription Notes</label>
+          <textarea
+            name="notes"
+            placeholder="Administration instructions, warnings, interactions..."
+            onChange={handleChange}
+          />
 
-          <button className="medicine-btn">Add Prescription</button>
-        </div>
+          <button type="submit" className="primary-btn">
+            Save Prescription
+          </button>
+        </form>
 
-     
-        <div className="medicine-card">
+  
+        <div className="medicine-history">
           <h3>Prescription History</h3>
 
-          {selectedChild.medications?.length > 0 ? (
-            selectedChild.medications.map((med, index) => (
-              <div className="history-item" key={index}>
-                <div className="history-header">
-                  <div>
-                    <strong>{med.name}</strong>
-                    <span className="tag">Long-term</span>
-                  </div>
-                </div>
-                <p className="history-dosage">Dosage: {med.dosage}</p>
-                <p className="history-date">Started: 9/1/2023</p>
-                <small>For allergy management</small>
+          {prescriptionHistory.map((item, index) => (
+            <div key={index} className="history-card">
+              <div>
+                <strong>{item.name}</strong>
+                <p>
+                  Dosage: {item.dosage} • {item.frequency}
+                </p>
+                <p>Started: {item.start}</p>
+                <small>{item.notes}</small>
               </div>
-            ))
-          ) : (
-            <p className="no-data">No prescriptions recorded.</p>
-          )}
+
+              {item.longTerm && (
+                <span className="pill warning">Long-term</span>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
-};
-
-export default Medicines;
+}
