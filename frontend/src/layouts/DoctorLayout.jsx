@@ -11,6 +11,7 @@ import MedicalHistory from "../doctor/pages/MedicalHistory/MedicalHistory";
 import Medicines from "../doctor/pages/Medicines/Medicines";
 import DoctorNotes from "../doctor/pages/DoctorNotes/DoctorNotes";
 import Messages from "../doctor/pages/Messages/Messages";
+import AIAnalytics from "../doctor/pages/AIAnalytics/AIAnalytics";
 import "../doctor/components/DoctorLayout.css";
 
 function Placeholder({ title }) {
@@ -67,8 +68,10 @@ export default function DoctorLayout() {
             element={<Messages selectedChild={selectedChild} />}
           />
 
-          
-          <Route path="/ai-analytics" element={<Placeholder title="AI Analytics" />} />
+          <Route
+            path="/ai-analytics"
+            element={<AIAnalytics selectedChild={selectedChild} />}
+          />
           <Route path="/auth" element={<Placeholder title="User Auth" />} />
         </Routes>
       </main>
