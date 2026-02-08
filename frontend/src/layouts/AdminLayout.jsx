@@ -25,7 +25,8 @@ export default function AdminLayout() {
       </div>
 
       <div className="admin-content">
-        <Routes>
+        
+        <Routes>// Routes for the admin dashboard
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<ManageUsers />} />
           <Route path="reports" element={<Reports />} />
