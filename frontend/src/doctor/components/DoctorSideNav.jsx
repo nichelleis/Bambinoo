@@ -30,8 +30,8 @@ export default function Sidebar() {
         <NavLink to="/doctor/medicalhistory" >
           Medical History
         </NavLink>
-        <NavLink to="/doctor/development" >
-          Development
+        <NavLink to="/doctor/doctornotes" >
+          Doctor Notes
         </NavLink>
         <NavLink to="/doctor/medicines" >
           Medicines

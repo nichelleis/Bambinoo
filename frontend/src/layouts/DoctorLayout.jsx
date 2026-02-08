@@ -9,6 +9,7 @@ import Growth from "../doctor/pages/Growth/Growth";
 import Immunizations from "../doctor/pages/Immunizations/Immunizations";
 import MedicalHistory from "../doctor/pages/MedicalHistory/MedicalHistory";
 import Medicines from "../doctor/pages/Medicines/Medicines";
+import DoctorNotes from "../doctor/pages/DoctorNotes/DoctorNotes";
 import "../doctor/components/DoctorLayout.css";
 
 function Placeholder({ title }) {
@@ -52,14 +53,15 @@ export default function DoctorLayout() {
             element={<MedicalHistory selectedChild={selectedChild} />}
           />
 
-          <Route path="/development" element={<Placeholder title="Development" />} />
-
           <Route
             path="/medicines"
             element={<Medicines selectedChild={selectedChild} />}
           />
+          <Route
+            path="/doctor-notes"
+            element={<DoctorNotes selectedChild={selectedChild} />}
+          />
 
-          <Route path="/doctor-notes" element={<Placeholder title="Doctor Notes" />} />
           <Route path="/messaging" element={<Placeholder title="Messaging" />} />
           <Route path="/ai-analytics" element={<Placeholder title="AI Analytics" />} />
           <Route path="/auth" element={<Placeholder title="User Auth" />} />
