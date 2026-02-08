@@ -1,32 +1,43 @@
-import "../../../assets/styleSheets/MedicalHistory.module.css";
+import React from "react";
+import "./MedicalHistory.css";
 
-const MedicalHistory = ({ selectedChild }) => {
+export default function MedicalHistory({ selectedChild }) {
   if (!selectedChild) {
     return (
-      <div className="empty-medical">
-        <h2>No Patient Selected</h2>
-        <p>Please search and select a patient first.</p>
+      <div className="mh-empty">
+        <div className="empty-card">
+          <i className="ri-heart-pulse-line"></i>
+          <h2>No Patient Selected</h2>
+          <p>
+            Please search and select a patient to manage
+            <br />
+            their medical history records.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="medical-page">
-    
-      <div className="medical-header">
-        <div>
-          <h2>Medical History</h2>
-          <p>
-            Managing records for:{" "}
-            <strong>{selectedChild.name}</strong>
-          </p>
+    <div className="mh-page">
+
+      <div className="mh-header">
+        <div className="header-left">
+          <div className="icon">❤</div>
+          <div>
+            <h2>Medical History</h2>
+            <p>Managing records for: {selectedChild.name}</p>
+          </div>
         </div>
       </div>
 
-      <div className="medical-layout">
-        
-        <div className="medical-card">
-          <h3>+ Add Medical Condition</h3>
+
+      <div className="mh-grid">
+
+        <div className="card">
+          <h3 className="card-title">
+            <i className="ri-add-line"></i> Add Medical Condition
+          </h3>
 
           <div className="form-group">
             <label>Condition / Diagnosis</label>
@@ -54,52 +65,42 @@ const MedicalHistory = ({ selectedChild }) => {
 
           <div className="form-group">
             <label>Clinical Notes</label>
-            <textarea
-              rows="3"
-              placeholder="Treatment details, observations, recommendations..."
-            />
+            <textarea placeholder="Treatment details, observations, recommendations..." />
           </div>
 
-          <button className="medical-btn">
-            Add to Medical History
+          <button className="primary-btn">
+            <i className="ri-save-line"></i> Add to Medical History
           </button>
         </div>
 
-        
-        <div className="medical-card">
-          <h3>Recorded Conditions</h3>
+       
+        <div className="card">
+          <h3 className="card-title">Recorded Conditions</h3>
 
-          {selectedChild.medicalHistory?.length > 0 ? (
-            selectedChild.medicalHistory.map((item, index) => (
-              <div className="condition-item" key={index}>
-                <div className="condition-header">
-                  <h4>{item.condition}</h4>
-                  <span className={`status ${item.status.toLowerCase()}`}>
-                    {item.status}
-                  </span>
-                </div>
-
-                <p className="condition-date">
-                  Diagnosed: {item.date}
-                </p>
-
-                <p className="condition-notes">
-                  {item.notes}
-                </p>
-
-                <div className="condition-actions">
-                  <button>Mark Resolved</button>
-                  <button>Mark Chronic</button>
-                </div>
+          <div className="condition-item">
+            <div className="condition-header">
+              <div className="condition-name">
+                <i className="ri-alert-line"></i>
+                <strong>Eczema</strong>
               </div>
-            ))
-          ) : (
-            <p className="no-data">No medical conditions recorded.</p>
-          )}
+              <span className="status-badge active">Active</span>
+            </div>
+
+            <small className="muted">
+              Diagnosed: 8/20/2022
+            </small>
+
+            <p className="condition-notes">
+              Mild case, managed with moisturizer
+            </p>
+
+            <div className="condition-actions">
+              <button className="outline-btn">Mark Resolved</button>
+              <button className="outline-btn">Mark Chronic</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default MedicalHistory;
+}
