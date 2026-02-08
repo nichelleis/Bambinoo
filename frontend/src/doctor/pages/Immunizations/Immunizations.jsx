@@ -37,14 +37,31 @@ const Immunizations = ({ selectedChild }) => {
     console.log("Immunization data:", formData);
   };
 
+
+  if (!selectedChild) {
+    return (
+      <div className="immunization-empty">
+        <div className="empty-card">
+          <i className="ri-syringe-line"></i>
+          <h2>No Patient Selected</h2>
+          <p>
+            Please search and select a patient to
+            <br />
+            view and record immunization details.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  
   return (
     <div className="immunizations-page">
       
       <div className="immunization-header">
         <h2>Immunization Records</h2>
         <p>
-          Recording for{" "}
-          <strong>{selectedChild?.name || "Selected Child"}</strong>
+          Recording for <strong>{selectedChild.name}</strong>
         </p>
       </div>
 
@@ -122,7 +139,7 @@ const Immunizations = ({ selectedChild }) => {
           </button>
         </form>
 
-      
+
         <div className="immunization-history">
           <h3>Immunization History</h3>
 
@@ -133,9 +150,7 @@ const Immunizations = ({ selectedChild }) => {
                 <p>Administered: {item.date}</p>
                 <p>By: {item.doctor}</p>
                 {item.next && (
-                  <p className="next-dose">
-                    Next dose: {item.next}
-                  </p>
+                  <p className="next-dose">Next dose: {item.next}</p>
                 )}
               </div>
 
