@@ -1,92 +1,145 @@
-import '../../../assets/styleSheets/Immunizations.module.css';
+import React, { useState } from "react";
+import "./Immunizations.css";
 
 const Immunizations = ({ selectedChild }) => {
-  if (!selectedChild) {
-    return (
-      <div className="empty-immunization">
-        <h2>No Patient Selected</h2>
-        <p>Please search and select a patient first.</p>
-      </div>
-    );
-  }
+  const [formData, setFormData] = useState({
+    vaccineName: "",
+    dateAdministered: "",
+    doseNumber: "",
+    batchNumber: "",
+    nextDueDate: "",
+    administeredBy: "",
+    notes: "",
+  });
+
+  const immunizationHistory = [
+    {
+      name: "MMR",
+      date: "6/15/2023",
+      doctor: "Dr. Smith",
+      dose: "Dose 1",
+      next: "6/15/2024",
+    },
+    {
+      name: "DTaP",
+      date: "3/10/2023",
+      doctor: "Dr. Smith",
+      dose: "Dose 3",
+    },
+  ];
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Immunization data:", formData);
+  };
 
   return (
-    <div className="immunization-page">
-     
+    <div className="immunizations-page">
+      
       <div className="immunization-header">
-        <h3>Immunization Records</h3>
+        <h2>Immunization Records</h2>
         <p>
-          Recording for: <strong>{selectedChild.name}</strong>
+          Recording for{" "}
+          <strong>{selectedChild?.name || "Selected Child"}</strong>
         </p>
       </div>
 
       <div className="immunization-layout">
-       
-        <div className="card">
-          <h4>➕ Record New Immunization</h4>
+        
+        <form className="immunization-form" onSubmit={handleSubmit}>
+          <h3>+ Record New Immunization</h3>
 
           <label>Vaccine Name</label>
-          <input type="text" placeholder="e.g. MMR, DTaP, Polio" />
+          <input
+            type="text"
+            name="vaccineName"
+            placeholder="e.g. MMR, DTaP, Polio"
+            onChange={handleChange}
+          />
 
           <div className="form-row">
             <div>
               <label>Date Administered</label>
-              <input type="date" />
+              <input
+                type="date"
+                name="dateAdministered"
+                onChange={handleChange}
+              />
             </div>
 
             <div>
               <label>Dose Number</label>
-              <input type="number" placeholder="1" />
+              <input
+                type="number"
+                name="doseNumber"
+                onChange={handleChange}
+              />
             </div>
           </div>
 
           <div className="form-row">
             <div>
               <label>Batch Number</label>
-              <input type="text" placeholder="Optional" />
+              <input
+                type="text"
+                name="batchNumber"
+                placeholder="Optional"
+                onChange={handleChange}
+              />
             </div>
 
             <div>
               <label>Next Due Date</label>
-              <input type="date" />
+              <input
+                type="date"
+                name="nextDueDate"
+                onChange={handleChange}
+              />
             </div>
           </div>
 
           <label>Administered By</label>
-          <input type="text" placeholder="Dr. Smith" />
+          <input
+            type="text"
+            name="administeredBy"
+            placeholder="Dr. Smith"
+            onChange={handleChange}
+          />
 
           <label>Notes</label>
-          <textarea placeholder="Any reactions or observations..." />
+          <textarea
+            name="notes"
+            placeholder="Any reactions or observations..."
+            onChange={handleChange}
+          />
 
-          <button className="saveing-btn">Record Immunization</button>
-        </div>
+          <button type="submit" className="primary-btn">
+            Record Immunization
+          </button>
+        </form>
 
-        <div className="card">
-          <h4>Immunization History</h4>
+      
+        <div className="immunization-history">
+          <h3>Immunization History</h3>
 
-          {selectedChild.immunizations.length === 0 && (
-            <p className="empty-text">No immunization records found.</p>
-          )}
-
-          {selectedChild.immunizations.map((i, index) => (
-            <div className="immunization-item" key={index}>
-              <div className="item-header">
-                <strong>{i.name}</strong>
-                <span className="dose-badge">
-                  {i.dose ? `Dose ${i.dose}` : "Completed"}
-                </span>
+          {immunizationHistory.map((item, index) => (
+            <div key={index} className="history-card">
+              <div className="history-left">
+                <strong>{item.name}</strong>
+                <p>Administered: {item.date}</p>
+                <p>By: {item.doctor}</p>
+                {item.next && (
+                  <p className="next-dose">
+                    Next dose: {item.next}
+                  </p>
+                )}
               </div>
 
-              <p>
-                Administered: <strong>{i.date || "—"}</strong>
-              </p>
-              <p>By: {i.administeredBy || "Dr. Smith"}</p>
-
-              {i.nextDue && (
-                <p className="next-dose">
-                  Next dose: {i.nextDue}
-                </p>
-              )}
+              <span className="dose-badge">{item.dose}</span>
             </div>
           ))}
         </div>
