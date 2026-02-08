@@ -1,6 +1,7 @@
 import "../admin/components/AdminLayout.css";
 import { Routes, Route, Link } from "react-router-dom";
 import AdminDashboard from "../admin/pages/AdminDashboard"; 
+import ManageUsers from "../admin/pages/ManageUsers";
 
 export default function AdminLayout() {
   const handleLogout = () => {
@@ -25,6 +26,7 @@ export default function AdminLayout() {
       <div className="admin-content">
         <Routes>
           <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<ManageUsers />} />
         </Routes>
       </div>
     </div>
