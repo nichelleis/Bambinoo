@@ -40,9 +40,6 @@ export default function Sidebar() {
 
       <div className="menu-section">
         <p className="section-title">COMMUNICATION</p>
-        <NavLink to="/doctor/doctor-notes" >
-          Doctor Notes
-        </NavLink>
         <NavLink to="/doctor/messaging" >
           Messaging
         </NavLink>

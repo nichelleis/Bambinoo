@@ -58,7 +58,7 @@ export default function DoctorLayout() {
             element={<Medicines selectedChild={selectedChild} />}
           />
           <Route
-            path="/doctor-notes"
+            path="/doctornotes"
             element={<DoctorNotes selectedChild={selectedChild} />}
           />
 
