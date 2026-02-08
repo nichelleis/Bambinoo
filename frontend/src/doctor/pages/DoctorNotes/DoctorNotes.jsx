@@ -1,5 +1,5 @@
 import React from "react";
-
+import "./DoctorNotes.css";
 
 export default function DoctorNotes({ selectedChild }) {
   if (!selectedChild) {

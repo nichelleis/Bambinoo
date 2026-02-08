@@ -73,7 +73,7 @@ export default function CHDRView({ selectedChild }) {
 
 
       <div className="chdr-grid">
-        {/* GROWTH */}
+   
         <div className="card">
           <h4>Latest Growth Measurements</h4>
           <div className="growth">
@@ -106,7 +106,7 @@ export default function CHDRView({ selectedChild }) {
           </ul>
         </div>
 
-        {/* MEDICAL HISTORY */}
+
         <div className="card">
           <h4>Medical History</h4>
           <p>
