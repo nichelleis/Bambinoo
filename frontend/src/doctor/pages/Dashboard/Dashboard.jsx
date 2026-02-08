@@ -21,25 +21,25 @@ const Dashboard = () => {
         <StatCard
           title="Quick Patient Search"
           value="Find Patient"
-          onClick={() => navigate("/search")}
+          onClick={() => navigate("/doctor/search")}
         />
 
         <StatCard
           title="Doctor Notes"
           value="Add Notes"
-          onClick={() => navigate("/doctor-notes")}
+          onClick={() => navigate("/doctor/doctor-notes")}
         />
 
         <StatCard
           title="AI Analytics"
           value="View Insights"
-          onClick={() => navigate("/ai-analytics")}
+          onClick={() => navigate("/doctor/ai-analytics")}
         />
 
         <StatCard
           title="User Authentication"
           value="Manage Access"
-          onClick={() => navigate("/auth")}
+          onClick={() => navigate("/doctor/auth")}
         />
       </div>
 
