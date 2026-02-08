@@ -1,7 +1,7 @@
 import React from 'react';
 
 export default function ManageUsers() {
-  // Temporary data representing the roles in your Bambinoo report
+  
   const users = [
     { id: 1, name: "Dr. Sandeep", email: "sandeep@bambinoo.lk", role: "Doctor", status: "Active" },
     { id: 2, name: "Nurse Kavindi", email: "kavindi@bambinoo.lk", role: "Nurse", status: "Active" },
