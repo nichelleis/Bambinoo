@@ -9,7 +9,7 @@
     background: #1e293b;
     color: white;
     padding: 20px;
-    display: flex; /* Added to help with logout positioning */
+    display: flex; 
     flex-direction: column;
 }
 
