@@ -1,81 +1,111 @@
-import { useEffect, useState } from "react";
-import "../../../assets/styleSheets/SearchChild.module.css";
-const SearchChild = ({ selectedChild, setSelectedChild }) => {
-  const [query, setQuery] = useState("");
-  const [childrenData, setChildrenData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+import "./SearchChild.css";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const SearchChild = ({ onSelect }) => {
+  const [children, setChildren] = useState([]);
+  const [filteredChildren, setFilteredChildren] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedChild, setSelectedChild] = useState(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/doctor/children")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setChildrenData(data);
-        } else {
-          setError("No patients found");
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Backend not reachable");
-        setLoading(false);
-      });
+    fetchChildren();
   }, []);
 
-  if (loading) {
-    return <p style={{ padding: 24 }}>Loading patients...</p>;
-  }
+  const fetchChildren = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:5000/children");
+      setChildren(res.data);
+      setFilteredChildren(res.data);
+    } catch (error) {
+      console.error("Error fetching children:", error);
+    }
+  };
 
-  if (error) {
-    return <p style={{ padding: 24, color: "red" }}>{error}</p>;
-  }
+  useEffect(() => {
+    const filtered = children.filter(
+      (child) =>
+        child.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        child.id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredChildren(filtered);
+  }, [searchTerm, children]);
 
-  const filteredChildren = childrenData.filter(
-    (child) =>
-      child.name?.toLowerCase().includes(query.toLowerCase()) ||
-      child.id?.toLowerCase().includes(query.toLowerCase())
-  );
+  const handleSelect = (child) => {
+    setSelectedChild(child);
+    if (onSelect) onSelect(child);
+  };
 
   return (
-    <div style={{ padding: 24 }}>
-      <h2>Search Patient</h2>
+    <div className="search-child-page">
+      <h2 className="page-title">Search Child</h2>
 
-      <input
-        style={{ padding: 10, width: "100%", marginBottom: 16 }}
-        type="text"
-        placeholder="Search by child name or ID..."
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
+      <div className="search-box">
+        <input
+          type="text"
+          placeholder="Search by child name or ID..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <span className="result-count">
+        {filteredChildren.length} child(ren) found
+      </span>
 
       {selectedChild && (
-        <div style={{ marginBottom: 16 }}>
-          <strong>Selected:</strong> {selectedChild.name}
+        <div className="selected-child">
+          <span>CURRENTLY SELECTED</span>
+          <strong>{selectedChild.name}</strong>
+          <span className="status">Active</span>
         </div>
       )}
 
-      {filteredChildren.map((child) => (
-        <div
-          key={child.id}
-          style={{
-            border: "1px solid #ccc",
-            padding: 16,
-            marginBottom: 12,
-            cursor: "pointer",
-            background:
-              selectedChild?.id === child.id ? "#eef2ff" : "white",
-          }}
-          onClick={() => setSelectedChild(child)}
-        >
-          <h3>{child.name}</h3>
-          <p>
-            {child.age} years • {child.gender}
-          </p>
-          <p>Parent: {child.parent}</p>
-          <p>Phone: {child.phone}</p>
-        </div>
-      ))}
+      <div className="child-grid">
+        {filteredChildren.length > 0 ? (
+          filteredChildren.map((child) => (
+            <div
+              key={child.id}
+              className={`child-card ${
+                selectedChild?.id === child.id ? "active" : ""
+              }`}
+              onClick={() => handleSelect(child)}
+            >
+              <h3>{child.name}</h3>
+              <p>
+                {child.age} years • {child.gender}
+              </p>
+
+              <div className="divider"></div>
+
+              <p>
+                <strong>Parent:</strong> {child.parent}
+              </p>
+              <p>
+                <strong>Email:</strong> {child.phone}
+              </p>
+              <p>
+                <strong>Blood Type:</strong> {child.blood}
+              </p>
+
+              <div className="allergy-tags">
+                {child.allergies.length > 0 ? (
+                  child.allergies.map((allergy, index) => (
+                    <span key={index}>{allergy}</span>
+                  ))
+                ) : (
+                  <span>No allergies</span>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="empty-state">
+            <h3>No child found</h3>
+            <p>Try searching with a different name or ID.</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
