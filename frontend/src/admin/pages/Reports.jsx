@@ -36,7 +36,6 @@ export default function Reports() {
         </div>
       </div>
 
-      
       <div style={{ marginTop: '30px', background: 'white', padding: '25px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
         <h3 style={{ color: '#64748b', marginBottom: '15px' }}>USER GROWTH OVERVIEW</h3>
         <div style={{ height: '200px', background: '#f8fafc', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
