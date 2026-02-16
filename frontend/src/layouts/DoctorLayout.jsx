@@ -7,7 +7,7 @@ import SearchChild from "../doctor/pages/searchchild/SearchChild";
 import CHDRView from "../doctor/pages/CHDRView/CHDRView";
 import Growth from "../doctor/pages/Growth/Growth";
 import Immunizations from "../doctor/pages/Immunizations/Immunizations";
-import MedicalHistory from "../doctor/pages/MedicalHistory/MedicalHistory";
+
 import Medicines from "../doctor/pages/Medicines/Medicines";
 import DoctorNotes from "../doctor/pages/DoctorNotes/DoctorNotes";
 import Messages from "../doctor/pages/Messages/Messages";
@@ -50,10 +50,7 @@ export default function DoctorLayout() {
             element={<Immunizations selectedChild={selectedChild} />}
           />
 
-          <Route
-            path="/medicalhistory"
-            element={<MedicalHistory selectedChild={selectedChild} />}
-          />
+          
 
           <Route
             path="/medicines"

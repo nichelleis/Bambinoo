@@ -27,9 +27,7 @@ export default function Sidebar() {
         <NavLink to="/doctor/immunizations" >
           Immunizations
         </NavLink>
-        <NavLink to="/doctor/medicalhistory" >
-          Medical History
-        </NavLink>
+        
         <NavLink to="/doctor/doctor-notes" >
           Doctor Notes
         </NavLink>
