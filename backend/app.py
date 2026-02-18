@@ -1145,6 +1145,40 @@ def get_children():
 
 
 
+# Admin Management Routes
+
+@app.route('/api/admin/users', methods=['GET'])
+@jwt_required()
+def get_admin_users():
+    """Fetches all users from the database for the Admin panel"""
+    try:
+        
+        current_user_id = get_jwt_identity()
+        admin_user = User.query.get(current_user_id)
+        
+        if not admin_user or admin_user.role != 'admin':
+            return jsonify({"message": "Unauthorized access. Admins only."}), 403
+
+        
+        users = User.query.all()
+        
+        
+        output = []
+        for u in users:
+            output.append({
+                "id": u.id,
+                "username": u.username,
+                "email": u.email,
+                "role": u.role,
+                "phone": u.phone
+            })
+            
+        return jsonify(output), 200
+    except Exception as e:
+        print(f"Admin API Error: {str(e)}")
+        return jsonify({"message": "Server error", "details": str(e)}), 500
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
