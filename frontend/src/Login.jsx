@@ -41,6 +41,7 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
         redirectDashboard(data.user.role);
       } else {
         setError(data.message || "Login failed. Please try again.");
@@ -63,6 +64,7 @@ const Login = () => {
       });
       const data = await response.json();
       if (response.ok && data.valid && data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
         redirectDashboard(data.user.role);
       } else {
         logout();
