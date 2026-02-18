@@ -216,6 +216,8 @@ def login():
             "user": {
                 "id": user.id,
                 "username": user.username,
+                "email": user.email,
+                "phone": user.phone,
                 "role": user.role
             }
         }), 200
@@ -242,6 +244,8 @@ def verify_token():
             "user": {
                 "id": user.id,
                 "username": user.username,
+                "email": user.email,
+                "phone": user.phone,
                 "role": user.role
             }
         }), 200
