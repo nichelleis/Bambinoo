@@ -1,6 +1,6 @@
-
-import React, { useState } from "react";
 import "./DoctorAi.css";
+import React, { useState } from "react";
+
 
 export default function AIAnalytics({ selectedChild }) {
   const [activeTab, setActiveTab] = useState("insights");
