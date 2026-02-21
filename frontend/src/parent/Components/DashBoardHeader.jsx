@@ -38,6 +38,14 @@ function calculateAge(dobString) {
   return parts.join(", ") + " old";
 }
 
+function getInitials(name){
+  if (!name) return "";
+  const nameParts = name.trim().split(" ");
+  const initials = nameParts.map(part => part[0].toUpperCase()).join("");
+  return initials
+
+}
+
 function DashboardHeader() {
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState("");
@@ -83,7 +91,7 @@ function DashboardHeader() {
       <div className={style.headerContent}>
         <div className={style.childInfoSection}>
           <div className={style.childIcon}>
-            {/* change to show the pic the parent adds later from the profile section and maybe add like a default icon to show if a image int added */}
+            {getInitials(childName)}
           </div>
           <div className={style.childInfo}>
             <h1 className={style.childName}>{childName}</h1>
