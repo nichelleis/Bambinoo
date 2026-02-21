@@ -7,7 +7,7 @@ import SearchChild from "../doctor/pages/searchchild/SearchChild";
 import CHDRView from "../doctor/pages/CHDRView/CHDRView";
 import Growth from "../doctor/pages/Growth/Growth";
 import Immunizations from "../doctor/pages/Immunizations/Immunizations";
-import MedicalHistory from "../doctor/pages/MedicalHistory/MedicalHistory";
+
 import Medicines from "../doctor/pages/Medicines/Medicines";
 import DoctorNotes from "../doctor/pages/DoctorNotes/DoctorNotes";
 import Messages from "../doctor/pages/Messages/Messages";
@@ -27,52 +27,50 @@ export default function DoctorLayout() {
 
       <main className="main-content">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
 
       
           <Route
-            path="/search"
+            path="search"
             element={<SearchChild onSelect={setSelectedChild} />}
           />
 
           <Route
-            path="/chdr"
+            path="chdr"
             element={<CHDRView selectedChild={selectedChild} />}
           />
 
           <Route
-            path="/growth"
+            path="growth"
             element={<Growth selectedChild={selectedChild} />}
           />
 
           <Route
-            path="/immunizations"
+            path="immunizations"
             element={<Immunizations selectedChild={selectedChild} />}
           />
 
-          <Route
-            path="/medicalhistory"
-            element={<MedicalHistory selectedChild={selectedChild} />}
-          />
+          
 
           <Route
-            path="/medicines"
+            path="medicines"
             element={<Medicines selectedChild={selectedChild} />}
           />
           <Route
-            path="/doctor-notes"
+            path=" doctor-notes"
             element={<DoctorNotes selectedChild={selectedChild} />}
           />
           <Route
-            path="/messaging"
+            path="messaging"
             element={<Messages selectedChild={selectedChild} />}
           />
 
           <Route
-            path="/ai-analytics"
+            path="ai-analytics"
             element={<AIAnalytics selectedChild={selectedChild} />}
           />
-          <Route path="/auth" element={<Placeholder title="User Auth" />} />
+          <Route path="auth" element={<Placeholder title="User Auth" />} />
         </Routes>
       </main>
     </div>

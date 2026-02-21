@@ -36,21 +36,21 @@ export default function Growth({ selectedChild }) {
   };
 
   return (
-    <div className="growth-page">
+    <div className="doctorgrowth-page">
 
-      <div className="growth-header">
+      <div className="doctorgrowth-header">
         <h2>Growth Data</h2>
         <p>Recording for: <strong>{selectedChild.name}</strong></p>
       </div>
 
    
-      <div className="growth-grid">
+      <div className="doctorgrowth-grid">
 
-        <div className="card">
+        <div className="doctorcard">
           <h4>+ Add New Measurement</h4>
 
-          <form onSubmit={handleSubmit} className="growth-form">
-            <div className="row">
+          <form onSubmit={handleSubmit} className="doctorgrowth-form">
+            <div className="doctorrow">
               <div>
                 <label>Date</label>
                 <input
@@ -76,7 +76,7 @@ export default function Growth({ selectedChild }) {
               </div>
             </div>
 
-            <div className="row">
+            <div className="doctorrow">
               <div>
                 <label>Height (cm)</label>
                 <input
@@ -111,17 +111,17 @@ export default function Growth({ selectedChild }) {
               onChange={handleChange}
             />
 
-            <button type="submit" className="save-btn">
+            <button type="submit" className="doctorsave-btn">
               Save Growth Data
             </button>
           </form>
         </div>
 
      
-        <div className="card">
+        <div className="doctorcard">
           <h4>Growth History</h4>
 
-          <table className="growth-table">
+          <table className="doctorgrowth-table">
             <thead>
               <tr>
                 <th>Date</th>
