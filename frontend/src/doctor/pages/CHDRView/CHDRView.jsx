@@ -125,6 +125,8 @@ export default function CHDRView({ selectedChild }) {
           <small>5ml • Once daily</small>
         </div>
       </div>
+     
     </div>
+    
   );
 }
