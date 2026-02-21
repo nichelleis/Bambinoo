@@ -35,11 +35,11 @@ export default function Sidebar() {
       </div>
 
       <div className="menu-section">
-        <p className="section-title">ANALYTICS</p>
+        <p className="sidesection-title">ANALYTICS</p>
         <NavLink to="/doctor/ai-analytics">AI Analytics</NavLink>
       </div>
       <div className="menu-section">
-        <p className="sidesection-title">ANALYTICS</p>
+        <p className="sidesection-title">AUTHENTICATION</p>
         <NavLink to="/doctor/auth">User Authentication</NavLink>
       </div>
 
