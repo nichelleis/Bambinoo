@@ -1,5 +1,6 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function calculateAge(dobString) {
   const dob = new Date(dobString);
@@ -41,6 +42,16 @@ function DashboardHeader() {
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState("");
   const [childGender, setChildGender] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const goToProfile = () => {
+    if (!location.pathname.startsWith("/parent/profile")) {
+      navigate("/parent/profile");
+    }
+  };
+
+  const isProfile = location.pathname.startsWith("/parent/profile");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -83,7 +94,11 @@ function DashboardHeader() {
           <button className={style.headerIcon}>
             <i className="bi bi-bell"></i>
           </button>
-          <button className={style.headerIcon}>
+          <button
+            className={style.headerIcon}
+            onClick={goToProfile}
+            disabled={isProfile}
+          >
             <i className="bi bi-person"></i>
           </button>
         </div>
