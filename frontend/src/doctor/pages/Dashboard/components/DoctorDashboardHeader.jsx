@@ -1,4 +1,4 @@
-import "../../../../assets/styleSheets/DashboardHeader.module.css";
+import "./DashboardHeader.css";
 
 const DashboardHeader = ({ doctorName, specialization }) => {
   const now = new Date();
