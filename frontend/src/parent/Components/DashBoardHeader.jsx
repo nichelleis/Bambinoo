@@ -38,14 +38,18 @@ function calculateAge(dobString) {
   return parts.join(", ") + " old";
 }
 
-function getInitials(name){
+function getInitials(name) {
   if (!name) return "";
+
   const nameParts = name.trim().split(" ");
-  const initials = nameParts.map(part => part[0].toUpperCase()).join("");
-  return initials
+  if (nameParts.length === 1) {
+    return nameParts[0][0].toUpperCase();
+  }
 
+  const firstInitial = nameParts[0][0].toUpperCase();
+  const lastInitial = nameParts[nameParts.length - 1][0].toUpperCase();
+  return firstInitial + lastInitial;
 }
-
 function DashboardHeader() {
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState("");
@@ -90,9 +94,7 @@ function DashboardHeader() {
     >
       <div className={style.headerContent}>
         <div className={style.childInfoSection}>
-          <div className={style.childIcon}>
-            {getInitials(childName)}
-          </div>
+          <div className={style.childIcon}>{getInitials(childName)}</div>
           <div className={style.childInfo}>
             <h1 className={style.childName}>{childName}</h1>
             <div className={style.childAge}>{childAge}</div>
