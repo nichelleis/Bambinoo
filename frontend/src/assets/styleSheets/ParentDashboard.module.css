@@ -1041,20 +1041,20 @@ nav {
   margin-top: 4px;
 }
 
-/*profile sec*/
-
+/*profile section*/
 
 .profileAvatar {
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  background: #6de2cd;
+  background: #f576b5ff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
   font-size: 28px;
-  color: #2f8f83;
+  color: white;
+  border: 2px solid #ffffffaa; 
 }
 
 .infoRow {
@@ -1069,8 +1069,35 @@ nav {
 }
 
 .badgeLight {
-  background: #e7f3f1;
+  background: #bae1db;
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 13px;
+  color: #166b61;
+  font-weight: bold;
+}
+
+.biProfile {
+  background: rgba(78, 205, 196, 0.15);
+  width: 46px;
+  height: 42px;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 0.3rem;
+  color: #3ea39c;
+  margin-right: 4px;
+}
+
+.infoMain {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.infoDetails {
+  font-size: 14px;
+}
+
+.refNumber {
+  color: rgb(122, 121, 121);
+  font-size: 14px;
 }
