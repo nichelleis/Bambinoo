@@ -7,7 +7,7 @@ function Profile() {
       <div
         style={{
           background:
-            "linear-gradient(135deg, rgba(22,163,110,0.08) 0%, rgba(99,148,255,0.06) 100%)",
+            "linear-gradient(135deg, rgba(37, 165, 185, 0.15) 0%, rgba(252, 99, 255, 0.06) 100%)",
           border: "1px solid rgba(22,163,110,0.2)",
           borderRadius: 20,
           padding: "28px 28px",
@@ -23,10 +23,10 @@ function Profile() {
           <div className={style.profileAvatar}>TF</div>
 
           <div>
-            <h2 className="mb-1">Thinal Fernando</h2>
+            <h2 className="mb-1" style={{fontFamily: "Nonito", fontWeight: "500"}}>Thinal Fernando</h2>
 
             <div className="d-flex align-items-center gap-3 flex-wrap">
-              <span>
+              <span  style={{color: "rgb(122, 121, 121)", fontSize: "14px", fontWeight: "bold"}}>
                 <i className="bi bi-calendar me-1"></i>
                 15 Jun 2024
               </span>
@@ -35,7 +35,9 @@ function Profile() {
               <span className={style.badgeLight}>Male</span>
             </div>
 
-            <div className="mt-2 text-muted">Reg. CHDR-2024-00312</div>
+            <div className={`mt-2  ${style.refNumber}`}>
+              Reg. CHDR-2024-00312
+            </div>
           </div>
         </div>
       </div>
@@ -45,26 +47,27 @@ function Profile() {
           <div className={style.dashboardCard}>
             <div
               style={{
-                fontWeight: 600,
+                fontWeight: "bolder",
                 marginBottom: 12,
               }}
             >
-              <i className="bi bi-heart"></i> Birth Details
+              <i className={`bi bi-activity ${style.biProfile}`}></i> Birth
+              Measurements
             </div>
 
             <div className={style.infoRow}>
-              <span>Hospital</span>
-              <span>National Hospital</span>
+              <span className={style.infoMain}>Weight</span>
+              <span className={style.infoDetails}>12</span>
             </div>
 
             <div className={style.infoRow}>
-              <span>Location</span>
-              <span>Colombo</span>
+              <span className={style.infoMain}>Length</span>
+              <span className={style.infoDetails}>23</span>
             </div>
 
             <div className={style.infoRow}>
-              <span>Delivery</span>
-              <span>Natural</span>
+              <span className={style.infoMain}>Head Circumference</span>
+              <span className={style.infoDetails}>50</span>
             </div>
           </div>
         </div>
@@ -77,22 +80,17 @@ function Profile() {
                 marginBottom: 12,
               }}
             >
-              <i className="bi bi-activity"></i> Birth Measurements
+              <i className={`bi bi-geo-alt ${style.biProfile}`}></i> Background
             </div>
 
             <div className={style.infoRow}>
-              <span>Weight</span>
-              <span>12</span>
+              <span className={style.infoMain}>Nationality</span>
+              <span className={style.infoDetails}>Sri Lankan</span>
             </div>
 
             <div className={style.infoRow}>
-              <span>Length</span>
-              <span>23</span>
-            </div>
-
-            <div className={style.infoRow}>
-              <span>Head Circ.</span>
-              <span>50</span>
+              <span className={style.infoMain}>Language</span>
+              <span className={style.infoDetails}>Sinhala</span>
             </div>
           </div>
         </div>
@@ -105,17 +103,27 @@ function Profile() {
                 marginBottom: 12,
               }}
             >
-              <i className="bi bi-geo-alt"></i> Background
+              <i className={`bi bi-heart ${style.biProfile}`}></i> Birth Details
             </div>
 
             <div className={style.infoRow}>
-              <span>Nationality</span>
-              <span>Sri Lankan</span>
+              <span className={style.infoMain}>Hospital</span>
+              <span className={style.infoDetails}>National Hospital</span>
             </div>
 
             <div className={style.infoRow}>
-              <span>Language</span>
-              <span>Sinhala</span>
+              <span className={style.infoMain}>Location</span>
+              <span className={style.infoDetails}>Colombo</span>
+            </div>
+
+            <div className={style.infoRow}>
+              <span className={style.infoMain}>Delivery</span>
+              <span className={style.infoDetails}>Natural</span>
+            </div>
+
+            <div className={style.infoRow}>
+              <span className={style.infoMain}>Surgery</span>
+              <span className={style.infoDetails}>No</span>
             </div>
           </div>
         </div>
@@ -128,22 +136,30 @@ function Profile() {
                 marginBottom: 12,
               }}
             >
-              <i className="bi bi-person"></i> Parent / Guardian
+              <i className={`bi bi-person ${style.biProfile}`}></i> Parent /
+              Guardian
             </div>
 
             <div className={style.infoRow}>
-              <span>Name</span>
-              <span>Thinal Fernando 2</span>
+              <span className={style.infoMain}>Name</span>
+              <span className={style.infoDetails}>Thinal Fernando 2</span>
             </div>
 
             <div className={style.infoRow}>
-              <span>Email</span>
-              <span>thinal@test.123</span>
+              <span className={style.infoMain}>Email</span>
+              <span className={style.infoDetails}>thinal@test.123</span>
             </div>
 
             <div className={style.infoRow}>
-              <span>Phone</span>
-              <span>305984295</span>
+              <span className={style.infoMain}>Phone</span>
+              <span className={style.infoDetails}>305984295</span>
+            </div>
+
+            <div className={style.infoRow}>
+              <span className={style.infoMain}>Address</span>
+              <span className={style.infoDetails}>
+                45/B, Lotus Lane, Rajagiriya, Colombo 10
+              </span>
             </div>
           </div>
         </div>
