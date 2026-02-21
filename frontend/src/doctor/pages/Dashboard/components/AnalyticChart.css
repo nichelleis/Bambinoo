@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 
 .chart-container {
-  background: rgba(255, 255, 255, 0.04);
+  background: #0d0f1e;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 0.9rem 1.1rem;
@@ -15,7 +15,7 @@
   font-family: 'Syne', sans-serif;
   font-size: 0.88rem;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #0d0f1e;
   flex-shrink: 0;
 }
 
