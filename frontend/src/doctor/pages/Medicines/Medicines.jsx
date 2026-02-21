@@ -48,7 +48,7 @@ export default function Medicines({ selectedChild }) {
   if (!selectedChild) {
     return (
       <div className="medicines-empty">
-        <div className="empty-card">
+        <div className="medicinesempty-card">
           <i className="ri-capsule-line"></i>
           <h2>No Patient Selected</h2>
           <p>
