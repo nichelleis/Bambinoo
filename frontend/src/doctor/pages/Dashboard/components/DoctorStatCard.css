@@ -1,67 +1,112 @@
 .doctorstat-card {
-  position: relative;
-  background: #0d0f1e !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  padding: 1.6rem 1.5rem 1.3rem;
   cursor: pointer;
+  position: relative;
   overflow: hidden;
-  transition: transform 0.2s, border-color 0.25s, box-shadow 0.25s;
-  color: #f1f5f9 !important;
+  transition: transform 0.22s cubic-bezier(.34,1.56,.64,1),
+              box-shadow 0.22s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  outline: none;
+  border: none;
 }
 
-.doctorstat-card::before {
+.doctorstat-card[data-color="blue"] {
+  --card-accent: #1e2a5e;
+  --card-text: #1e2a5e;
+  background: linear-gradient(145deg, #dde4f7 0%, #c8d3f2 100%);
+  box-shadow: 0 4px 18px rgba(30,42,94,0.15);
+}
+
+.doctorstat-card[data-color="pink"] {
+  --card-accent: #a61e5a;
+  --card-text: #8b1a4e;
+  background: linear-gradient(145deg, #f9d6ea 0%, #f4bedd 100%);
+  box-shadow: 0 4px 18px rgba(214,51,132,0.15);
+}
+
+.doctorstat-card[data-color="purple"] {
+  --card-accent: #5218b0;
+  --card-text: #4a1699;
+  background: linear-gradient(145deg, #e0d8f9 0%, #d0c5f6 100%);
+  box-shadow: 0 4px 18px rgba(109,40,217,0.15);
+}
+
+.doctorstat-card[data-color="teal"] {
+  --card-accent: #0a5c73;
+  --card-text: #0a5c73;
+  background: linear-gradient(145deg, #cceaf2 0%, #b5e0ec 100%);
+  box-shadow: 0 4px 18px rgba(14,116,144,0.15);
+}
+
+.doctorstat-card::after {
   content: '';
   position: absolute;
-  inset: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-accent);
   opacity: 0;
-  transition: opacity 0.25s;
-  border-radius: inherit;
+  transition: opacity 0.2s;
 }
 
-.doctorstat-card:hover { transform: translateY(-3px); }
-.doctorstat-card:hover::before { opacity: 1; }
+.doctorstat-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.14);
+}
 
-.doctorstat-card[data-color="blue"]::before { background: radial-gradient(circle at 70% 30%, rgba(59,130,246,0.3), transparent 70%); }
-.doctorstat-card[data-color="blue"]:hover { border-color: rgba(59,130,246,0.5); box-shadow: 0 8px 24px rgba(59,130,246,0.2); }
-.doctorstat-card[data-color="blue"] p { color: #93c5fd !important; }
+.doctorstat-card:hover::after {
+  opacity: 1;
+}
 
-.doctorstat-card[data-color="pink"]::before { background: radial-gradient(circle at 70% 30%, rgba(236,72,153,0.3), transparent 70%); }
-.doctorstat-card[data-color="pink"]:hover { border-color: rgba(236,72,153,0.5); box-shadow: 0 8px 24px rgba(236,72,153,0.2); }
-.doctorstat-card[data-color="pink"] p { color: #f9a8d4 !important; }  
-.doctorstat-card[data-color="purple"]::before { background: radial-gradient(circle at 70% 30%, rgba(168,85,247,0.3), transparent 70%); }
-.doctorstat-card[data-color="purple"]:hover { border-color: rgba(168,85,247,0.5); box-shadow: 0 8px 24px rgba(168,85,247,0.2); }
-.doctorstat-card[data-color="purple"] p { color: #d8b4fe !important; }
+.doctorstat-card:focus-visible {
+  outline: 2px solid var(--card-accent);
+  outline-offset: 2px;
+}
 
-.doctorstat-card[data-color="teal"]::before { background: radial-gradient(circle at 70% 30%, rgba(6,182,212,0.3), transparent 70%); }
-.doctorstat-card[data-color="teal"]:hover { border-color: rgba(6,182,212,0.5); box-shadow: 0 8px 24px rgba(6,182,212,0.2); }
-.doctorstat-card[data-color="teal"] p { color: #67e8f9 !important; }
+.doctorstat-card-icon {
+  font-size: 1.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.3rem;
+}
 
-.doctorstat-card-icon { font-size: 1.3rem; margin-bottom: 0.45rem; }
 .doctorstat-card h4 {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.68rem;
-  color: rgba(241,245,249,0.45) !important;
-  font-weight: 400;
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--card-text);
+  opacity: 0.65;
 }
 
 .doctorstat-card p {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-top: 0.15rem;
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--card-text);
 }
 
 .doctorstat-card-arrow {
   position: absolute;
-  right: 0.85rem;
-  bottom: 0.85rem;
-  font-size: 0.8rem;
-  color: #f1f5f9;
-  opacity: 0.3;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 1rem;
+  color: var(--card-accent);
+  opacity: 0.4;
   transition: opacity 0.2s, transform 0.2s;
 }
 
-.doctorstat-card:hover .doctorstat-card-arrow { opacity: 0.8; transform: translate(2px, -2px); }
+.doctorstat-card:hover .doctorstat-card-arrow {
+  opacity: 1;
+  transform: translate(2px, -2px);
+}

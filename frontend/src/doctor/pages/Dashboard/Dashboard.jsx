@@ -39,7 +39,7 @@ const Dashboard = () => {
 
       <div className="doctorstat-grid">
         <StatCard title="Quick Patient Search" value="Find Patient" icon="🔍" color="blue" onClick={() => navigate("/doctor/search")} />
-        <StatCard title="Doctor Notes" value="Add Notes" icon="📝" color="pink" onClick={() => navigate("/doctor/doctor-notes")} />
+        <StatCard title="Doctor Notes" value="Add Notes" icon="📝" color="pink" onClick={() => navigate("/doctor/doctornotes")} />
         <StatCard title="AI Analytics" value="View Insights" icon="🤖" color="purple" onClick={() => navigate("/doctor/ai-analytics")} />
         <StatCard title="User Authentication" value="Manage Access" icon="🔐" color="teal" onClick={() => navigate("/doctor/auth")} />
       </div>

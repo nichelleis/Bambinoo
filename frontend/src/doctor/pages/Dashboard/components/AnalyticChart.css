@@ -1,57 +1,71 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
-
 .chart-container {
-  background: #0d0f1e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.5rem 1.2rem;
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  height: 100%;
+  gap: 0.3rem;
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-container::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(109,40,217,0.06) 0%,
+    rgba(214,51,132,0.04) 50%,
+    transparent 70%);
+  pointer-events: none;
 }
 
 .chart-container h3 {
-  font-family: 'Syne', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #0d0f1e;
-  flex-shrink: 0;
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
 }
 
 .chart-subtitle {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.68rem;
-  color: rgba(241, 245, 249, 0.45);
-  margin-top: 0.1rem;
+  font-size: 0.73rem;
+  color: var(--text-sub);
+  font-family: var(--font-body);
   margin-bottom: 0.6rem;
-  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
 }
 
+.chart-container > .recharts-responsive-container,
 .chart-container > div:last-child {
   flex: 1;
-  min-height: 0;
-}
-
-/* Recharts overrides */
-.recharts-cartesian-grid-horizontal line,
-.recharts-cartesian-grid-vertical line {
-  stroke: rgba(255, 255, 255, 0.06);
-}
-
-.recharts-text,
-.recharts-cartesian-axis-tick-value {
-  fill: rgba(241, 245, 249, 0.45) !important;
-  font-size: 11px !important;
-  font-family: 'DM Sans', sans-serif !important;
+  min-height: 220px;
 }
 
 .recharts-legend-item-text {
-  color: rgba(241, 245, 249, 0.55) !important;
-  font-size: 0.7rem !important;
-  font-family: 'DM Sans', sans-serif !important;
+  color: var(--text-sub) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.73rem !important;
 }
 
-.recharts-tooltip-wrapper {
-  outline: none;
+.recharts-cartesian-axis-tick-value {
+  fill: var(--text-sub) !important;
+}
+
+.recharts-default-tooltip {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  color: var(--text-main) !important;
+  font-family: var(--font-body) !important;
 }

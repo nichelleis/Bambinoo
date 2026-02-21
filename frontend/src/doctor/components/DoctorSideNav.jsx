@@ -38,7 +38,10 @@ export default function Sidebar() {
         <p className="section-title">ANALYTICS</p>
         <NavLink to="/doctor/ai-analytics">AI Analytics</NavLink>
       </div>
-
+      <div className="menu-section">
+        <p className="section-title">ANALYTICS</p>
+        <NavLink to="/doctor/auth">User Authentication</NavLink>
+      </div>
 
       <div className="menu-section logout-section">
         <button className="logout-btn" onClick={handleLogout}>
