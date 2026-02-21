@@ -19,7 +19,6 @@ const Dashboard = () => {
     <div className="doctordashboard">
       <DashboardHeader
         doctorName="Dr. Sarah Mitchell"
-        specialization="Pediatric Specialist"
       />
 
       <div className="doctormini-stats-row">

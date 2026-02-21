@@ -6,12 +6,12 @@ const DashboardHeader = ({ doctorName, specialization }) => {
   const dateStr = now.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" });
 
   return (
-    <div className="dashboard-header">
+    <div className="doctor-dashboard-header">
       <div>
-        <h1 className="dashboard-header-title">Welcome back, {doctorName} </h1>
-        <p className="dashboard-header-subtitle">{specialization} • Doctor Dashboard • {dateStr}</p>
+        <h1 className="doctor-dashboard-header-title">Welcome back, {doctorName} </h1>
+        <p className="doctor-dashboard-header-subtitle">{specialization} • Doctor Dashboard • {dateStr}</p>
       </div>
-      <div className="header-badge">On Duty · {timeStr}</div>
+      <div className="doctor-header-badge">{timeStr}</div>
     </div>
   );
 };
