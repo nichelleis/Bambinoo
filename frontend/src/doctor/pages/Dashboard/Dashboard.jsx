@@ -1,5 +1,5 @@
-import "./Dashboard.css";
-import StatCard from "./components/StatCard";
+import "./DoctorDashboard.css";
+import StatCard from "./components/DoctorStatCard";
 import RecentActivity from "./components/RecentActivity";
 import AnalyticChart from "./components/AnalyticChart";
 import DashboardHeader from "./components/DoctorDashboardHeader";
@@ -16,13 +16,13 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="dashboard">
+    <div className="doctordashboard">
       <DashboardHeader
         doctorName="Dr. Sarah Mitchell"
         specialization="Pediatric Specialist"
       />
 
-      <div className="mini-stats-row">
+      <div className="doctormini-stats-row">
         {stats.map((s, i) => (
           <div className="mini-stat" key={i}>
             <span className="mini-icon">{s.icon}</span>
@@ -37,14 +37,14 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <div className="stat-grid">
+      <div className="doctorstat-grid">
         <StatCard title="Quick Patient Search" value="Find Patient" icon="🔍" color="blue" onClick={() => navigate("/doctor/search")} />
         <StatCard title="Doctor Notes" value="Add Notes" icon="📝" color="pink" onClick={() => navigate("/doctor/doctor-notes")} />
         <StatCard title="AI Analytics" value="View Insights" icon="🤖" color="purple" onClick={() => navigate("/doctor/ai-analytics")} />
         <StatCard title="User Authentication" value="Manage Access" icon="🔐" color="teal" onClick={() => navigate("/doctor/auth")} />
       </div>
 
-      <div className="bottom-grid">
+      <div className="doctorbottom-grid">
         <RecentActivity />
         <AnalyticChart />
       </div>

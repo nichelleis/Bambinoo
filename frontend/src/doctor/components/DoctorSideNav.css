@@ -1,177 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
 .sidebar {
-  width: 260px;
+  width: 240px;
   height: 100vh;
-  background: linear-gradient(180deg, #fafaf8 0%, #f5f5f0 100%);
-  border-right: 1px solid #d4d2cd;
+  background: #0b0d1a;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
-  padding: 24px 16px;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.03);
+  padding: 28px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
 }
 
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+
+.sidebar::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+
 .logo {
-  font-size: 24px;
-  font-weight: 700;
-  color: #2a2825;
-  margin-bottom: 36px;
-  padding: 0 12px;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #4a4845 0%, #2a2825 100%);
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 32px;
+  padding: 0 10px;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, #fff 0%, #a78bfa 55%, #ec4899 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+
 .menu-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .section-title {
-  font-size: 11px;
-  color: #8b8985;
-  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.62rem;
+  color: rgba(241, 245, 249, 0.28);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin-bottom: 12px;
-  padding: 0 12px;
+  letter-spacing: 0.12em;
+  margin-bottom: 6px;
+  padding: 0 10px;
   position: relative;
 }
 
 .section-title::after {
   content: "";
   position: absolute;
-  bottom: -6px;
-  left: 12px;
-  width: 24px;
-  height: 2px;
-  background: linear-gradient(90deg, #a8a6a1 0%, transparent 100%);
-  border-radius: 1px;
+  bottom: -5px;
+  left: 10px;
+  width: 20px;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.5), transparent);
+  border-radius: 2px;
 }
+
 
 .sidebar a {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  margin-bottom: 6px;
+  padding: 9px 12px;
+  margin-bottom: 2px;
   border-radius: 10px;
   text-decoration: none;
-  color: #5a5754;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+  color: rgba(241, 245, 249, 0.5);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  transition: all 0.2s ease;
   border: 1px solid transparent;
-}
-
-.sidebar a::before {
-  content: attr(data-icon);
-  font-size: 18px;
-  width: 22px;
-  text-align: center;
-  opacity: 0.85;
-  transition: all 0.25s ease;
+  position: relative;
+  letter-spacing: 0.01em;
 }
 
 .sidebar a:hover {
-  background: #ffffff;
-  color: #2a2825;
-  border-color: #e8e6e1;
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-.sidebar a:hover::before {
-  opacity: 1;
-  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(241, 245, 249, 0.9);
+  border-color: rgba(255, 255, 255, 0.06);
+  transform: translateX(3px);
 }
 
 .sidebar a.active {
-  background: linear-gradient(135deg, #e8e6e1 0%, #d4d2cd 100%);
-  color: #2a2825;
-  font-weight: 600;
-  border-color: #c9c7c2;
-  box-shadow: 0 6px 16px rgba(139, 137, 133, 0.12);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.1));
+  color: #f1f5f9;
+  font-weight: 500;
+  border-color: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.1);
 }
+
 
 .sidebar a.active::before {
-  opacity: 1;
-  color: #4a4845;
-}
-
-.sidebar a.active::after {
   content: "";
   position: absolute;
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 4px;
-  height: 28px;
-  background: linear-gradient(180deg, #8b8985 0%, #6a6864 100%);
-  border-radius: 0 4px 4px 0;
-  box-shadow: 2px 0 8px rgba(139, 137, 133, 0.25);
+  width: 3px;
+  height: 60%;
+  background: linear-gradient(180deg, #a855f7, #3b82f6);
+  border-radius: 0 3px 3px 0;
 }
 
-.sidebar::-webkit-scrollbar {
-  width: 8px;
-}
 
-.sidebar::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 12px 0;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #d4d2cd 0%, #c9c7c2 100%);
-  border-radius: 4px;
-  border: 2px solid #fafaf8;
-  transition: all 0.2s ease;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #c9c7c2 0%, #b5b3ae 100%);
-}
-
-.sidebar a:active {
-  transform: translateX(2px);
-  transition: transform 0.1s ease;
-}
-
-.menu-section:last-child {
-  margin-bottom: 0;
-}
-
-.sidebar-logout {
-  margin-top: auto; 
-  padding: 16px;
+.logout-section {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .logout-btn {
   width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px; 
-  padding: 10px 16px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #2a2825;
-  background: linear-gradient(135deg, #e8e6e1 0%, #d4d2cd 100%);
-  border: 1px solid #c9c7c2;
-  border-radius: 8px;
-  box-shadow: 0 6px 16px rgba(139, 137, 133, 0.12);
+  padding: 10px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: rgba(241, 245, 249, 0.55);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-align: left;
+  letter-spacing: 0.01em;
 }
-
-
-.logout-btn i {
-  font-size: 18px;
-}
-
 
 .logout-btn:hover {
-  background: linear-gradient(135deg, #d4d2cd 0%, #bfbcb5 100%);
-  color: #1a1a1a;
-  box-shadow: 0 8px 20px rgba(139, 137, 133, 0.2);
-  transform: translateY(-2px);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+  transform: translateX(3px);
 }
+
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }

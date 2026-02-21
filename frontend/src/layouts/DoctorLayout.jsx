@@ -27,7 +27,8 @@ export default function DoctorLayout() {
 
       <main className="main-content">
         <Routes>
-          <Route index element={<Dashboard />} />
+          
+          <Route path="/" element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
 
       
@@ -58,7 +59,7 @@ export default function DoctorLayout() {
             element={<Medicines selectedChild={selectedChild} />}
           />
           <Route
-            path=" doctor-notes"
+            path="doctornotes"
             element={<DoctorNotes selectedChild={selectedChild} />}
           />
           <Route

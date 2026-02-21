@@ -1,4 +1,4 @@
-import "./Growth.css";
+import "./DoctorGrowth.css";
 import React, { useState } from "react";
 
 export default function Growth({ selectedChild }) {
@@ -12,8 +12,8 @@ export default function Growth({ selectedChild }) {
 
   if (!selectedChild) {
     return (
-      <div className="chdr-empty">
-        <div className="empty-card">
+      <div className="growth-empty">
+        <div className="growth-empty-card">
           <i className="ri-line-chart-line"></i>
           <h2>No Patient Selected</h2>
           <p>
@@ -36,92 +36,50 @@ export default function Growth({ selectedChild }) {
   };
 
   return (
-    <div className="doctorgrowth-page">
-
-      <div className="doctorgrowth-header">
+    <div className="growth-page">
+      <div className="growth-header">
         <h2>Growth Data</h2>
         <p>Recording for: <strong>{selectedChild.name}</strong></p>
       </div>
 
-   
-      <div className="doctorgrowth-grid">
-
-        <div className="doctorcard">
+      <div className="growth-grid">
+        <div className="growth-card">
           <h4>+ Add New Measurement</h4>
-
-          <form onSubmit={handleSubmit} className="doctorgrowth-form">
-            <div className="doctorrow">
-              <div>
+          <form onSubmit={handleSubmit} className="growth-form">
+            <div className="growth-row">
+              <div className="growth-field">
                 <label>Date</label>
-                <input
-                  type="date"
-                  name="date"
-                  value={form.date}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="date" name="date" value={form.date} onChange={handleChange} required />
               </div>
-
-              <div>
+              <div className="growth-field">
                 <label>Weight (kg)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  name="weight"
-                  placeholder="e.g. 12.5"
-                  value={form.weight}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="number" step="0.1" name="weight" placeholder="e.g. 12.5" value={form.weight} onChange={handleChange} required />
               </div>
             </div>
 
-            <div className="doctorrow">
-              <div>
+            <div className="growth-row">
+              <div className="growth-field">
                 <label>Height (cm)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  name="height"
-                  placeholder="e.g. 85.0"
-                  value={form.height}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="number" step="0.1" name="height" placeholder="e.g. 85.0" value={form.height} onChange={handleChange} required />
               </div>
-
-              <div>
+              <div className="growth-field">
                 <label>Head Circumference (cm)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  name="head"
-                  placeholder="Optional"
-                  value={form.head}
-                  onChange={handleChange}
-                />
+                <input type="number" step="0.1" name="head" placeholder="Optional" value={form.head} onChange={handleChange} />
               </div>
             </div>
 
-            <label>Notes</label>
-            <textarea
-              name="notes"
-              placeholder="Any additional observations..."
-              value={form.notes}
-              onChange={handleChange}
-            />
+            <div className="growth-field">
+              <label>Notes</label>
+              <textarea name="notes" placeholder="Any additional observations..." value={form.notes} onChange={handleChange} />
+            </div>
 
-            <button type="submit" className="doctorsave-btn">
-              Save Growth Data
-            </button>
+            <button type="submit" className="growth-save-btn">Save Growth Data</button>
           </form>
         </div>
 
-     
-        <div className="doctorcard">
+        <div className="growth-card">
           <h4>Growth History</h4>
-
-          <table className="doctorgrowth-table">
+          <table className="growth-table">
             <thead>
               <tr>
                 <th>Date</th>
