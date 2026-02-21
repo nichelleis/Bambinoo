@@ -1,13 +1,5 @@
 import "./AnalyticChart.css";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 const data = [
   { month: "Jan", height: 85, weight: 12 },
@@ -18,38 +10,37 @@ const data = [
   { month: "Jun", height: 95, weight: 14.5 },
 ];
 
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ background:"rgba(15,16,28,0.95)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"10px", padding:"0.6rem 0.9rem", fontSize:"0.72rem", color:"#f1f5f9" }}>
+        <p style={{ marginBottom:"0.3rem", fontWeight:600 }}>{label}</p>
+        {payload.map((p, i) => <p key={i} style={{ color: p.color }}>{p.name}: {p.value}</p>)}
+      </div>
+    );
+  }
+  return null;
+};
+
 const AnalyticChart = () => {
   return (
     <div className="chart-container">
       <h3>Child Growth Trends</h3>
-      <p className="chart-subtitle">
-        Height (cm) & Weight (kg) over last 6 months
-      </p>
-
-      <ResponsiveContainer width="100%" height={280}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="month" />
-          <YAxis />
-          <Tooltip />
-
-          <Line
-            type="monotone"
-            dataKey="height"
-            stroke="#14b8a6"
-            strokeWidth={3}
-            dot={{ r: 4 }}
-            name="Height (cm)"
+      <p className="chart-subtitle">Height (cm) & Weight (kg) — last 6 months</p>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 4, right: 10, left: -20, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+          <XAxis dataKey="month" tick={{ fill:"rgba(241,245,249,0.45)", fontSize:11 }} axisLine={false} tickLine={false} />
+          <YAxis
+            tick={{ fill:"rgba(241,245,249,0.45)", fontSize:11 }}
+            axisLine={false}
+            tickLine={false}
+            domain={['auto', 'auto']}
           />
-
-          <Line
-            type="monotone"
-            dataKey="weight"
-            stroke="#6366f1"
-            strokeWidth={3}
-            dot={{ r: 4 }}
-            name="Weight (kg)"
-          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize:"0.7rem", color:"rgba(241,245,249,0.55)" }} />
+          <Line type="monotone" dataKey="height" stroke="#3b82f6" strokeWidth={2.5} dot={{ r:3, fill:"#3b82f6", strokeWidth:0 }} activeDot={{ r:5 }} name="Height (cm)" />
+          <Line type="monotone" dataKey="weight" stroke="#ec4899" strokeWidth={2.5} dot={{ r:3, fill:"#ec4899", strokeWidth:0 }} activeDot={{ r:5 }} name="Weight (kg)" />
         </LineChart>
       </ResponsiveContainer>
     </div>
