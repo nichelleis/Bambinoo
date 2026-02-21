@@ -61,6 +61,8 @@ body {
   justify-content: center;
   font-size: 1.5rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-weight: bold;
 }
 
 .childInfo h1 {
@@ -1054,7 +1056,7 @@ nav {
   font-weight: 600;
   font-size: 28px;
   color: white;
-  border: 2px solid #ffffffaa; 
+  border: 2px solid #ffffffaa;
 }
 
 .infoRow {
