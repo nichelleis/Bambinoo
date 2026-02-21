@@ -1,8 +1,50 @@
 import "./DoctorCHDRView.css";
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+function calculateAge(dobString) {
+  const dob = new Date(dobString);
+  const today = new Date();
+  const years = today.getFullYear() - dob.getFullYear();
+  const months = today.getMonth() - dob.getMonth();
+  const totalMonths = years * 12 + months;
+  const y = Math.floor(totalMonths / 12);
+  const m = totalMonths % 12;
+  return `${y} year${y !== 1 ? "s" : ""}, ${m} month${m !== 1 ? "s" : ""}`;
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString();
+}
 
 export default function CHDRView({ selectedChild }) {
- 
+  const [vaccines, setVaccines] = useState([]);
+  const [vaccinesLoading, setVaccinesLoading] = useState(false);
+
+  useEffect(() => {
+    if (!selectedChild) return;
+
+    const fetchVaccines = async () => {
+      setVaccinesLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        const numericId = parseInt(selectedChild.id.replace("CH", ""));
+        const res = await fetch(`/completed-vaccines/${numericId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setVaccines(data);
+      } catch (err) {
+        console.error("Failed to fetch vaccines:", err);
+        setVaccines([]);
+      } finally {
+        setVaccinesLoading(false);
+      }
+    };
+
+    fetchVaccines();
+  }, [selectedChild]);
+
   if (!selectedChild) {
     return (
       <div className="chdr-empty">
@@ -19,10 +61,16 @@ export default function CHDRView({ selectedChild }) {
     );
   }
 
- 
+  // All data comes from selectedChild prop (fetched from /children endpoint in parent)
+  const dob = selectedChild.date_of_birth;   // now included in /children response
+  const growth = selectedChild.growth || {};
+  const allergies = selectedChild.allergies || [];
+  const activeConditions = selectedChild.activeConditions || [];
+
   return (
     <div className="chdr-page">
-  
+
+      {/* ── Header ── */}
       <div className="chdr-header">
         <div className="child-info">
           <div className="avatar">{selectedChild.name[0]}</div>
@@ -31,102 +79,141 @@ export default function CHDRView({ selectedChild }) {
             <p>Child Health Development Record (CHDR)</p>
           </div>
         </div>
-
         <button className="export-btn">Export CHDR</button>
       </div>
 
+      {/* ── Stat cards ── */}
       <div className="chdr-stats">
         <div className="stat-card">
           <span>Date of Birth</span>
-          <strong>{selectedChild.dob || "3/15/2021"}</strong>
-          <small>5 years, 10 months</small>
+          <strong>{formatDate(dob)}</strong>
+          <small>{dob ? calculateAge(dob) : "N/A"}</small>
+        </div>
+
+        <div className="chdrstat-card">
+          <span>Gender</span>
+          <strong>{selectedChild.gender || "N/A"}</strong>
         </div>
 
         <div className="chdrstat-card">
           <span>Blood Type</span>
-          <strong>{selectedChild.blood}</strong>
+          <strong>{selectedChild.blood || "Unknown"}</strong>
         </div>
 
         <div className="chdrstat-card">
           <span>Allergies</span>
-          <strong>{selectedChild.allergies.length}</strong>
+          <strong>{allergies.length}</strong>
           <small>recorded</small>
         </div>
 
         <div className="chdrstat-card">
           <span>Active Conditions</span>
-          <strong>1</strong>
+          <strong>{activeConditions.length}</strong>
         </div>
       </div>
 
-
-      <div className="alert-box">
-        <h4>Known Allergies</h4>
-        <div className="tags">
-          {selectedChild.allergies.map((a, i) => (
-            <span key={i} className="tag danger">
-              {a}
-            </span>
-          ))}
+      {/* ── Allergy alert ── */}
+      {allergies.length > 0 && (
+        <div className="alert-box">
+          <h4>⚠ Known Allergies</h4>
+          <div className="tags">
+            {allergies.map((a, i) => (
+              <span key={i} className="tag danger">
+                {a}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-
+      {/* ── Main grid ── */}
       <div className="chdr-grid">
-   
+
+        {/* Growth */}
         <div className="chdrcard">
           <h4>Latest Growth Measurements</h4>
-          <div className="CHDRgrowth">
-            <div>
-              <strong>12.5</strong>
-              <span>kg (Weight)</span>
+          {growth.weight || growth.height || growth.head ? (
+            <div className="CHDRgrowth">
+              <div>
+                <strong>{growth.weight ?? "N/A"}</strong>
+                <span>kg (Weight)</span>
+              </div>
+              <div>
+                <strong>{growth.height ?? "N/A"}</strong>
+                <span>cm (Height)</span>
+              </div>
+              <div>
+                <strong>{growth.head ?? "N/A"}</strong>
+                <span>cm (Head)</span>
+              </div>
             </div>
-            <div>
-              <strong>85</strong>
-              <span>cm (Height)</span>
-            </div>
-            <div>
-              <strong>47</strong>
-              <span>cm (Head)</span>
-            </div>
-          </div>
-          <small>Recorded on 1/1/2024</small>
+          ) : (
+            <p className="empty-text">No growth records available.</p>
+          )}
         </div>
 
-
+        {/* Vaccines */}
         <div className="chdrcard">
           <h4>Immunization Status</h4>
-          <p>
-            <strong>Total Immunizations</strong>
-            <span className="count">2</span>
-          </p>
-          <ul>
-            <li>MMR <span>6/15/2023</span></li>
-            <li>DTaP <span>3/10/2023</span></li>
-          </ul>
+          {vaccinesLoading ? (
+            <p className="loading-text">Loading...</p>
+          ) : vaccines.length === 0 ? (
+            <p className="empty-text">No vaccination records found.</p>
+          ) : (
+            <>
+              <p>
+                <strong>Total Immunizations</strong>
+                <span className="count">
+                  {vaccines.filter(v => v.status === "completed").length} / {vaccines.length}
+                </span>
+              </p>
+              <ul>
+                {vaccines.map((v, i) => (
+                  <li key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                    <span>
+                      {v.vaccine_name} ({v.dose_number})
+                    </span>
+                    <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <small>
+                        {v.administered_date
+                          ? formatDate(v.administered_date)
+                          : v.due_date
+                          ? `Due: ${formatDate(v.due_date)}`
+                          : "N/A"}
+                      </small>
+                      <span className={`status ${v.status === "completed" ? "active" : "pending"}`}>
+                        {v.status}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
 
-
+        {/* Active Conditions */}
         <div className="chdrcard">
-          <h4>Medical History</h4>
-          <p>
-            <strong>Eczema</strong>
-            <span className="status active">active</span>
-          </p>
-          <small>Diagnosed: 8/20/2022</small>
+          <h4>Active Conditions</h4>
+          {activeConditions.length === 0 ? (
+            <p className="empty-text">No active conditions recorded.</p>
+          ) : (
+            activeConditions.map((condition, i) => (
+              <p key={i}>
+                <strong>{condition}</strong>
+                <span className="status active">active</span>
+              </p>
+            ))
+          )}
         </div>
 
+        {/* Medications — no backend data yet */}
         <div className="chdrcard">
           <h4>Active Medications</h4>
-          <p>
-            <strong>Cetirizine</strong>
-            <span className="pill">Long-term</span>
-          </p>
-          <small>5ml • Once daily</small>
+          <p className="empty-text">No medications data available.</p>
         </div>
+
       </div>
-     
     </div>
-    
   );
 }
