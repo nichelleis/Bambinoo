@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+
+.doctordashboard {
+  min-height: 100vh;
+  height: auto;
+  background: #07080f;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+  color: #f1f5f9;
+  font-family: 'DM Sans', sans-serif;
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+
+.doctormini-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.mini-stat {
+  background: #0d0f1e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.mini-stat:hover {
+  background: #111328;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.mini-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.mini-label {
+  font-size: 0.68rem;
+  color: rgba(241, 245, 249, 0.4);
+  margin: 0;
+}
+
+.mini-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: 0.1rem;
+}
+
+.mini-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.mini-trend {
+  font-size: 0.65rem;
+  color: #4ade80;
+  background: rgba(34, 197, 94, 0.12);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+
+.doctorstat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.doctorbottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 0.75rem;
+  min-height: 340px;
+}

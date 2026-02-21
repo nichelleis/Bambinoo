@@ -1,4 +1,4 @@
-import "./CHDRView.css";
+import "./DoctorCHDRView.css";
 import React from "react";
 
 export default function CHDRView({ selectedChild }) {
@@ -6,7 +6,7 @@ export default function CHDRView({ selectedChild }) {
   if (!selectedChild) {
     return (
       <div className="chdr-empty">
-        <div className="empty-card">
+        <div className="chdrempty-card">
           <i className="ri-file-list-3-line"></i>
           <h2>No Patient Selected</h2>
           <p>
@@ -42,18 +42,18 @@ export default function CHDRView({ selectedChild }) {
           <small>5 years, 10 months</small>
         </div>
 
-        <div className="stat-card">
+        <div className="chdrstat-card">
           <span>Blood Type</span>
           <strong>{selectedChild.blood}</strong>
         </div>
 
-        <div className="stat-card">
+        <div className="chdrstat-card">
           <span>Allergies</span>
           <strong>{selectedChild.allergies.length}</strong>
           <small>recorded</small>
         </div>
 
-        <div className="stat-card">
+        <div className="chdrstat-card">
           <span>Active Conditions</span>
           <strong>1</strong>
         </div>
@@ -74,9 +74,9 @@ export default function CHDRView({ selectedChild }) {
 
       <div className="chdr-grid">
    
-        <div className="card">
+        <div className="chdrcard">
           <h4>Latest Growth Measurements</h4>
-          <div className="growth">
+          <div className="CHDRgrowth">
             <div>
               <strong>12.5</strong>
               <span>kg (Weight)</span>
@@ -94,7 +94,7 @@ export default function CHDRView({ selectedChild }) {
         </div>
 
 
-        <div className="card">
+        <div className="chdrcard">
           <h4>Immunization Status</h4>
           <p>
             <strong>Total Immunizations</strong>
@@ -107,7 +107,7 @@ export default function CHDRView({ selectedChild }) {
         </div>
 
 
-        <div className="card">
+        <div className="chdrcard">
           <h4>Medical History</h4>
           <p>
             <strong>Eczema</strong>
@@ -116,7 +116,7 @@ export default function CHDRView({ selectedChild }) {
           <small>Diagnosed: 8/20/2022</small>
         </div>
 
-        <div className="card">
+        <div className="chdrcard">
           <h4>Active Medications</h4>
           <p>
             <strong>Cetirizine</strong>
