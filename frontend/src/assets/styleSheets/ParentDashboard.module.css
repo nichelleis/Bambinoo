@@ -451,7 +451,9 @@ nav {
   color: white;
   font-size: 26px;
   cursor: pointer;
-  transition: transform 0.25s ease-in-out, filter 0.25s ease;
+  transition:
+    transform 0.25s ease-in-out,
+    filter 0.25s ease;
   margin: 2px;
   position: relative;
 }
@@ -553,7 +555,9 @@ nav {
   border-radius: 8px;
   border: 1px solid #ddd;
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .recordForm input:focus,
@@ -1035,4 +1039,38 @@ nav {
   font-size: 14px;
   opacity: 0.9;
   margin-top: 4px;
+}
+
+/*profile sec*/
+
+
+.profileAvatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: #6de2cd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 28px;
+  color: #2f8f83;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e1e5ea;
+}
+
+.infoRow:last-child {
+  border-bottom: none;
+}
+
+.badgeLight {
+  background: #e7f3f1;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
 }
