@@ -921,16 +921,39 @@ def clean_ai_response(text):
 # 1. MEAL PLAN API 
 # React calls this to generate a meal plan
 @app.route('/generate-plan', methods=['POST'])
+@jwt_required()  # Add JWT authentication
 def generate_plan():
     try:
-        # Get user input from react
-        data = request.json 
-        child_age = data.get('age')
-        weight = data.get('weight')
-
+        # Get the logged-in parent's user_id from JWT token
+        parent_id = get_jwt_identity()
+        
+        # Fetch the child belonging to this parent
+        child = Child.query.filter_by(parent_id=parent_id).first()
+        
+        if not child:
+            return jsonify({"success": False, "error": "No child found for this parent"}), 404
+        
+        # Get the latest growth record for this child
+        latest_growth = (
+            GrowthRecord.query
+            .filter_by(child_id=child.id)
+            .order_by(GrowthRecord.record_date.desc())
+            .first()
+        )
+        
+        if not latest_growth or not latest_growth.weight:
+            return jsonify({"success": False, "error": "No weight data found for this child"}), 404
+        
+        # Calculate age in months
+        today = date.today()
+        child_age = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
+        if today.day < child.date_of_birth.day:
+            child_age -= 1
+        
+        # Get weight from latest growth record
+        weight = latest_growth.weight
 
         # Prompt engineering for meal plan generation
-        # Instructs AI to act as a Nutritionist and strictly output HTML for the frontend
         prompt = f"""
         Act as a highly intelligent Sri Lankan Pediatric Nutritionist.
         
@@ -1010,9 +1033,9 @@ def generate_plan():
         # Send the clean HTML back to React as JSON
         return jsonify({"success": True, "html": html_content})
 
-    # Catch any server errors (like API failures) and return the error message
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 # 2. RESOURCE API 
 # React calls this to get book/video recommendations
