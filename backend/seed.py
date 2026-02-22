@@ -17,8 +17,8 @@ with app.app_context():
     db.session.commit()  
 
 
-    boy = Child(parent_id=parent_male.id, name="Noah Fernando", date_of_birth=date(2024, 1, 10), gender="Male", blood="O+")    
-    girl = Child(parent_id=parent_female.id, name="Emma Silva", date_of_birth=date(2024, 6, 15), gender="Female", blood="B-")
+    boy = Child(parent_id=parent_male.id, name="Noah Fernando", date_of_birth=date(2024, 1, 10), gender="Male" )    
+    girl = Child(parent_id=parent_female.id, name="Emma Silva", date_of_birth=date(2024, 6, 15), gender="Female")
 
     db.session.add_all([boy, girl])
     db.session.commit()

@@ -69,11 +69,6 @@ export default function CHDRView({ selectedChild }) {
         </div>
 
         <div className="chdrstat-card">
-          <span>Blood Type</span>
-          <strong>{selectedChild.blood || "Unknown"}</strong>
-        </div>
-
-        <div className="chdrstat-card">
           <span>Allergies</span>
           <strong>{allergies.length}</strong>
           <small>recorded</small>
