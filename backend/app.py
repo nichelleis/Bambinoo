@@ -1040,15 +1040,32 @@ def generate_plan():
 # 2. RESOURCE API 
 # React calls this to get book/video recommendations
 @app.route('/get-resources', methods=['POST'])
+@jwt_required()  # Add JWT authentication
 def get_resources():
     try:
-        # Extract the user's data (age and specific concern) from the request
+        # Get the logged-in parent's user_id from JWT token
+        parent_id = get_jwt_identity()
+        
+        # Fetch the child belonging to this parent
+        child = Child.query.filter_by(parent_id=parent_id).first()
+        
+        if not child:
+            return jsonify({"success": False, "error": "No child found for this parent"}), 404
+        
+        # Calculate age in months
+        today = date.today()
+        age = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
+        if today.day < child.date_of_birth.day:
+            age -= 1
+        
+        # Extract the user's concern from the request
         data = request.json
-        age = data.get('age')
         concern = data.get('concern')
+        
+        if not concern:
+            return jsonify({"success": False, "error": "Please select a topic"}), 400
 
         # Prompt engineering for educational content generation
-        # Ask AI to curate books/videos based on the specific parenting concern
         prompt = f"""
     Act as a Pediatric Media Curator.
     User: Parent of a {age} month old. Topic: "{concern}".
@@ -1067,7 +1084,7 @@ def get_resources():
     <h2 class="section-title"> Verified Reading</h2>
     <div class="media-grid">
         <div class="book-card">
-            <h4><a href="https://www.amazon.com/s?k=(Insert Book Title)" target="_blank">📖 (Insert Book Title)</a></h4>
+            <h4><a href="https://www.amazon.com/s?k=(Insert Book Title)" target="_blank"> (Insert Book Title)</a></h4>
             <p class="author">by (Author)</p>
             <p class="desc">(Brief summary)</p>
         </div>
@@ -1096,9 +1113,16 @@ def get_resources():
         # Send the clean HTML back to React as JSON
         return jsonify({"success": True, "html": html_content})
 
-    # Catch any server errors (like API failures) and return the error message
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+
+
+
+
+
+
+
     
 #Doctor Layout Backend
 
