@@ -44,6 +44,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20))
     role = db.Column(db.String(50), nullable=False, default='parent')
+    MOH_ID = db.Column(db.String(20), unique=True)   
 
 
 class Child(db.Model):
@@ -53,7 +54,6 @@ class Child(db.Model):
     name = db.Column(db.String(100), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     gender = db.Column(db.String(10), nullable=False)
-    blood = db.Column(db.String(5))
 
     
     growth_records = db.relationship('GrowthRecord', backref='child', lazy=True, cascade='all, delete-orphan')
@@ -191,6 +191,26 @@ class PendingRegistration(db.Model):
         onupdate=datetime.utcnow
     )
 
+#am using this to represent one chat between 2 diff users so a new chat doesnt need to be made everytime a new message is sent by and to the same people
+class Conversation(db.Model):   
+    __tablename__ = "conversation"
+    id = db.Column(db.Integer, primary_key=True)
+    user1_id = db.Column(db.Integer, nullable=False)
+    user2_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+#this is to store each message thats sent so the message history can be stored
+class Message(db.Model):
+    __tablename__ = "message"
+    id = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey("conversation.id"), nullable=False)
+    sender_id = db.Column(db.Integer, nullable=False)
+    receiver_id = db.Column(db.Integer, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
 
 with app.app_context():
     db.create_all()
@@ -281,7 +301,7 @@ def get_child():
         "date_of_birth": child.date_of_birth.isoformat(),
         "gender": child.gender,
 
-        "blood": child.blood,
+     
 
          "growth": {
             "weight": {
