@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import style from "../../assets/styleSheets/Messages.module.css";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:5000", {
@@ -34,7 +35,6 @@ export default function Messages() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-
   const searchUser = async () => {
     if (!searchCode) return;
 
@@ -59,7 +59,6 @@ export default function Messages() {
     }
   };
 
-
   const loadMessages = async (userId) => {
     try {
       const res = await fetch(`http://localhost:5000/messages/${userId}`, {
@@ -77,7 +76,6 @@ export default function Messages() {
     }
   };
 
-
   const sendMessage = () => {
     if (!text.trim() || !selectedUser) return;
 
@@ -91,20 +89,25 @@ export default function Messages() {
   };
 
   return (
-    <div style={{ display: "flex", height: "80vh", border: "1px solid #ccc" }}>
+    <div className={style.messageContainer}>
+      <div className={style.leftSideBar}>
+        <h3 className={style.messageHeader}>
+          {" "}
+          <i className={`bi bi-chat ${style.chatIcon}`}></i> Messages
+        </h3>
 
-      <div style={{ width: "30%", borderRight: "1px solid #ccc", padding: 10 }}>
-        <h3>Messages</h3>
-
-        <input
-          placeholder="Enter doc/nurse/parent ID"
-          value={searchCode}
-          onChange={(e) => setSearchCode(e.target.value)}
-          style={{ width: "70%", marginRight: 5 }}
-        />
-        <button onClick={searchUser}>Search</button>
-
-        {selectedUser && (
+        <div className={style.searchRow}>
+          <input
+            placeholder="Enter doctor/nurse/parent ID"
+            value={searchCode}
+            onChange={(e) => setSearchCode(e.target.value)}
+            className={style.searchInput}
+          />
+          <button onClick={searchUser} className={style.searchButton}>
+            Search
+          </button>
+        </div>
+        {selectedUser && ( //style or change this bit
           <div style={{ marginTop: 20 }}>
             <strong>Chatting with:</strong>
             <p>
@@ -114,37 +117,38 @@ export default function Messages() {
         )}
       </div>
 
-      <div style={{ width: "70%", display: "flex", flexDirection: "column" }}>
+      <div className={style.chatArea}>
         {selectedUser ? (
           <>
-            <div
-              style={{
-                padding: 10,
-                borderBottom: "1px solid #ccc",
-                background: "#f5f5f5",
-              }}
-            >
-              <strong>{selectedUser.username}</strong> ({selectedUser.role})
+            <div className={style.chatHeader}>
+              <div className={style.selectedProfileAvatar}>TF</div>
+              <div className={style.selectedUserDeatils}>
+                <strong className={style.selectedUserName}>
+                  {selectedUser.username}
+                </strong>
+
+                <span className={style.selectedUserRole}>
+                  &middot; {selectedUser.role}
+                </span>
+              </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", padding: 10 }}>
+            <div className={style.messagesContainer}>
               {messages.map((msg, index) => (
                 <div
                   key={index}
-                  style={{
-                    textAlign:
-                      msg.sender_id === currentUser.id ? "right" : "left",
-                    marginBottom: 10,
-                  }}
+                  className={`${style.messageRow} ${
+                    msg.sender_id === currentUser.id
+                      ? style.myMessage
+                      : style.otherMessage
+                  }`}
                 >
                   <span
-                    style={{
-                      display: "inline-block",
-                      padding: 10,
-                      borderRadius: 10,
-                      background:
-                        msg.sender_id === currentUser.id ? "#d1e7ff" : "#eee",
-                    }}
+                    className={`${style.bubble} ${
+                      msg.sender_id === currentUser.id
+                        ? style.myBubble
+                        : style.otherBubble
+                    }`}
                   >
                     {msg.content}
                   </span>
@@ -153,25 +157,35 @@ export default function Messages() {
               <div ref={bottomRef} />
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                padding: 10,
-                borderTop: "1px solid #ccc",
-              }}
-            >
+            <div className={style.inputArea}>
               <input
-                style={{ flex: 1, marginRight: 10 }}
+                className={style.textInput}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Type message..."
                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
               />
-              <button onClick={sendMessage}>Send</button>
+              <button className={style.sendButton} onClick={sendMessage}>
+                <i class="bi bi-send"></i>
+              </button>
             </div>
           </>
         ) : (
-          <div style={{ padding: 20 }}>Search a user to start chatting</div>
+          <div className={style.emptyState}>
+            <div className={style.emptyContent}>
+              <div className={style.emptyIcon}>
+                <i className="bi bi-chat"></i>
+              </div>
+
+              <h3 className={style.emptyTitle}>Start a conversation</h3>
+
+              <p className={style.emptyText}>
+                Search for a doctor, nurse, or parent by their ID
+                <br />
+                to begin messaging.
+              </p>
+            </div>
+          </div>
         )}
       </div>
     </div>
