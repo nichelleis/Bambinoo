@@ -1,6 +1,11 @@
 import "./DoctorGrowth.css";
 import React, { useState } from "react";
 
+function formatDate(dateString) {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString();
+}
+
 export default function Growth({ selectedChild }) {
   const [form, setForm] = useState({
     date: "",
@@ -9,6 +14,8 @@ export default function Growth({ selectedChild }) {
     head: "",
     notes: "",
   });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
   if (!selectedChild) {
     return (
@@ -26,13 +33,36 @@ export default function Growth({ selectedChild }) {
     );
   }
 
+  const growthHistory = selectedChild.growthHistory || [];
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Growth Data Saved:", form);
+    setSaving(true);
+    setMessage("");
+    try {
+      const numericId = parseInt(selectedChild.id.replace("CH", ""));
+      const res = await fetch(`http://localhost:5000/children/${numericId}/growth`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (res.ok) {
+        setMessage("✓ Growth record saved successfully.");
+        setForm({ date: "", weight: "", height: "", head: "", notes: "" });
+      } else {
+        setMessage("✗ Failed to save. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error saving growth:", err);
+      setMessage("✗ Server error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -43,6 +73,8 @@ export default function Growth({ selectedChild }) {
       </div>
 
       <div className="growth-grid">
+
+        {/* Add New Measurement */}
         <div className="growth-card">
           <h4>+ Add New Measurement</h4>
           <form onSubmit={handleSubmit} className="growth-form">
@@ -73,37 +105,47 @@ export default function Growth({ selectedChild }) {
               <textarea name="notes" placeholder="Any additional observations..." value={form.notes} onChange={handleChange} />
             </div>
 
-            <button type="submit" className="growth-save-btn">Save Growth Data</button>
+            {message && (
+              <p style={{ color: message.startsWith("✓") ? "green" : "red", fontSize: "0.85rem" }}>
+                {message}
+              </p>
+            )}
+
+            <button type="submit" className="growth-save-btn" disabled={saving}>
+              {saving ? "Saving..." : "Save Growth Data"}
+            </button>
           </form>
         </div>
 
+        {/* Growth History */}
         <div className="growth-card">
           <h4>Growth History</h4>
-          <table className="growth-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Weight</th>
-                <th>Height</th>
-                <th>Head</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1/1/2024</td>
-                <td>12.5 kg</td>
-                <td>85 cm</td>
-                <td>47 cm</td>
-              </tr>
-              <tr>
-                <td>10/1/2023</td>
-                <td>11.8 kg</td>
-                <td>82 cm</td>
-                <td>46 cm</td>
-              </tr>
-            </tbody>
-          </table>
+          {growthHistory.length === 0 ? (
+            <p className="empty-text">No growth records found.</p>
+          ) : (
+            <table className="growth-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Weight</th>
+                  <th>Height</th>
+                  <th>Head</th>
+                </tr>
+              </thead>
+              <tbody>
+                {growthHistory.map((r, i) => (
+                  <tr key={i}>
+                    <td>{formatDate(r.record_date)}</td>
+                    <td>{r.weight ? `${r.weight} kg` : "N/A"}</td>
+                    <td>{r.height ? `${r.height} cm` : "N/A"}</td>
+                    <td>{r.head ? `${r.head} cm` : "N/A"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
+
       </div>
     </div>
   );

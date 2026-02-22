@@ -1217,12 +1217,14 @@ def get_children():
     for child in children:
         parent = User.query.get(child.parent_id)
 
-        latest_growth = (
+        growth_history = (
             GrowthRecord.query
             .filter_by(child_id=child.id)
             .order_by(GrowthRecord.record_date.desc())
-            .first()
+            .all()
         )
+
+        latest_growth = growth_history[0] if growth_history else None
 
         vaccinations = (
             Vaccination.query
@@ -1278,6 +1280,16 @@ def get_children():
                     "record_date": h.record_date.isoformat()
                 }
                 for h in health_notes
+            ],
+            "growthHistory": [
+                {
+                    "record_date": r.record_date.isoformat(),
+                    "weight": r.weight,
+                    "height": r.height,
+                    "head": r.head_circumference,
+                    "notes": r.notes
+                }
+                for r in growth_history
             ]
         })
 
