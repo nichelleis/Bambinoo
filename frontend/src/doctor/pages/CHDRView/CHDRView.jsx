@@ -1,5 +1,4 @@
 import "./DoctorCHDRView.css";
-import React, { useEffect, useState } from "react";
 
 function calculateAge(dobString) {
   const dob = new Date(dobString);
@@ -18,32 +17,6 @@ function formatDate(dateString) {
 }
 
 export default function CHDRView({ selectedChild }) {
-  const [vaccines, setVaccines] = useState([]);
-  const [vaccinesLoading, setVaccinesLoading] = useState(false);
-
-  useEffect(() => {
-    if (!selectedChild) return;
-
-    const fetchVaccines = async () => {
-      setVaccinesLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const numericId = parseInt(selectedChild.id.replace("CH", ""));
-        const res = await fetch(`/completed-vaccines/${numericId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        setVaccines(data);
-      } catch (err) {
-        console.error("Failed to fetch vaccines:", err);
-        setVaccines([]);
-      } finally {
-        setVaccinesLoading(false);
-      }
-    };
-
-    fetchVaccines();
-  }, [selectedChild]);
 
   if (!selectedChild) {
     return (
@@ -61,11 +34,11 @@ export default function CHDRView({ selectedChild }) {
     );
   }
 
-  // All data comes from selectedChild prop (fetched from /children endpoint in parent)
-  const dob = selectedChild.date_of_birth;   // now included in /children response
+  const dob = selectedChild.date_of_birth;
   const growth = selectedChild.growth || {};
   const allergies = selectedChild.allergies || [];
   const activeConditions = selectedChild.activeConditions || [];
+  const vaccines = selectedChild.vaccinations || [];
 
   return (
     <div className="chdr-page">
@@ -152,12 +125,10 @@ export default function CHDRView({ selectedChild }) {
           )}
         </div>
 
-        {/* Vaccines */}
+        {/* Immunization */}
         <div className="chdrcard">
           <h4>Immunization Status</h4>
-          {vaccinesLoading ? (
-            <p className="loading-text">Loading...</p>
-          ) : vaccines.length === 0 ? (
+          {vaccines.length === 0 ? (
             <p className="empty-text">No vaccination records found.</p>
           ) : (
             <>
@@ -207,7 +178,7 @@ export default function CHDRView({ selectedChild }) {
           )}
         </div>
 
-        {/* Medications — no backend data yet */}
+        {/* Medications */}
         <div className="chdrcard">
           <h4>Active Medications</h4>
           <p className="empty-text">No medications data available.</p>

@@ -1131,11 +1131,18 @@ def get_children():
             .first()
         )
 
+        vaccinations = (
+            Vaccination.query
+            .filter_by(child_id=child.id)
+            .order_by(Vaccination.administered_date.desc())
+            .all()
+        )
+
         response.append({
             "id": f"CH{child.id:03d}",
             "name": child.name,
             "age": calculate_age(child.date_of_birth),
-            "date_of_birth":child.date_of_birth.isoformat(),
+            "date_of_birth": child.date_of_birth.isoformat(),
             "gender": child.gender,
             "parent": parent.username if parent else None,
             "phone": parent.email if parent else None,
@@ -1146,43 +1153,22 @@ def get_children():
                 "height": latest_growth.height if latest_growth else None,
                 "weight": latest_growth.weight if latest_growth else None,
                 "head": latest_growth.head_circumference if latest_growth else None,
-            } if latest_growth else None
+            } if latest_growth else None,
+            "vaccinations": [
+                {
+                    "vaccine_name": v.vaccine_name,
+                    "dose_number": v.dose_number,
+                    "administered_date": v.administered_date.isoformat() if v.administered_date else None,
+                    "due_date": v.due_date.isoformat() if v.due_date else None,
+                    "status": v.status,
+                    "administered_by": v.administered_by,
+                    "location": v.location
+                }
+                for v in vaccinations
+            ]
         })
 
     return jsonify(response)
-@app.route("/completed-vaccines/<int:child_id>", methods=["GET"])
-@jwt_required()
-def completed_vaccines_by_child(child_id):
-    try:
-        current_user_id = int(get_jwt_identity())
-        doctor = User.query.get(current_user_id)
-
-        if not doctor or doctor.role not in ['doctor', 'nurse', 'admin']:
-            return jsonify({"message": "Unauthorized"}), 403
-
-        vaccines = (
-            Vaccination.query
-            .filter_by(child_id=child_id)
-            .order_by(Vaccination.administered_date.desc())
-            .all()
-        )
-
-        return jsonify([
-            {
-                "vaccine_name": v.vaccine_name,
-                "dose_number": v.dose_number,
-                "administered_date": v.administered_date.isoformat() if v.administered_date else None,
-                "due_date": v.due_date.isoformat() if v.due_date else None,
-                "status": v.status,
-                "administered_by": v.administered_by,
-                "location": v.location
-            }
-            for v in vaccines
-        ]), 200
-
-    except Exception as e:
-        print(f"Error fetching vaccines: {e}")
-        return jsonify({"error": "Failed to fetch vaccines"}), 500
 
 # Admin Management Routes
 
