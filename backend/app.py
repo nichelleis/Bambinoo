@@ -1146,7 +1146,6 @@ def get_children():
             "gender": child.gender,
             "parent": parent.username if parent else None,
             "phone": parent.email if parent else None,
-            "blood": child.blood,
             "allergies": [a.name for a in child.allergies],
             "activeConditions": [c.name for c in child.active_conditions],
             "growth": {
