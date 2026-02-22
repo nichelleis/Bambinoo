@@ -1014,7 +1014,8 @@ def get_messages(other_user_id):
     ])
 
 
-@app.route("/search-user/<MOH_ID>", methods=["GET"])
+#route to search user for messageing with MOH given ID
+@app.route("/search-user/<code>", methods=["GET"])
 @jwt_required()
 def search_user(code):
     user = User.query.filter_by(MOH_ID=code).first()
