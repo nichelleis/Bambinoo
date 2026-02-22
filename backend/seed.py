@@ -7,11 +7,11 @@ with app.app_context():
     db.drop_all()
     db.create_all()
 
-    admin = User(username="admin", email="admin@test.com", password_hash=generate_password_hash("admin123"), role="admin")
-    doctor = User(username="doctor", email="doctor@test.com", password_hash=generate_password_hash("doctor123"), role="doctor")
-    nurse = User(username="nurse", email="nurse@test.com", password_hash=generate_password_hash("nurse123"), role="nurse")
-    parent_male = User(username="parent_male", email="father@test.com", password_hash=generate_password_hash("parent123"), role="parent")
-    parent_female = User(username="parent_female", email="mother@test.com", password_hash=generate_password_hash("parent123"), role="parent")
+    admin = User(username="admin", email="admin@test.com", password_hash=generate_password_hash("admin123"), role="admin", MOH_ID="CHDR-admin-001")
+    doctor = User(username="doctor", email="doctor@test.com", password_hash=generate_password_hash("doctor123"), role="doctor", MOH_ID="CHDR-doctor-001")
+    nurse = User(username="nurse", email="nurse@test.com", password_hash=generate_password_hash("nurse123"), role="nurse", MOH_ID="CHDR-nurse-001")
+    parent_male = User(username="parent_male", email="father@test.com", password_hash=generate_password_hash("parent123"), role="parent", MOH_ID="CHDR-2026-001")
+    parent_female = User(username="parent_female", email="mother@test.com", password_hash=generate_password_hash("parent123"), role="parent", MOH_ID="CHDR-2026-002")
 
     db.session.add_all([admin, doctor, nurse, parent_male, parent_female])
     db.session.commit()  
