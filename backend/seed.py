@@ -1,6 +1,6 @@
 from app import app, db
-from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination,Allergy, ActiveCondition)
-from datetime import datetime, date, timedelta
+from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination,Allergy, ActiveCondition, PendingRegistration)
+from datetime import datetime, date, timedelta, UTC
 from werkzeug.security import generate_password_hash
 
 with app.app_context():
@@ -323,6 +323,61 @@ with app.app_context():
     db.session.add_all([
         ActiveCondition(child_id=boy.id, name="Eczema"),
         ActiveCondition(child_id=girl.id, name="Asthma"),
+    ])
+
+    db.session.add_all([
+        PendingRegistration(
+            registration_number="CHDR-2026-001",
+            child_name="Noah Fernando",
+            child_dob=date(2024, 1, 10),
+            nationality="Sri Lankan",
+            child_number="C001",
+            language="English",
+            mother_name="Dilani Perera",
+            mother_dob=date(1995, 5, 14),
+            mother_email="dilani.perera@test.com",
+            mother_phone="0771234567",
+            birth_location="Colombo",
+            birth_hospital="Castle Street Hospital for Women",
+            delivery_type="Normal",
+            surgery="No",
+            birth_weight=3.1,
+            birth_length=49.5,
+            head_circumference=34.0,
+            personnel_type="Doctor",
+            personnel_name="Dr. Nimal Jayasinghe",
+            living_address="123, Temple Road, Nugegoda",
+            registration_date=date(2026, 1, 5),
+            status="pending",
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+        ),
+        PendingRegistration(
+            registration_number="CHDR-2026-002",
+            child_name="Emma Silva",
+            child_dob=date(2024, 6, 15),
+            nationality="Sri Lankan",
+            child_number="C002",
+            language="Sinhala",
+            mother_name="Nadeesha Fernando",
+            mother_dob=date(1993, 8, 2),
+            mother_email="nadeesha.fernando@test.com",
+            mother_phone="0719876543",
+            birth_location="Kandy",
+            birth_hospital="Teaching Hospital Kandy",
+            delivery_type="C-Section",
+            surgery="Yes",
+            birth_weight=3.4,
+            birth_length=50.2,
+            head_circumference=34.6,
+            personnel_type="Nurse",
+            personnel_name="Nurse Malini Perera",
+            living_address="45, Peradeniya Road, Kandy",
+            registration_date=date(2026, 1, 10),
+            status="pending",
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
+        ),
     ])
 
     db.session.commit()
