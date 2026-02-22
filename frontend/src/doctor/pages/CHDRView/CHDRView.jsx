@@ -16,6 +16,15 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString();
 }
 
+function getSeverityClass(severity) {
+  if (!severity) return "";
+  const s = severity.toLowerCase();
+  if (s === "mild") return "pending";
+  if (s === "moderate") return "warning";
+  if (s === "severe") return "danger";
+  return "";
+}
+
 export default function CHDRView({ selectedChild }) {
 
   if (!selectedChild) {
@@ -39,6 +48,7 @@ export default function CHDRView({ selectedChild }) {
   const allergies = selectedChild.allergies || [];
   const activeConditions = selectedChild.activeConditions || [];
   const vaccines = selectedChild.vaccinations || [];
+  const healthNotes = selectedChild.healthNotes || [];
 
   return (
     <div className="chdr-page">
@@ -86,9 +96,7 @@ export default function CHDRView({ selectedChild }) {
           <h4>⚠ Known Allergies</h4>
           <div className="tags">
             {allergies.map((a, i) => (
-              <span key={i} className="tag danger">
-                {a}
-              </span>
+              <span key={i} className="tag danger">{a}</span>
             ))}
           </div>
         </div>
@@ -136,9 +144,7 @@ export default function CHDRView({ selectedChild }) {
               <ul>
                 {vaccines.map((v, i) => (
                   <li key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                    <span>
-                      {v.vaccine_name} ({v.dose_number})
-                    </span>
+                    <span>{v.vaccine_name} ({v.dose_number})</span>
                     <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>
                       <small>
                         {v.administered_date
@@ -173,10 +179,37 @@ export default function CHDRView({ selectedChild }) {
           )}
         </div>
 
-        {/* Medications */}
+        {/* Health Notes */}
         <div className="chdrcard">
-          <h4>Active Medications</h4>
-          <p className="empty-text">No medications data available.</p>
+          <h4>Health Notes</h4>
+          {healthNotes.length === 0 ? (
+            <p className="empty-text">No health notes recorded.</p>
+          ) : (
+            <ul>
+              {healthNotes.map((h, i) => (
+                <li key={i} style={{ marginBottom: "10px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <strong>{h.title || h.record_type}</strong>
+                    <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <small>{formatDate(h.record_date)}</small>
+                      {h.severity && (
+                        <span className={`status ${getSeverityClass(h.severity)}`}>
+                          {h.severity}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <small style={{ color: "#888" }}>{h.record_type}</small>
+                  {h.temperature && (
+                    <div><small>🌡 {h.temperature}°C</small></div>
+                  )}
+                  {h.description && (
+                    <div><small>{h.description}</small></div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
       </div>
