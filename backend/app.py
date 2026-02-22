@@ -851,6 +851,50 @@ def toggle_milestone():
     return jsonify({"success": True})
 
 
+@app.route("/profile", methods=["GET"])
+@jwt_required()
+def get_profile_data():
+    try:
+        user_id = get_jwt_identity()
+
+        user = User.query.get(user_id)
+        child = Child.query.filter_by(parent_id=user_id).first()
+
+        if not user or not child:
+            return jsonify({"message": "Profile not found"}), 404
+        
+        pending = PendingRegistration.query.filter_by(child_name=child.name).order_by(PendingRegistration.created_at.desc()).first()
+
+        return jsonify({
+            "child": {
+                "name": child.name,
+                "dob": child.date_of_birth.isoformat(),
+                "gender": child.gender,
+                "reg_number": pending.registration_number if pending else None
+            },
+            "birth": {
+                "hospital": pending.birth_hospital if pending else None,
+                "location": pending.birth_location if pending else None,
+                "delivery": pending.delivery_type if pending else None,
+                "weight": pending.birth_weight if pending else None,
+                "length": pending.birth_length if pending else None,
+                "head": pending.head_circumference if pending else None
+            },
+            "background": {
+                "nationality": pending.nationality if pending else None,
+                "language": pending.language if pending else None
+            },
+            "parent": {
+                "name": pending.mother_name if pending else user.username,
+                "email": user.email,
+                "phone": user.phone
+            }
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 @app.route("/analize", methods=["GET"])
 @jwt_required()
 def get_growth_records():
