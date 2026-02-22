@@ -1,31 +1,31 @@
 import { useState } from 'react';
 
 const AIAnalytics = () => {
-  // Manages the form data: child's age in months and weight in kg
-  const [formData, setFormData] = useState({ age: '', weight: '' });
-  // Holds the HTML content of the generated nutrition plan from the server
   const [result, setResult] = useState(null);
-  // Controls the loading state during the API request
   const [loading, setLoading] = useState(false);
 
-  // Function to handle form submission and fetch nutrition plan from backend
   const handleGenerate = async (e) => {
     e.preventDefault();
     setLoading(true);
     setResult(null);
     try {
-      // Send POST request to backend API with form data
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login first");
+        return;
+      }
+
       const res = await fetch('http://127.0.0.1:5000/generate-plan', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Add JWT token
+        },
       });
       const data = await res.json();
-      // If successful, display the HTML result otherwise show error
       if (data.success) setResult(data.html);
       else alert(data.error);
     } catch (err) {
-      // Alert user if backend server is not running
       alert("Error: Python server not running on port 5000");
     }
     setLoading(false);
@@ -61,11 +61,6 @@ const AIAnalytics = () => {
           display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap;
           background: var(--gray-soft); padding: 25px; border-radius: 16px; margin-bottom: 30px;
         }
-        input, select {
-          padding: 14px 20px; border: 2px solid #cbd5e1; border-radius: 10px; font-size: 16px;
-          background: white; color: var(--text); outline: none;
-        }
-        input:focus, select:focus { border-color: var(--primary); }
 
         button {
           padding: 14px 30px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
@@ -79,38 +74,18 @@ const AIAnalytics = () => {
         .meal-table td { border-bottom: 1px solid #e2e8f0; padding: 16px; color: var(--text); }
         .summary-card { background: #eff6ff; border: 1px solid #bfdbfe; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
         .tips-card { background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 12px; margin-top: 25px; }
-                    
-        
-      
       ` }} />
       <div className="container">
       <h1>Nutrition Plan</h1>
       <p className="subtitle">Personalized for your child's weight</p>
 
-      {/* Form for entering child's age and weight */}
       <form onSubmit={handleGenerate} className="input-section">
-        <input
-          type="number"
-          placeholder="Age (Months)"
-          required
-          value={formData.age}
-          onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Weight (kg)"
-          required
-          value={formData.weight}
-          onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-        />
         <button type="submit" disabled={loading}>
           {loading ? 'Analyzing...' : 'Generate Plan'}
         </button>
       </form>
 
-      {/* Show loading message while processing */}
       {loading && <p style={{ textAlign: 'center', marginTop: '20px' }}>Generating Plan...</p>}
-      {/* Render the generated plan HTML if available */}
       {result && <div style={{ marginTop: '30px' }} dangerouslySetInnerHTML={{ __html: result }} />}
     </div>
     </>
