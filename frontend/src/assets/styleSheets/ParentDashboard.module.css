@@ -61,6 +61,8 @@ body {
   justify-content: center;
   font-size: 1.5rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-weight: bold;
 }
 
 .childInfo h1 {
@@ -451,7 +453,9 @@ nav {
   color: white;
   font-size: 26px;
   cursor: pointer;
-  transition: transform 0.25s ease-in-out, filter 0.25s ease;
+  transition:
+    transform 0.25s ease-in-out,
+    filter 0.25s ease;
   margin: 2px;
   position: relative;
 }
@@ -553,7 +557,9 @@ nav {
   border-radius: 8px;
   border: 1px solid #ddd;
   font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .recordForm input:focus,
@@ -1035,4 +1041,64 @@ nav {
   font-size: 14px;
   opacity: 0.9;
   margin-top: 4px;
+}
+
+/*profile section*/
+
+.profileAvatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 28px;
+  color: white;
+  border: 2px solid #ffffffaa;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e1e5ea;
+}
+
+.infoRow:last-child {
+  border-bottom: none;
+}
+
+.badgeLight {
+  background: #bae1db;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #166b61;
+  font-weight: bold;
+}
+
+.biProfile {
+  background: rgba(78, 205, 196, 0.15);
+  width: 46px;
+  height: 42px;
+  border-radius: 8px;
+  font-size: 1rem;
+  padding: 0.3rem;
+  color: #3ea39c;
+  margin-right: 4px;
+}
+
+.infoMain {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.infoDetails {
+  font-size: 14px;
+}
+
+.refNumber {
+  color: rgb(122, 121, 121);
+  font-size: 14px;
 }

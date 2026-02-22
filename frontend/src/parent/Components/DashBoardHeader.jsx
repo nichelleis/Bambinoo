@@ -1,5 +1,6 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
 import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function calculateAge(dobString) {
   const dob = new Date(dobString);
@@ -37,10 +38,32 @@ function calculateAge(dobString) {
   return parts.join(", ") + " old";
 }
 
+function getInitials(name) {
+  if (!name) return "";
+
+  const nameParts = name.trim().split(" ");
+  if (nameParts.length === 1) {
+    return nameParts[0][0].toUpperCase();
+  }
+
+  const firstInitial = nameParts[0][0].toUpperCase();
+  const lastInitial = nameParts[nameParts.length - 1][0].toUpperCase();
+  return firstInitial + lastInitial;
+}
 function DashboardHeader() {
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState("");
   const [childGender, setChildGender] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const goToProfile = () => {
+    if (!location.pathname.startsWith("/parent/profile")) {
+      navigate("/parent/profile");
+    }
+  };
+
+  const isProfile = location.pathname.startsWith("/parent/profile");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -71,9 +94,7 @@ function DashboardHeader() {
     >
       <div className={style.headerContent}>
         <div className={style.childInfoSection}>
-          <div className={style.childIcon}>
-            {/* change to show the pic the parent adds later from the profile section and maybe add like a default icon to show if a image int added */}
-          </div>
+          <div className={style.childIcon}>{getInitials(childName)}</div>
           <div className={style.childInfo}>
             <h1 className={style.childName}>{childName}</h1>
             <div className={style.childAge}>{childAge}</div>
@@ -83,7 +104,11 @@ function DashboardHeader() {
           <button className={style.headerIcon}>
             <i className="bi bi-bell"></i>
           </button>
-          <button className={style.headerIcon}>
+          <button
+            className={style.headerIcon}
+            onClick={goToProfile}
+            disabled={isProfile}
+          >
             <i className="bi bi-person"></i>
           </button>
         </div>
