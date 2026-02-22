@@ -1,7 +1,7 @@
 import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import timedelta,datetime,date
+from datetime import timedelta,datetime,date, UTC
 import os
 from flask_cors import CORS, cross_origin
 from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
@@ -854,6 +854,52 @@ def toggle_milestone():
     return jsonify({"success": True})
 
 
+@app.route("/profile", methods=["GET"])
+@jwt_required()
+def get_profile_data():
+    try:
+        user_id = get_jwt_identity()
+
+        user = User.query.get(user_id)
+        child = Child.query.filter_by(parent_id=user_id).first()
+
+        if not user or not child:
+            return jsonify({"message": "Profile not found"}), 404
+        
+        pending = PendingRegistration.query.filter_by(child_name=child.name).order_by(PendingRegistration.created_at.desc()).first() ##### change with Registration when thats done
+
+        return jsonify({
+            "child": {
+                "name": child.name,
+                "dob": child.date_of_birth.isoformat(),
+                "gender": child.gender,
+                "reg_number": pending.registration_number if pending else None
+            },
+            "birth": {
+                "hospital": pending.birth_hospital if pending else None,
+                "location": pending.birth_location if pending else None,
+                "delivery": pending.delivery_type if pending else None,
+                "weight": pending.birth_weight if pending else None,
+                "length": pending.birth_length if pending else None,
+                "head": pending.head_circumference if pending else None,
+                "surgery": pending.surgery if pending else None 
+            },
+            "background": {
+                "nationality": pending.nationality if pending else None,
+                "language": pending.language if pending else None
+            },
+            "parent": {
+                "name": pending.mother_name if pending else user.username,
+                "email": user.email,
+                "phone": user.phone,
+                "Address":pending.living_address if pending else None
+            }
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 @app.route("/analize", methods=["GET"])
 @jwt_required()
 def get_growth_records():
@@ -921,16 +967,39 @@ def clean_ai_response(text):
 # 1. MEAL PLAN API 
 # React calls this to generate a meal plan
 @app.route('/generate-plan', methods=['POST'])
+@jwt_required()  # Add JWT authentication
 def generate_plan():
     try:
-        # Get user input from react
-        data = request.json 
-        child_age = data.get('age')
-        weight = data.get('weight')
-
+        # Get the logged-in parent's user_id from JWT token
+        parent_id = get_jwt_identity()
+        
+        # Fetch the child belonging to this parent
+        child = Child.query.filter_by(parent_id=parent_id).first()
+        
+        if not child:
+            return jsonify({"success": False, "error": "No child found for this parent"}), 404
+        
+        # Get the latest growth record for this child
+        latest_growth = (
+            GrowthRecord.query
+            .filter_by(child_id=child.id)
+            .order_by(GrowthRecord.record_date.desc())
+            .first()
+        )
+        
+        if not latest_growth or not latest_growth.weight:
+            return jsonify({"success": False, "error": "No weight data found for this child"}), 404
+        
+        # Calculate age in months
+        today = date.today()
+        child_age = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
+        if today.day < child.date_of_birth.day:
+            child_age -= 1
+        
+        # Get weight from latest growth record
+        weight = latest_growth.weight
 
         # Prompt engineering for meal plan generation
-        # Instructs AI to act as a Nutritionist and strictly output HTML for the frontend
         prompt = f"""
         Act as a highly intelligent Sri Lankan Pediatric Nutritionist.
         
@@ -1010,22 +1079,39 @@ def generate_plan():
         # Send the clean HTML back to React as JSON
         return jsonify({"success": True, "html": html_content})
 
-    # Catch any server errors (like API failures) and return the error message
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 # 2. RESOURCE API 
 # React calls this to get book/video recommendations
 @app.route('/get-resources', methods=['POST'])
+@jwt_required()  # Add JWT authentication
 def get_resources():
     try:
-        # Extract the user's data (age and specific concern) from the request
+        # Get the logged-in parent's user_id from JWT token
+        parent_id = get_jwt_identity()
+        
+        # Fetch the child belonging to this parent
+        child = Child.query.filter_by(parent_id=parent_id).first()
+        
+        if not child:
+            return jsonify({"success": False, "error": "No child found for this parent"}), 404
+        
+        # Calculate age in months
+        today = date.today()
+        age = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
+        if today.day < child.date_of_birth.day:
+            age -= 1
+        
+        # Extract the user's concern from the request
         data = request.json
-        age = data.get('age')
         concern = data.get('concern')
+        
+        if not concern:
+            return jsonify({"success": False, "error": "Please select a topic"}), 400
 
         # Prompt engineering for educational content generation
-        # Ask AI to curate books/videos based on the specific parenting concern
         prompt = f"""
     Act as a Pediatric Media Curator.
     User: Parent of a {age} month old. Topic: "{concern}".
@@ -1044,7 +1130,7 @@ def get_resources():
     <h2 class="section-title"> Verified Reading</h2>
     <div class="media-grid">
         <div class="book-card">
-            <h4><a href="https://www.amazon.com/s?k=(Insert Book Title)" target="_blank">📖 (Insert Book Title)</a></h4>
+            <h4><a href="https://www.amazon.com/s?k=(Insert Book Title)" target="_blank"> (Insert Book Title)</a></h4>
             <p class="author">by (Author)</p>
             <p class="desc">(Brief summary)</p>
         </div>
@@ -1073,9 +1159,16 @@ def get_resources():
         # Send the clean HTML back to React as JSON
         return jsonify({"success": True, "html": html_content})
 
-    # Catch any server errors (like API failures) and return the error message
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": str(e)}), 500
+    
+
+
+
+
+
+
+
     
 #Doctor Layout Backend
 
