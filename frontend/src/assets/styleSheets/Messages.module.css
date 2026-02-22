@@ -149,9 +149,10 @@
   font-weight: 100;
   font-size: 13px;
 }
+
 .selectedUserDeatils {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
 }
 
