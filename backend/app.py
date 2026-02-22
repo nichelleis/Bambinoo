@@ -922,6 +922,8 @@ def get_profile_data():
         return jsonify({"error": str(e)}), 500
 
 
+#messaging component
+
 @socketio.on("connect")   
 def handle_connect(auth):
     token = auth.get("token")
@@ -932,6 +934,53 @@ def handle_connect(auth):
         emit("connected", {"message": "Connected"})
     except Exception:
         return False
+
+
+
+@socketio.on("send_message")
+def handle_send_message(data): # get and extract the information from the data dic the client sends
+    sender_id = data["sender_id"]
+    receiver_id = data["receiver_id"]
+    content = data["content"]
+
+    user1 = min(sender_id, receiver_id)  # making sure to store the smaller id 1st to make sure that only one convo is recorded for a pair of users
+    user2 = max(sender_id, receiver_id)
+
+    conversation = Conversation.query.filter_by(   # checking the db to see if the convo already exissts
+        user1_id=user1,
+        user2_id=user2
+    ).first()
+
+    if not conversation:  # if not createing a new convo and adding to the database
+        conversation = Conversation(user1_id=user1, user2_id=user2)
+        db.session.add(conversation)
+        db.session.commit()
+
+    message = Message(  # create a new message reocord linked to the specific convo and save it in the db
+        conversation_id=conversation.id,
+        sender_id=sender_id,
+        receiver_id=receiver_id,
+        content=content
+    )
+
+    db.session.add(message)
+    db.session.commit()
+
+    msg_data = {   # creating a dic with the messge details to send through the websocket
+        "id": message.id,
+        "conversation_id": conversation.id,
+        "sender_id": sender_id,
+        "receiver_id": receiver_id,
+        "content": content,
+        "timestamp": message.timestamp.isoformat()
+    }
+
+   
+    emit("receive_message", msg_data, room=f"user_{receiver_id}")  # sends the message to the receviers personal room so it updates instantly
+
+    emit("receive_message", msg_data, room=f"user_{sender_id}") # sends the message to the senders personal room so it updates instantly
+
+
 
 
 
