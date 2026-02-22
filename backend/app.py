@@ -4,13 +4,14 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta,datetime,date, UTC
 import os
 from flask_cors import CORS, cross_origin
-from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
+from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token)
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 from dateutil.relativedelta import relativedelta
 import csv
 from collections import defaultdict
 from dotenv import load_dotenv
+from flask_socketio import SocketIO, join_room, leave_room, emit
 
 
 load_dotenv()
@@ -18,6 +19,8 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS( app, resources={r"/*": {"origins": os.getenv("FRONTEND_URL")}}, supports_credentials=True)
+
+socketio = SocketIO(app, cors_allowed_origins=os.getenv("FRONTEND_URL"))
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -919,6 +922,18 @@ def get_profile_data():
         return jsonify({"error": str(e)}), 500
 
 
+@socketio.on("connect")   
+def handle_connect(auth):
+    token = auth.get("token")
+    try:
+        decoded = decode_token(token)
+        user_id = decoded["sub"]
+        join_room(f"user_{user_id}")
+        emit("connected", {"message": "Connected"})
+    except Exception:
+        return False
+
+
 
 @app.route("/analize", methods=["GET"])
 @jwt_required()
@@ -1351,8 +1366,9 @@ def get_admin_users():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-if __name__ == "__main__":
-    app.run(debug=os.getenv("FLASK_DEBUG") == "1", port=int(os.getenv("PORT", 5000)))
-
-
+    socketio.run(
+        app,
+        debug=os.getenv("FLASK_DEBUG") == "1",
+        port=int(os.getenv("PORT", 5000)),
+        use_reloader=False
+    )
