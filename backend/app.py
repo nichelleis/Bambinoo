@@ -924,14 +924,14 @@ def get_profile_data():
 
 #messaging component
 
-@socketio.on("connect")   
-def handle_connect(auth):
-    token = auth.get("token")
+@socketio.on("connect")    #the decorator tells the server to run this function when a client connects to the server
+def handle_connect(auth):  # auth is a dictionary sent by the client during connection,  containing JWT token.
+    token = auth.get("token")  # gets the token from the auth dic
     try:
-        decoded = decode_token(token)
-        user_id = decoded["sub"]
-        join_room(f"user_{user_id}")
-        emit("connected", {"message": "Connected"})
+        decoded = decode_token(token) #decodes the token 
+        user_id = decoded["sub"]   # contains the user ID
+        join_room(f"user_{user_id}")   #join_room is a Flask-SocketIO function that adds this connection to a room named "user_{user_id}".
+        emit("connected", {"message": "Connected"}) # Sends a message back to the client who just connected.
     except Exception:
         return False
 
@@ -980,6 +980,53 @@ def handle_send_message(data): # get and extract the information from the data d
 
     emit("receive_message", msg_data, room=f"user_{sender_id}") # sends the message to the senders personal room so it updates instantly
 
+
+
+#route to get the messages of the logged in user
+@app.route("/messages/<int:other_user_id>", methods=["GET"])
+@jwt_required()
+def get_messages(other_user_id):
+    current_user = int(get_jwt_identity())
+
+    user1 = min(current_user, other_user_id) 
+    user2 = max(current_user, other_user_id)
+
+    conversation = Conversation.query.filter_by(
+        user1_id=user1,
+        user2_id=user2
+    ).first()
+
+    if not conversation:  # checks if there is a convo fo the user if not returns a empty list cause there are no mesg if there are no convos 
+        return jsonify([])
+
+    messages = Message.query.filter_by( #get all the messages for the specific convo ordered accendingly
+        conversation_id=conversation.id
+    ).order_by(Message.timestamp.asc()).all()
+
+    return jsonify([  # Converts each Message object into a dictionary with its data and sends it as a JSON array to the client
+        {
+            "sender_id": m.sender_id,
+            "receiver_id": m.receiver_id,
+            "content": m.content,
+            "timestamp": m.timestamp.isoformat()
+        }
+        for m in messages
+    ])
+
+
+@app.route("/search-user/<MOH_ID>", methods=["GET"])
+@jwt_required()
+def search_user(code):
+    user = User.query.filter_by(MOH_ID=code).first()
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "role": user.role
+    })
 
 
 
