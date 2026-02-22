@@ -8,7 +8,7 @@ const socket = io("http://localhost:5000", {
   },
 });
 
-export default function Messages() {
+export default function MessageDoctor() {
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   const [selectedUser, setSelectedUser] = useState(null);
