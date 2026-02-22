@@ -1231,6 +1231,13 @@ def get_children():
             .all()
         )
 
+        health_notes = (
+            HealthNote.query
+            .filter_by(child_id=child.id)
+            .order_by(HealthNote.record_date.desc())
+            .all()
+        )
+
         response.append({
             "id": f"CH{child.id:03d}",
             "name": child.name,
@@ -1257,6 +1264,20 @@ def get_children():
                     "location": v.location
                 }
                 for v in vaccinations
+            ],
+            "healthNotes": [
+                {
+                    "record_type": h.record_type,
+                    "title": h.title,
+                    "description": h.description,
+                    "temperature": h.temperature,
+                    "severity": h.severity,
+                    "medication_name": h.medication_name,
+                    "medication_dosage": h.medication_dosage,
+                    "notes": h.notes,
+                    "record_date": h.record_date.isoformat()
+                }
+                for h in health_notes
             ]
         })
 
