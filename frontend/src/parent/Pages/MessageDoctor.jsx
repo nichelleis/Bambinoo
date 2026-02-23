@@ -15,17 +15,34 @@ export default function MessageDoctor() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [searchCode, setSearchCode] = useState("");
+  const [conversations, setConversations] = useState([]);
 
   const bottomRef = useRef();
 
+  const fetchConversations = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/conversations", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to load conversations");
+      const data = await res.json();
+      setConversations(data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchConversations();
+  }, []);
+
   useEffect(() => {
     socket.on("receive_message", (msg) => {
-      if (
-        msg.sender_id === selectedUser?.id ||
-        msg.receiver_id === selectedUser?.id
-      ) {
-        setMessages((prev) => [...prev, msg]);
-      }
+      setMessages((prev) => [...prev, msg]);
+
+      fetchConversations();
     });
 
     return () => socket.off("receive_message");
@@ -76,16 +93,21 @@ export default function MessageDoctor() {
     }
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!text.trim() || !selectedUser) return;
 
-    socket.emit("send_message", {
+    const newMsg = {
       sender_id: currentUser.id,
       receiver_id: selectedUser.id,
       content: text,
-    });
+      timestamp: new Date().toISOString(),
+    };
 
+    socket.emit("send_message", newMsg);
     setText("");
+    setMessages((prev) => [...prev, newMsg]);
+
+    fetchConversations();
   };
 
   const formatTime = (isoString) => {
@@ -117,14 +139,31 @@ export default function MessageDoctor() {
             Search
           </button>
         </div>
-        {selectedUser && ( //style or change this bit
-          <div style={{ marginTop: 20 }}>
-            <strong>Chatting with:</strong>
-            <p>
-              {selectedUser.username} ({selectedUser.role})
-            </p>
-          </div>
-        )}
+
+        <div className={style.conversationList}>
+          {conversations.map((c) => (
+            <div
+              key={c.conversation_id}
+              className={`${style.chatCard} ${selectedUser?.id === c.user.id ? style.activeCard : ""}`}
+              onClick={() => {
+                setSelectedUser(c.user);
+                loadMessages(c.user.id);
+              }}
+            >
+              <div className={style.avatar}>NF</div> {/*make this dynamic too*/}
+              <div className={style.cardContent}>
+                <strong>{c.user.username}</strong>
+                <p className={style.lastMessage}>{c.last_message}</p>
+              </div>
+              <span className={style.timestamp}>
+                {new Date(c.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className={style.chatArea}>
