@@ -15,21 +15,35 @@ export default function Messages() {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [searchCode, setSearchCode] = useState("");
+  const [conversations, setConversations] = useState([]);
 
   const bottomRef = useRef();
 
-  useEffect(() => {
-    socket.on("receive_message", (msg) => {
-      if (
-        msg.sender_id === selectedUser?.id ||
-        msg.receiver_id === selectedUser?.id
-      ) {
-        setMessages((prev) => [...prev, msg]);
-      }
-    });
+  const fetchConversations = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/conversations", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to load conversations");
+      const data = await res.json();
+      setConversations(data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
 
-    return () => socket.off("receive_message");
-  }, [selectedUser]);
+  useEffect(() => {
+    fetchConversations();
+  }, []);
+
+  useEffect(() => {
+    const handleMessage = (msg) => setMessages((prev) => [...prev, msg]);
+    socket.on("receive_message", handleMessage);
+
+    return () => socket.off("receive_message", handleMessage);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,17 +90,47 @@ export default function Messages() {
     }
   };
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!text.trim() || !selectedUser) return;
 
-    socket.emit("send_message", {
+    const newMsg = {
       sender_id: currentUser.id,
       receiver_id: selectedUser.id,
       content: text,
-    });
+      timestamp: new Date().toISOString(),
+    };
 
+    socket.emit("send_message", newMsg);
     setText("");
   };
+
+  const formatTime = (isoString) => {
+    const date = new Date(isoString);
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  };
+
+  const limitText = (text, maxLength = 25) => {
+    if (!text) return "";
+    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+  };
+
+  function getInitials(name) {
+    if (!name) return "";
+
+    const nameParts = name.trim().split(" ");
+    if (nameParts.length === 1) {
+      return nameParts[0][0].toUpperCase();
+    }
+
+    const firstInitial = nameParts[0][0].toUpperCase();
+    const lastInitial = nameParts[nameParts.length - 1][0].toUpperCase();
+    return firstInitial + lastInitial;
+  }
 
   return (
     <div className={style.messageContainer} style={{marginTop: "4rem", width: "98%", marginLeft: "0.7rem"}}>
@@ -107,56 +151,107 @@ export default function Messages() {
             Search
           </button>
         </div>
-        {selectedUser && ( //style or change this bit
-          <div style={{ marginTop: 20 }}>
-            <strong>Chatting with:</strong>
-            <p>
-              {selectedUser.username} ({selectedUser.role})
-            </p>
-          </div>
-        )}
+
+        <div className={style.conversationList}>
+          {conversations.map((c) => (
+            <div
+              key={c.conversation_id}
+              className={`${style.chatCard} ${selectedUser?.id === c.user.id ? style.activeCard : ""}`}
+              onClick={() => {
+                setSelectedUser(c.user);
+                loadMessages(c.user.id);
+              }}
+            >
+              <div className={style.avatar}>
+                {" "}
+                {getInitials(c.user.username)}
+              </div>{" "}
+              <div className={style.cardContent}>
+                <strong>{c.user.username}</strong>
+                <p className={style.lastMessage}>{limitText(c.last_message)}</p>
+              </div>
+              <span className={style.timestamp}>
+                {new Date(c.timestamp).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className={style.chatArea}>
         {selectedUser ? (
           <>
             <div className={style.chatHeader}>
-              <div className={style.selectedProfileAvatar}>TF</div>
+              <div className={style.selectedProfileAvatar}>
+                {getInitials(selectedUser.username)}
+              </div>
               <div className={style.selectedUserDeatils}>
                 <strong className={style.selectedUserName}>
                   {selectedUser.username}
                 </strong>
 
                 <span className={style.selectedUserRole}>
-                  &middot; {selectedUser.role}
+                  &middot;{" "}
+                  {selectedUser.role.charAt(0).toUpperCase() +
+                    selectedUser.role.slice(1)}
                 </span>
               </div>
             </div>
 
             <div className={style.messagesContainer}>
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`${style.messageRow} ${
-                    msg.sender_id === currentUser.id
-                      ? style.myMessage
-                      : style.otherMessage
-                  }`}
-                >
-                  <span
-                    className={`${style.bubble} ${
-                      msg.sender_id === currentUser.id
-                        ? style.myBubble
-                        : style.otherBubble
-                    }`}
-                  >
-                    {msg.content}
-                  </span>
-                </div>
-              ))}
+              {messages.map((msg, index) => {
+                const messageDate = new Date(msg.timestamp).toDateString();
+                const prevDate =
+                  index > 0
+                    ? new Date(messages[index - 1].timestamp).toDateString()
+                    : null;
+                const showDate = messageDate !== prevDate;
+
+                return (
+                  <>
+                    {showDate && (
+                      <div className={style.dateSeparatorWrapper}>
+                        <div className={style.dateSeparator}>
+                          {messageDate === new Date().toDateString()
+                            ? "Today"
+                            : messageDate ===
+                                new Date(
+                                  new Date().setDate(new Date().getDate() - 1),
+                                ).toDateString()
+                              ? "Yesterday"
+                              : messageDate}
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className={`${style.messageRow} ${
+                        msg.sender_id === currentUser.id
+                          ? style.myMessage
+                          : style.otherMessage
+                      }`}
+                    >
+                      <span
+                        className={`${style.bubble} ${
+                          msg.sender_id === currentUser.id
+                            ? style.myBubble
+                            : style.otherBubble
+                        }`}
+                      >
+                        <div className={style.messageText}>{msg.content}</div>
+                        <div className={style.messageTime}>
+                          {formatTime(msg.timestamp)}
+                        </div>
+                      </span>
+                    </div>
+                  </>
+                );
+              })}
               <div ref={bottomRef} />
             </div>
-
             <div className={style.inputArea}>
               <input
                 className={style.textInput}
