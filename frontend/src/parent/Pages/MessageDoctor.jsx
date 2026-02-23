@@ -119,6 +119,19 @@ export default function MessageDoctor() {
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   };
 
+  function getInitials(name) {
+    if (!name) return "";
+
+    const nameParts = name.trim().split(" ");
+    if (nameParts.length === 1) {
+      return nameParts[0][0].toUpperCase();
+    }
+
+    const firstInitial = nameParts[0][0].toUpperCase();
+    const lastInitial = nameParts[nameParts.length - 1][0].toUpperCase();
+    return firstInitial + lastInitial;
+  }
+
   return (
     <div className={style.messageContainer}>
       <div className={style.leftSideBar}>
@@ -149,7 +162,10 @@ export default function MessageDoctor() {
                 loadMessages(c.user.id);
               }}
             >
-              <div className={style.avatar}>NF</div> {/*make this dynamic too*/}
+              <div className={style.avatar}>
+                {" "}
+                {getInitials(c.user.username)}
+              </div>{" "}
               <div className={style.cardContent}>
                 <strong>{c.user.username}</strong>
                 <p className={style.lastMessage}>{limitText(c.last_message)}</p>
@@ -169,14 +185,18 @@ export default function MessageDoctor() {
         {selectedUser ? (
           <>
             <div className={style.chatHeader}>
-              <div className={style.selectedProfileAvatar}>TF</div>
+              <div className={style.selectedProfileAvatar}>
+                {getInitials(selectedUser.username)}
+              </div>
               <div className={style.selectedUserDeatils}>
                 <strong className={style.selectedUserName}>
                   {selectedUser.username}
                 </strong>
 
                 <span className={style.selectedUserRole}>
-                  &middot; {selectedUser.role}
+                  &middot;{" "}
+                  {selectedUser.role.charAt(0).toUpperCase() +
+                    selectedUser.role.slice(1)}
                 </span>
               </div>
             </div>
