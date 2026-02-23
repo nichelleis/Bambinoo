@@ -88,6 +88,15 @@ export default function MessageDoctor() {
     setText("");
   };
 
+  const formatTime = (isoString) => {
+    const date = new Date(isoString);
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <div className={style.messageContainer}>
       <div className={style.leftSideBar}>
@@ -150,7 +159,11 @@ export default function MessageDoctor() {
                         : style.otherBubble
                     }`}
                   >
-                    {msg.content}
+                    <div className={style.messageText}>{msg.content}</div>
+
+                    <div className={style.messageTime}>
+                      {formatTime(msg.timestamp)}
+                    </div>
                   </span>
                 </div>
               ))}

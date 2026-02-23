@@ -258,3 +258,25 @@
   color: #2a2f45;
   border-bottom-left-radius: 4px;
 }
+
+
+.messageText {
+  display: block;
+}
+
+.messageTime {
+  font-size: 10px;
+  margin-top: 4px;
+  opacity: 0.7;
+  width: 100%;
+}
+
+.myBubble .messageTime {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.otherBubble .messageTime {
+  text-align: left;
+  color: #6b7280;
+}
