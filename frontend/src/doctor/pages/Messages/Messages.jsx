@@ -1,155 +1,193 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./DoctorMessages.css";
+import React, { useEffect, useRef, useState } from "react";
+import style from "../../../assets/styleSheets/Messages.module.css";
+import { io } from "socket.io-client";
 
-// Dummy children conversations with genders
-const dummyConversations = [
-  {
-    id: 1,
-    parentName: "Father Fernando",
-    childName: "Noah Fernando",
-    gender: "boy",
-    messages: [
-      { id: 1, sender: "parent", content: "Doctor, my child has been scratching his skin a lot recently." },
-      { id: 2, sender: "doctor", content: "Does he have any rashes or redness?" },
-      { id: 3, sender: "parent", content: "Yes, mainly around elbows and knees." },
-      { id: 4, sender: "doctor", content: "That sounds like eczema. Are you moisturizing daily?" },
-      { id: 5, sender: "parent", content: "Yes doctor, twice a day." },
-      { id: 6, sender: "doctor", content: "Good. Continue moisturizing and apply the prescribed cream." },
-    ],
+const socket = io("http://localhost:5000", {
+  auth: {
+    token: localStorage.getItem("token"),
   },
-  {
-    id: 2,
-    parentName: "Mother Silva",
-    childName: "Emma Silva",
-    gender: "girl",
-    messages: [
-      { id: 1, sender: "parent", content: "Doctor, my daughter is having breathing difficulty at night." },
-      { id: 2, sender: "doctor", content: "Does she have asthma history?" },
-      { id: 3, sender: "parent", content: "Yes, she was diagnosed last year." },
-      { id: 4, sender: "doctor", content: "Is she using her inhaler regularly?" },
-      { id: 5, sender: "parent", content: "Sometimes she forgets." },
-      { id: 6, sender: "doctor", content: "Please ensure regular inhaler use before bedtime." },
-      { id: 7, sender: "parent", content: "Understood, doctor. Thank you." },
-      { id: 8, sender: "doctor", content: "No problem. Keep monitoring her symptoms." },
-      { id: 9, sender: "parent", content: "Should I give her any supplements?" },
-      { id: 10, sender: "doctor", content: "Vitamin D is fine, but nothing else without prescription." },
-      { id: 11, sender: "parent", content: "Okay, will do." },
-    ],
-  },
-  {
-    id: 3,
-    parentName: "Father Perera",
-    childName: "Liam Perera",
-    gender: "boy",
-    messages: [
-      { id: 1, sender: "parent", content: "Doctor, Liam has a fever for two days." },
-      { id: 2, sender: "doctor", content: "What is his temperature?" },
-      { id: 3, sender: "parent", content: "Around 101°F." },
-      { id: 4, sender: "doctor", content: "Keep him hydrated and monitor temperature. If it crosses 102°F, visit clinic." },
-    ],
-  },
-  {
-    id: 4,
-    parentName: "Mother Jayasinghe",
-    childName: "Olivia Jayasinghe",
-    gender: "girl",
-    messages: [
-      { id: 1, sender: "parent", content: "Doctor, Olivia is having frequent headaches." },
-      { id: 2, sender: "doctor", content: "Since when?" },
-      { id: 3, sender: "parent", content: "About a week now." },
-      { id: 4, sender: "doctor", content: "We may need to check vision and stress factors." },
-    ],
-  },
-];
+});
 
-const DoctorMessages = () => {
-  const [selectedConversation, setSelectedConversation] = useState(dummyConversations[0]);
-  const [replyText, setReplyText] = useState("");
-  const messagesEndRef = useRef(null);
+export default function Messages() {
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
-  const handleSelectConversation = (conv) => {
-    setSelectedConversation(conv);
-    setReplyText("");
-  };
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+  const [searchCode, setSearchCode] = useState("");
 
-  const handleSendReply = () => {
-    if (!replyText.trim()) return;
+  const bottomRef = useRef();
 
-    const newMessage = {
-      id: selectedConversation.messages.length + 1,
-      sender: "doctor",
-      content: replyText,
-    };
-
-    setSelectedConversation({
-      ...selectedConversation,
-      messages: [...selectedConversation.messages, newMessage],
+  useEffect(() => {
+    socket.on("receive_message", (msg) => {
+      if (
+        msg.sender_id === selectedUser?.id ||
+        msg.receiver_id === selectedUser?.id
+      ) {
+        setMessages((prev) => [...prev, msg]);
+      }
     });
 
-    setReplyText("");
+    return () => socket.off("receive_message");
+  }, [selectedUser]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const searchUser = async () => {
+    if (!searchCode) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/search-user/${searchCode}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+
+      if (!res.ok) throw new Error("User not found");
+
+      const data = await res.json();
+      setSelectedUser(data);
+      loadMessages(data.id);
+      setSearchCode("");
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  // Scroll to bottom on new message
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [selectedConversation.messages]);
+  const loadMessages = async (userId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/messages/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed to load messages");
+
+      const data = await res.json();
+      setMessages(data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const sendMessage = () => {
+    if (!text.trim() || !selectedUser) return;
+
+    socket.emit("send_message", {
+      sender_id: currentUser.id,
+      receiver_id: selectedUser.id,
+      content: text,
+    });
+
+    setText("");
+  };
 
   return (
-    <div className="doctor-chat-container">
-      
-      <div className="conversation-list">
-        <h3>Conversations</h3>
-        {dummyConversations.map((conv) => (
-          <div
-            key={conv.id}
-            className={`conversation-item ${selectedConversation.id === conv.id ? "active" : ""}`}
-            onClick={() => handleSelectConversation(conv)}
-          >
-            <strong>{conv.childName}</strong> ({conv.parentName})
+    <div className={style.messageContainer} style={{marginTop: "4rem", width: "98%", marginLeft: "0.7rem"}}>
+      <div className={style.leftSideBar}>
+        <h3 className={style.messageHeader}>
+          {" "}
+          <i className={`bi bi-chat ${style.chatIcon}`}></i> Messages
+        </h3>
+
+        <div className={style.searchRow}>
+          <input
+            placeholder="Enter doctor/nurse/parent ID"
+            value={searchCode}
+            onChange={(e) => setSearchCode(e.target.value)}
+            className={style.searchInput}
+          />
+          <button onClick={searchUser} className={style.searchButton}>
+            Search
+          </button>
+        </div>
+        {selectedUser && ( //style or change this bit
+          <div style={{ marginTop: 20 }}>
+            <strong>Chatting with:</strong>
+            <p>
+              {selectedUser.username} ({selectedUser.role})
+            </p>
           </div>
-        ))}
+        )}
       </div>
 
-    
-      <div className="chat-window">
-        <div className="chat-header">
-          Chat with {selectedConversation.parentName} about {selectedConversation.childName}
-        </div>
+      <div className={style.chatArea}>
+        {selectedUser ? (
+          <>
+            <div className={style.chatHeader}>
+              <div className={style.selectedProfileAvatar}>TF</div>
+              <div className={style.selectedUserDeatils}>
+                <strong className={style.selectedUserName}>
+                  {selectedUser.username}
+                </strong>
 
-        <div className="chat-messages">
-          {selectedConversation.messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`chat-message ${msg.sender}`}
-              style={{
-                backgroundColor:
-                  msg.sender === "parent"
-                    ? selectedConversation.gender === "boy"
-                      ? "#cce4ff"
-                      : "#ffcce0"
-                    : "#007bff",
-                color: msg.sender === "doctor" ? "white" : "black",
-              }}
-            >
-              {msg.content}
+                <span className={style.selectedUserRole}>
+                  &middot; {selectedUser.role}
+                </span>
+              </div>
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
 
-        <div className="chat-input">
-          <input
-            type="text"
-            placeholder="Type a message..."
-            value={replyText}
-            onChange={(e) => setReplyText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSendReply()}
-          />
-          <button onClick={handleSendReply}>Send</button>
-        </div>
+            <div className={style.messagesContainer}>
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`${style.messageRow} ${
+                    msg.sender_id === currentUser.id
+                      ? style.myMessage
+                      : style.otherMessage
+                  }`}
+                >
+                  <span
+                    className={`${style.bubble} ${
+                      msg.sender_id === currentUser.id
+                        ? style.myBubble
+                        : style.otherBubble
+                    }`}
+                  >
+                    {msg.content}
+                  </span>
+                </div>
+              ))}
+              <div ref={bottomRef} />
+            </div>
+
+            <div className={style.inputArea}>
+              <input
+                className={style.textInput}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Type message..."
+                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              />
+              <button className={style.sendButton} onClick={sendMessage}>
+                <i class="bi bi-send"></i>
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className={style.emptyState}>
+            <div className={style.emptyContent}>
+              <div className={style.emptyIcon}>
+                <i className="bi bi-chat"></i>
+              </div>
+
+              <h3 className={style.emptyTitle}>Start a conversation</h3>
+
+              <p className={style.emptyText}>
+                Search for a doctor, nurse, or parent by their ID
+                <br />
+                to begin messaging.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default DoctorMessages;
+}

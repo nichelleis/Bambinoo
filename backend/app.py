@@ -4,13 +4,14 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta,datetime,date, UTC
 import os
 from flask_cors import CORS, cross_origin
-from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity)
+from flask_jwt_extended import (JWTManager, create_access_token, jwt_required, get_jwt_identity, decode_token)
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 from dateutil.relativedelta import relativedelta
 import csv
 from collections import defaultdict
 from dotenv import load_dotenv
+from flask_socketio import SocketIO, join_room, leave_room, emit
 
 
 load_dotenv()
@@ -18,6 +19,8 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS( app, resources={r"/*": {"origins": os.getenv("FRONTEND_URL")}}, supports_credentials=True)
+
+socketio = SocketIO(app, cors_allowed_origins=os.getenv("FRONTEND_URL"))
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -44,6 +47,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(20))
     role = db.Column(db.String(50), nullable=False, default='parent')
+    MOH_ID = db.Column(db.String(20), unique=True)   
 
 
 class Child(db.Model):
@@ -53,7 +57,6 @@ class Child(db.Model):
     name = db.Column(db.String(100), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
     gender = db.Column(db.String(10), nullable=False)
-    blood = db.Column(db.String(5))
 
     
     growth_records = db.relationship('GrowthRecord', backref='child', lazy=True, cascade='all, delete-orphan')
@@ -191,6 +194,26 @@ class PendingRegistration(db.Model):
         onupdate=datetime.utcnow
     )
 
+#am using this to represent one chat between 2 diff users so a new chat doesnt need to be made everytime a new message is sent by and to the same people
+class Conversation(db.Model):   
+    __tablename__ = "conversation"
+    id = db.Column(db.Integer, primary_key=True)
+    user1_id = db.Column(db.Integer, nullable=False)
+    user2_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+#this is to store each message thats sent so the message history can be stored
+class Message(db.Model):
+    __tablename__ = "message"
+    id = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey("conversation.id"), nullable=False)
+    sender_id = db.Column(db.Integer, nullable=False)
+    receiver_id = db.Column(db.Integer, nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
+
 
 with app.app_context():
     db.create_all()
@@ -281,7 +304,7 @@ def get_child():
         "date_of_birth": child.date_of_birth.isoformat(),
         "gender": child.gender,
 
-        "blood": child.blood,
+     
 
          "growth": {
             "weight": {
@@ -899,6 +922,115 @@ def get_profile_data():
         return jsonify({"error": str(e)}), 500
 
 
+#messaging component
+
+@socketio.on("connect")    #the decorator tells the server to run this function when a client connects to the server
+def handle_connect(auth):  # auth is a dictionary sent by the client during connection,  containing JWT token.
+    token = auth.get("token")  # gets the token from the auth dic
+    try:
+        decoded = decode_token(token) #decodes the token 
+        user_id = decoded["sub"]   # contains the user ID
+        join_room(f"user_{user_id}")   #join_room is a Flask-SocketIO function that adds this connection to a room named "user_{user_id}".
+        emit("connected", {"message": "Connected"}) # Sends a message back to the client who just connected.
+    except Exception:
+        return False
+
+
+
+@socketio.on("send_message")
+def handle_send_message(data): # get and extract the information from the data dic the client sends
+    sender_id = data["sender_id"]
+    receiver_id = data["receiver_id"]
+    content = data["content"]
+
+    user1 = min(sender_id, receiver_id)  # making sure to store the smaller id 1st to make sure that only one convo is recorded for a pair of users
+    user2 = max(sender_id, receiver_id)
+
+    conversation = Conversation.query.filter_by(   # checking the db to see if the convo already exissts
+        user1_id=user1,
+        user2_id=user2
+    ).first()
+
+    if not conversation:  # if not createing a new convo and adding to the database
+        conversation = Conversation(user1_id=user1, user2_id=user2)
+        db.session.add(conversation)
+        db.session.commit()
+
+    message = Message(  # create a new message reocord linked to the specific convo and save it in the db
+        conversation_id=conversation.id,
+        sender_id=sender_id,
+        receiver_id=receiver_id,
+        content=content
+    )
+
+    db.session.add(message)
+    db.session.commit()
+
+    msg_data = {   # creating a dic with the messge details to send through the websocket
+        "id": message.id,
+        "conversation_id": conversation.id,
+        "sender_id": sender_id,
+        "receiver_id": receiver_id,
+        "content": content,
+        "timestamp": message.timestamp.isoformat()
+    }
+
+   
+    emit("receive_message", msg_data, room=f"user_{receiver_id}")  # sends the message to the receviers personal room so it updates instantly
+
+    emit("receive_message", msg_data, room=f"user_{sender_id}") # sends the message to the senders personal room so it updates instantly
+
+
+
+#route to get the messages of the logged in user
+@app.route("/messages/<int:other_user_id>", methods=["GET"])
+@jwt_required()
+def get_messages(other_user_id):
+    current_user = int(get_jwt_identity())
+
+    user1 = min(current_user, other_user_id) 
+    user2 = max(current_user, other_user_id)
+
+    conversation = Conversation.query.filter_by(
+        user1_id=user1,
+        user2_id=user2
+    ).first()
+
+    if not conversation:  # checks if there is a convo fo the user if not returns a empty list cause there are no mesg if there are no convos 
+        return jsonify([])
+
+    messages = Message.query.filter_by( #get all the messages for the specific convo ordered accendingly
+        conversation_id=conversation.id
+    ).order_by(Message.timestamp.asc()).all()
+
+    return jsonify([  # Converts each Message object into a dictionary with its data and sends it as a JSON array to the client
+        {
+            "sender_id": m.sender_id,
+            "receiver_id": m.receiver_id,
+            "content": m.content,
+            "timestamp": m.timestamp.isoformat()
+        }
+        for m in messages
+    ])
+
+
+#route to search user for messageing with MOH given ID
+@app.route("/search-user/<code>", methods=["GET"])
+@jwt_required()
+def search_user(code):
+    user = User.query.filter_by(MOH_ID=code).first()
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "username": user.username,
+        "role": user.role
+    })
+
+
+
 
 @app.route("/analize", methods=["GET"])
 @jwt_required()
@@ -1331,8 +1463,9 @@ def get_admin_users():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-if __name__ == "__main__":
-    app.run(debug=os.getenv("FLASK_DEBUG") == "1", port=int(os.getenv("PORT", 5000)))
-
-
+    socketio.run(
+        app,
+        debug=os.getenv("FLASK_DEBUG") == "1",
+        port=int(os.getenv("PORT", 5000)),
+        use_reloader=False
+    )
