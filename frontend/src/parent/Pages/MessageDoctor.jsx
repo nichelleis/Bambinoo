@@ -39,14 +39,11 @@ export default function MessageDoctor() {
   }, []);
 
   useEffect(() => {
-    socket.on("receive_message", (msg) => {
-      setMessages((prev) => [...prev, msg]);
+    const handleMessage = (msg) => setMessages((prev) => [...prev, msg]);
+    socket.on("receive_message", handleMessage);
 
-      fetchConversations();
-    });
-
-    return () => socket.off("receive_message");
-  }, [selectedUser]);
+    return () => socket.off("receive_message", handleMessage);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -105,9 +102,6 @@ export default function MessageDoctor() {
 
     socket.emit("send_message", newMsg);
     setText("");
-    setMessages((prev) => [...prev, newMsg]);
-
-    fetchConversations();
   };
 
   const formatTime = (isoString) => {
@@ -118,6 +112,11 @@ export default function MessageDoctor() {
       minute: "2-digit",
       hour12: false,
     });
+  };
+
+  const limitText = (text, maxLength = 25) => {
+    if (!text) return "";
+    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   };
 
   return (
@@ -153,7 +152,7 @@ export default function MessageDoctor() {
               <div className={style.avatar}>NF</div> {/*make this dynamic too*/}
               <div className={style.cardContent}>
                 <strong>{c.user.username}</strong>
-                <p className={style.lastMessage}>{c.last_message}</p>
+                <p className={style.lastMessage}>{limitText(c.last_message)}</p>
               </div>
               <span className={style.timestamp}>
                 {new Date(c.timestamp).toLocaleTimeString([], {
@@ -183,33 +182,56 @@ export default function MessageDoctor() {
             </div>
 
             <div className={style.messagesContainer}>
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`${style.messageRow} ${
-                    msg.sender_id === currentUser.id
-                      ? style.myMessage
-                      : style.otherMessage
-                  }`}
-                >
-                  <span
-                    className={`${style.bubble} ${
-                      msg.sender_id === currentUser.id
-                        ? style.myBubble
-                        : style.otherBubble
-                    }`}
-                  >
-                    <div className={style.messageText}>{msg.content}</div>
+              {messages.map((msg, index) => {
+                const messageDate = new Date(msg.timestamp).toDateString();
+                const prevDate =
+                  index > 0
+                    ? new Date(messages[index - 1].timestamp).toDateString()
+                    : null;
+                const showDate = messageDate !== prevDate;
 
-                    <div className={style.messageTime}>
-                      {formatTime(msg.timestamp)}
+                return (
+                  <>
+                    {showDate && (
+                      <div className={style.dateSeparatorWrapper}>
+                        <div className={style.dateSeparator}>
+                          {messageDate === new Date().toDateString()
+                            ? "Today"
+                            : messageDate ===
+                                new Date(
+                                  new Date().setDate(new Date().getDate() - 1),
+                                ).toDateString()
+                              ? "Yesterday"
+                              : messageDate}
+                        </div>
+                      </div>
+                    )}
+
+                    <div
+                      className={`${style.messageRow} ${
+                        msg.sender_id === currentUser.id
+                          ? style.myMessage
+                          : style.otherMessage
+                      }`}
+                    >
+                      <span
+                        className={`${style.bubble} ${
+                          msg.sender_id === currentUser.id
+                            ? style.myBubble
+                            : style.otherBubble
+                        }`}
+                      >
+                        <div className={style.messageText}>{msg.content}</div>
+                        <div className={style.messageTime}>
+                          {formatTime(msg.timestamp)}
+                        </div>
+                      </span>
                     </div>
-                  </span>
-                </div>
-              ))}
+                  </>
+                );
+              })}
               <div ref={bottomRef} />
             </div>
-
             <div className={style.inputArea}>
               <input
                 className={style.textInput}
