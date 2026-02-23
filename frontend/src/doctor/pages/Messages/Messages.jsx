@@ -102,6 +102,8 @@ export default function Messages() {
 
     socket.emit("send_message", newMsg);
     setText("");
+
+    fetchConversations();
   };
 
   const formatTime = (isoString) => {
@@ -133,7 +135,10 @@ export default function Messages() {
   }
 
   return (
-    <div className={style.messageContainer} style={{marginTop: "4rem", width: "98%", marginLeft: "0.7rem"}}>
+    <div
+      className={style.messageContainer}
+      style={{ marginTop: "4rem", width: "98%", marginLeft: "0.7rem" }}
+    >
       <div className={style.leftSideBar}>
         <h3 className={style.messageHeader}>
           {" "}

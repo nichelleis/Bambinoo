@@ -102,6 +102,8 @@ export default function MessageDoctor() {
 
     socket.emit("send_message", newMsg);
     setText("");
+
+    fetchConversations();
   };
 
   const formatTime = (isoString) => {
