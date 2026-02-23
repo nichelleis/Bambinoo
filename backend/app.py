@@ -1030,6 +1030,36 @@ def search_user(code):
     })
 
 
+@app.route("/conversations", methods=["GET"])
+@jwt_required()
+def get_conversations():
+    current_user = int(get_jwt_identity())
+
+    conversations = Conversation.query.filter(
+        (Conversation.user1_id == current_user) | (Conversation.user2_id == current_user)
+    ).order_by(Conversation.created_at.desc()).all()
+
+    conversations_list = []
+    for conversation in conversations:
+
+        other_user_id = conversation.user2_id if conversation.user1_id == current_user else conversation.user1_id
+        user = User.query.get(other_user_id)
+
+        
+        last_message = Message.query.filter_by(conversation_id=conversation.id).order_by(Message.timestamp.desc()).first()
+        conversations_list.append({
+            "conversation_id": conversation.id,
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "role": user.role
+            },
+            "last_message": last_message.content if last_message else "",
+            "timestamp": last_message.timestamp.isoformat() if last_message else conversation.created_at.isoformat()
+        })
+
+    return jsonify(conversations_list)
+
 
 
 @app.route("/analize", methods=["GET"])
