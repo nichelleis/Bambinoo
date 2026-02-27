@@ -71,24 +71,14 @@ function Analytics() {
       { x: dates, y: dates.map(() => 115), type: 'scatter', mode: 'lines', name: '95th Percentile', line: { color: '#10b981', dash: 'dash', width: 2 } },
       { x: dates, y: dates.map(() => 107), type: 'scatter', mode: 'lines', name: '50th Percentile', line: { color: '#f59e0b', dash: 'dot', width: 2 } },
       { x: dates, y: dates.map(() => 100), type: 'scatter', mode: 'lines', name: '5th Percentile', line: { color: '#dc2626', dash: 'dash', width: 2 } }
-    ], {
-      title: { text: 'Height Growth Over Time', font: { size: 18, color: '#1e293b' } },
-      xaxis: { title: { text: 'Measurement Date', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      yaxis: { title: { text: 'Height (cm)', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff'
-    }, { responsive: true });
+    ], { title: 'Height Growth Chart (cm)', xaxis: { title: 'Date' }, yaxis: { title: 'Height (cm)' }, hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff' }, { responsive: true });
 
     Plotly.react('weightChart', [
       { x: dates, y: weights, type: 'scatter', mode: 'lines+markers', name: 'Child Weight', line: { color: '#8b5cf6', width: 3 }, marker: { size: 10, color: '#8b5cf6' } },
       { x: dates, y: dates.map(() => 20), type: 'scatter', mode: 'lines', name: '95th Percentile', line: { color: '#10b981', dash: 'dash', width: 2 } },
       { x: dates, y: dates.map(() => 17), type: 'scatter', mode: 'lines', name: '50th Percentile', line: { color: '#f59e0b', dash: 'dot', width: 2 } },
       { x: dates, y: dates.map(() => 14), type: 'scatter', mode: 'lines', name: '5th Percentile', line: { color: '#dc2626', dash: 'dash', width: 2 } }
-    ], {
-      title: { text: 'Weight Growth Over Time', font: { size: 18, color: '#1e293b' } },
-      xaxis: { title: { text: 'Measurement Date', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      yaxis: { title: { text: 'Weight (kg)', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff'
-    }, { responsive: true });
+    ], { title: 'Weight Growth Chart (kg)', xaxis: { title: 'Date' }, yaxis: { title: 'Weight (kg)' }, hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff' }, { responsive: true });
 
     Plotly.react('bmiChart', [
       { x: dates, y: bmis, type: 'scatter', mode: 'lines+markers', name: 'BMI', line: { color: '#ec4899', width: 3 }, marker: { size: 12, color: bmiColors, line: { color: '#fff', width: 2 } } },
@@ -96,12 +86,7 @@ function Analytics() {
       { x: dates, y: dates.map(() => 17), type: 'scatter', mode: 'lines', name: 'Overweight (17-18)', line: { color: '#f59e0b', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(245,158,11,0.1)' },
       { x: dates, y: dates.map(() => 15), type: 'scatter', mode: 'lines', name: 'Normal (15-17)', line: { color: '#10b981', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(16,185,129,0.1)' },
       { x: dates, y: dates.map(() => 14), type: 'scatter', mode: 'lines', name: 'Underweight (<15)', line: { color: '#f59e0b', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(245,158,11,0.1)' }
-    ], {
-      title: { text: 'BMI Trend with Risk Zones', font: { size: 18, color: '#1e293b' } },
-      xaxis: { title: { text: 'Measurement Date', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      yaxis: { title: { text: 'BMI (kg/m²)', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff'
-    }, { responsive: true });
+    ], { title: 'BMI Chart with Risk Levels', xaxis: { title: 'Date' }, yaxis: { title: 'BMI' }, hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff' }, { responsive: true });
 
   }, [childData]);
 
