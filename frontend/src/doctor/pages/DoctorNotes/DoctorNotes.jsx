@@ -8,30 +8,27 @@ function formatDate(dateString) {
   });
 }
 
-const RECORD_TYPE_COLORS = {
-  "Doctor Note":          { bg: "#e8f4fd", border: "#3b82f6", badge: "#3b82f6" },
-  "Prescription":         { bg: "#fef3e2", border: "#f59e0b", badge: "#f59e0b" },
-  "Fever":                { bg: "#fde8e8", border: "#ef4444", badge: "#ef4444" },
-  "Cold":                 { bg: "#e8f5e9", border: "#4caf50", badge: "#4caf50" },
-  "Vaccination reaction": { bg: "#f3e8fd", border: "#9c27b0", badge: "#9c27b0" },
-  "Checkup note":         { bg: "#e8fdf5", border: "#10b981", badge: "#10b981" },
+const TYPE_STYLES = {
+  "Doctor Note":  { bg: "#e8f4fd", border: "#3b82f6", badge: "#3b82f6" },
+  "Prescription": { bg: "#fef3e2", border: "#f59e0b", badge: "#f59e0b" },
+  "Doctor Visit": { bg: "#e8fdf5", border: "#10b981", badge: "#10b981" },
 };
 
 function getStyle(type) {
-  return RECORD_TYPE_COLORS[type] || { bg: "#f5f5f5", border: "#aaa", badge: "#aaa" };
+  return TYPE_STYLES[type] || { bg: "#f5f5f5", border: "#aaa", badge: "#aaa" };
 }
 
 export default function ClinicalNotes({ selectedChild }) {
   const [activeTab, setActiveTab] = useState("all");
-  const [noteForm, setNoteForm] = useState({ title: "", description: "" });
-  const [medForm, setMedForm] = useState({
-    medicineName: "", dosage: "", frequency: "",
-    startDate: "", endDate: "", longTerm: false, notes: "",
+  const [noteForm, setNoteForm] = useState({ title: "", doctor_name: "", notes: "" });
+  const [medForm, setMedForm]   = useState({
+    medication_name: "", medication_dosage: "", frequency: "",
+    doctor_name: "", longTerm: false, notes: "",
   });
   const [savingNote, setSavingNote] = useState(false);
-  const [savingMed, setSavingMed] = useState(false);
+  const [savingMed,  setSavingMed]  = useState(false);
   const [noteMsg, setNoteMsg] = useState("");
-  const [medMsg, setMedMsg] = useState("");
+  const [medMsg,  setMedMsg]  = useState("");
 
   if (!selectedChild) {
     return (
@@ -39,155 +36,143 @@ export default function ClinicalNotes({ selectedChild }) {
         <div className="cn-empty-card">
           <i className="ri-file-medical-line"></i>
           <h2>No Patient Selected</h2>
-          <p>Please search and select a patient to view clinical notes.</p>
+          <p>Please search and select a patient to view clinical records.</p>
         </div>
       </div>
     );
   }
 
-  const numericId = parseInt(selectedChild.id.replace("CH", ""));
-  const allNotes = selectedChild.healthNotes || [];
+  const numericId    = parseInt(selectedChild.id.replace("CH", ""));
+  const allRecords   = selectedChild.healthRecords || [];
+  const doctorNotes  = allRecords.filter(r => r.record_type === "Doctor Note");
+  const prescriptions= allRecords.filter(r => r.record_type === "Prescription");
+  const longTermMeds = prescriptions.filter(r => r.notes?.toLowerCase().includes("long-term"));
 
-  const prescriptions = allNotes.filter(n => n.record_type === "Prescription");
-  const doctorNotes   = allNotes.filter(n => n.record_type === "Doctor Note");
-  const longTermMeds  = prescriptions.filter(n => n.notes && n.notes.toLowerCase().includes("long-term"));
+  const displayed = (
+    activeTab === "all"           ? allRecords :
+    activeTab === "notes"         ? doctorNotes :
+    activeTab === "prescriptions" ? prescriptions :
+    allRecords
+  ).slice().sort((a, b) => new Date(b.record_date) - new Date(a.record_date));
 
-  const filteredNotes = activeTab === "all"          ? allNotes
-    : activeTab === "notes"        ? doctorNotes
-    : activeTab === "prescriptions"? prescriptions
-    : allNotes.filter(n => n.record_type === activeTab);
-
-  // Sort newest first
-  const sortedNotes = [...filteredNotes].sort(
-    (a, b) => new Date(b.record_date) - new Date(a.record_date)
-  );
-
-  const handleNoteChange = (e) => setNoteForm({ ...noteForm, [e.target.name]: e.target.value });
-  const handleMedChange = (e) => {
+  const handleNoteChange = e => setNoteForm({ ...noteForm, [e.target.name]: e.target.value });
+  const handleMedChange  = e => {
     const { name, value, type, checked } = e.target;
     setMedForm({ ...medForm, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleNoteSubmit = async (e) => {
+  const handleNoteSubmit = async e => {
     e.preventDefault();
     setSavingNote(true);
     setNoteMsg("");
     try {
-      const res = await fetch(`http://localhost:5000/children/${numericId}/notes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(noteForm),
-      });
+      const res = await fetch(
+        `http://localhost:5000/children/${numericId}/health-records/notes`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(noteForm) }
+      );
       const result = await res.json();
-      if (res.ok) {
-        setNoteMsg("✓ Note saved successfully.");
-        setNoteForm({ title: "", description: "" });
-      } else {
-        setNoteMsg(`✗ ${result.error || "Failed to save."}`);
-      }
-    } catch {
-      setNoteMsg("✗ Cannot reach server.");
-    } finally {
-      setSavingNote(false);
-    }
+      if (res.ok) { setNoteMsg("✓ Note saved."); setNoteForm({ title: "", doctor_name: "", notes: "" }); }
+      else          setNoteMsg(`✗ ${result.error || "Failed."}`);
+    } catch { setNoteMsg("✗ Cannot reach server."); }
+    finally   { setSavingNote(false); }
   };
 
-  const handleMedSubmit = async (e) => {
+  const handleMedSubmit = async e => {
     e.preventDefault();
     setSavingMed(true);
     setMedMsg("");
     try {
-      const res = await fetch(`http://localhost:5000/children/${numericId}/medicines`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(medForm),
-      });
+      const res = await fetch(
+        `http://localhost:5000/children/${numericId}/health-records/prescriptions`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(medForm) }
+      );
       const result = await res.json();
       if (res.ok) {
-        setMedMsg("✓ Prescription saved successfully.");
-        setMedForm({ medicineName: "", dosage: "", frequency: "", startDate: "", endDate: "", longTerm: false, notes: "" });
-      } else {
-        setMedMsg(`✗ ${result.error || "Failed to save."}`);
-      }
-    } catch {
-      setMedMsg("✗ Cannot reach server.");
-    } finally {
-      setSavingMed(false);
-    }
+        setMedMsg("✓ Prescription saved.");
+        setMedForm({ medication_name: "", medication_dosage: "", frequency: "", doctor_name: "", longTerm: false, notes: "" });
+      } else setMedMsg(`✗ ${result.error || "Failed."}`);
+    } catch { setMedMsg("✗ Cannot reach server."); }
+    finally   { setSavingMed(false); }
   };
 
   return (
     <div className="cn-page">
+
+     
       <div className="cn-header">
         <div className="cn-header-left">
           <div className="cn-avatar">{selectedChild.name[0]}</div>
           <div>
-            <h2>Clinical Notes</h2>
+            <h2>Clinical Records</h2>
             <p>Patient: <strong>{selectedChild.name}</strong></p>
           </div>
         </div>
         <div className="cn-stats">
-          <span className="cn-stat-badge">{allNotes.length} Total Records</span>
-          <span className="cn-stat-badge prescription">{prescriptions.length} Prescriptions</span>
-          <span className="cn-stat-badge note">{doctorNotes.length} Doctor Notes</span>
+          <span className="cn-badge">📋 {allRecords.length} Total</span>
+          <span className="cn-badge note">📝 {doctorNotes.length} Notes</span>
+          <span className="cn-badge rx">💊 {prescriptions.length} Prescriptions</span>
         </div>
       </div>
 
-      {/* Long-term medicines alert */}
+    
       {longTermMeds.length > 0 && (
         <div className="cn-alert">
           <i className="ri-alert-line"></i>
           <strong>Long-Term Medications:</strong>
           {longTermMeds.map((m, i) => (
             <span key={i} className="cn-alert-pill">
-              {m.medication_name} {m.medication_dosage} — {m.reason}
+              {m.medication_name} {m.medication_dosage} — {m.treatment}
             </span>
           ))}
         </div>
       )}
 
       <div className="cn-layout">
-        {/* LEFT side shows  Forms */}
+
+     
         <div className="cn-forms">
 
-          {/* the Doctor Note Form */}
+          {/* Doctor Note Form */}
           <div className="cn-form-card">
             <h3><i className="ri-sticky-note-line"></i> Add Doctor Note</h3>
             <form onSubmit={handleNoteSubmit}>
               <div className="cn-field">
-                <label>Title (optional)</label>
+                <label>Title</label>
                 <input type="text" name="title" placeholder="e.g. Follow-up visit"
                   value={noteForm.title} onChange={handleNoteChange} />
               </div>
               <div className="cn-field">
-                <label>Note *</label>
-                <textarea name="description" rows={4}
-                  placeholder="Observations, diagnosis, follow-up instructions..."
-                  value={noteForm.description} onChange={handleNoteChange} required />
+                <label>Doctor Name</label>
+                <input type="text" name="doctor_name" placeholder="e.g. Dr. Sarah Mitchell"
+                  value={noteForm.doctor_name} onChange={handleNoteChange} />
               </div>
-              {noteMsg && (
-                <p className={noteMsg.startsWith("✓") ? "cn-success" : "cn-error"}>{noteMsg}</p>
-              )}
-              <button type="submit" className="cn-btn primary" disabled={savingNote}>
+              <div className="cn-field">
+                <label>Note *</label>
+                <textarea name="notes" rows={4}
+                  placeholder="Observations, diagnosis, follow-up instructions..."
+                  value={noteForm.notes} onChange={handleNoteChange} required />
+              </div>
+              {noteMsg && <p className={noteMsg.startsWith("✓") ? "cn-success" : "cn-error"}>{noteMsg}</p>}
+              <button type="submit" className="cn-btn" disabled={savingNote}>
                 <i className="ri-save-line"></i> {savingNote ? "Saving..." : "Save Note"}
               </button>
             </form>
           </div>
 
-          {/* the Prescription Form */}
+          {/* Prescription Form */}
           <div className="cn-form-card">
             <h3><i className="ri-capsule-line"></i> Prescribe Medicine</h3>
             <form onSubmit={handleMedSubmit}>
               <div className="cn-field">
                 <label>Medicine Name *</label>
-                <input type="text" name="medicineName" placeholder="e.g. Amoxicillin"
-                  value={medForm.medicineName} onChange={handleMedChange} required />
+                <input type="text" name="medication_name" placeholder="e.g. Amoxicillin"
+                  value={medForm.medication_name} onChange={handleMedChange} required />
               </div>
               <div className="cn-row">
                 <div className="cn-field">
                   <label>Dosage</label>
-                  <input type="text" name="dosage" placeholder="e.g. 250mg"
-                    value={medForm.dosage} onChange={handleMedChange} />
+                  <input type="text" name="medication_dosage" placeholder="e.g. 250mg"
+                    value={medForm.medication_dosage} onChange={handleMedChange} />
                 </div>
                 <div className="cn-field">
                   <label>Frequency</label>
@@ -195,15 +180,10 @@ export default function ClinicalNotes({ selectedChild }) {
                     value={medForm.frequency} onChange={handleMedChange} />
                 </div>
               </div>
-              <div className="cn-row">
-                <div className="cn-field">
-                  <label>Start Date</label>
-                  <input type="date" name="startDate" value={medForm.startDate} onChange={handleMedChange} />
-                </div>
-                <div className="cn-field">
-                  <label>End Date</label>
-                  <input type="date" name="endDate" value={medForm.endDate} onChange={handleMedChange} />
-                </div>
+              <div className="cn-field">
+                <label>Doctor Name</label>
+                <input type="text" name="doctor_name" placeholder="e.g. Dr. Sarah Mitchell"
+                  value={medForm.doctor_name} onChange={handleMedChange} />
               </div>
               <div className="cn-checkbox">
                 <input type="checkbox" name="longTerm" id="longTerm"
@@ -219,69 +199,70 @@ export default function ClinicalNotes({ selectedChild }) {
                   placeholder="Administration instructions, warnings..."
                   value={medForm.notes} onChange={handleMedChange} />
               </div>
-              {medMsg && (
-                <p className={medMsg.startsWith("✓") ? "cn-success" : "cn-error"}>{medMsg}</p>
-              )}
-              <button type="submit" className="cn-btn primary" disabled={savingMed}>
+              {medMsg && <p className={medMsg.startsWith("✓") ? "cn-success" : "cn-error"}>{medMsg}</p>}
+              <button type="submit" className="cn-btn rx-btn" disabled={savingMed}>
                 <i className="ri-save-line"></i> {savingMed ? "Saving..." : "Save Prescription"}
               </button>
             </form>
           </div>
         </div>
 
-        {/* RIGHT Side Shows the History */}
+        {/* RIGHT: History */}
         <div className="cn-history">
           <div className="cn-tabs">
-            {["all", "notes", "prescriptions"].map(tab => (
-              <button key={tab} className={`cn-tab ${activeTab === tab ? "active" : ""}`}
-                onClick={() => setActiveTab(tab)}>
-                {tab === "all" ? "All Records" : tab === "notes" ? "Doctor Notes" : "Prescriptions"}
+            {[
+              { key: "all",           label: "All Records" },
+              { key: "notes",         label: "Doctor Notes" },
+              { key: "prescriptions", label: "Prescriptions" },
+            ].map(t => (
+              <button key={t.key}
+                className={`cn-tab ${activeTab === t.key ? "active" : ""}`}
+                onClick={() => setActiveTab(t.key)}>
+                {t.label}
               </button>
             ))}
           </div>
 
           <div className="cn-records">
-            {sortedNotes.length === 0 ? (
+            {displayed.length === 0 ? (
               <p className="cn-muted">No records found.</p>
             ) : (
-              sortedNotes.map((note, i) => {
-                const style = getStyle(note.record_type);
-                const isLongTerm = note.notes && note.notes.toLowerCase().includes("long-term");
+              displayed.map((record, i) => {
+                const style     = getStyle(record.record_type);
+                const isLongTerm = record.notes?.toLowerCase().includes("long-term");
+                const cleanNotes = record.notes?.replace("Long-term.", "").trim();
+
                 return (
                   <div key={i} className="cn-record-card"
                     style={{ backgroundColor: style.bg, borderLeft: `4px solid ${style.border}` }}>
+
                     <div className="cn-record-top">
-                      <span className="cn-record-badge" style={{ backgroundColor: style.badge }}>
-                        {note.record_type}
+                      <span className="cn-record-type" style={{ background: style.badge }}>
+                        {record.record_type}
                       </span>
-                      <small className="cn-muted">{formatDate(note.record_date)}</small>
-                      {isLongTerm && <span className="cn-longterm-badge">Long-term</span>}
+                      <small className="cn-muted">{formatDate(record.record_date)}</small>
+                      {isLongTerm && <span className="cn-longterm">Long-term</span>}
                     </div>
 
-                    {note.title && <strong className="cn-record-title">{note.title}</strong>}
+                    {record.title && <strong className="cn-record-title">{record.title}</strong>}
+                    {record.doctor_name && <p className="cn-muted" style={{fontSize:"0.8rem"}}>👨‍⚕️ {record.doctor_name}</p>}
 
-         
-                    {note.description && <p className="cn-record-text">{note.description}</p>}
-
-                    {note.medication_name && (
-                      <div className="cn-med-details">
-                        <span>💊 {note.medication_name}</span>
-                        {note.medication_dosage && <span>• {note.medication_dosage}</span>}
-                        {note.reason && <span>• {note.reason}</span>}
+                    {/* Prescription details */}
+                    {record.medication_name && (
+                      <div className="cn-med-row">
+                        <span>💊 {record.medication_name}</span>
+                        {record.medication_dosage && <span>• {record.medication_dosage}</span>}
+                        {record.treatment        && <span>• {record.treatment}</span>}
                       </div>
                     )}
 
-     
-                    {note.temperature && <p className="cn-record-text">🌡 Temp: {note.temperature}°C</p>}
-                    {note.severity && <p className="cn-record-text">Severity: {note.severity}</p>}
+                    {/* Doctor visit details */}
+                    {record.diagnosis  && <p className="cn-record-text">🔍 <strong>Diagnosis:</strong> {record.diagnosis}</p>}
+                    {record.treatment && !record.medication_name &&
+                      <p className="cn-record-text">💉 <strong>Treatment:</strong> {record.treatment}</p>}
 
-               
-                    {note.notes && !isLongTerm && (
-                      <p className="cn-record-notes">{note.notes}</p>
-                    )}
-                    {note.notes && isLongTerm && note.notes.replace("Long-term.", "").trim() && (
-                      <p className="cn-record-notes">{note.notes.replace("Long-term.", "").trim()}</p>
-                    )}
+                    {/* Note text */}
+                    {record.notes && <p className="cn-record-notes">{cleanNotes}</p>}
                   </div>
                 );
               })
