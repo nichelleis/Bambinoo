@@ -1517,6 +1517,62 @@ def add_growth_record(child_id):
         db.session.rollback()
         print(f"Growth record error: {e}")   # <-- This will show in your Flask terminal
         return jsonify({"error": str(e)}), 500
+@app.route("/children/<int:child_id>/vaccinations", methods=["POST"])
+@cross_origin()
+def add_vaccination(child_id):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data received"}), 400
+
+        child = Child.query.get(child_id)
+        if not child:
+            return jsonify({"error": "Child not found"}), 404
+
+        if not data.get("vaccineName"):
+            return jsonify({"error": "Vaccine name is required"}), 400
+
+        if not data.get("dateAdministered"):
+            return jsonify({"error": "Date administered is required"}), 400
+
+        # Safe date parsing
+        try:
+            administered_date = datetime.strptime(data["dateAdministered"], "%Y-%m-%d").date()
+        except ValueError:
+            return jsonify({"error": "Invalid date format"}), 400
+
+        next_due_date = None
+        if data.get("nextDueDate"):
+            try:
+                next_due_date = datetime.strptime(data["nextDueDate"], "%Y-%m-%d").date()
+            except ValueError:
+                pass
+
+        new_vaccination = Vaccination(
+            child_id=child_id,
+            vaccine_name=data["vaccineName"].strip(),
+            dose_number=str(data.get("doseNumber", "")).strip() or None,
+            administered_date=administered_date,
+            due_date=next_due_date,
+            administered_by=data.get("administeredBy", "").strip() or None,
+            batch_number=data.get("batchNumber", "").strip() or None,
+            notes=data.get("notes", "").strip() or None,
+            status="completed"
+        )
+
+        db.session.add(new_vaccination)
+        db.session.commit()
+
+        return jsonify({
+            "message": "Vaccination recorded successfully",
+            "id": new_vaccination.id
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Vaccination record error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # Admin Management Routes
 
