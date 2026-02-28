@@ -1674,6 +1674,99 @@ def add_prescription(child_id):
         db.session.rollback()
         print(f"Prescription error: {e}")
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/doctor-recent-activity", methods=["GET"])
+def get_doctor_recent_activity():
+    try:
+        activities = []
+
+        def fmt(dt):
+            if not dt:
+                return ""
+            if hasattr(dt, 'isoformat'):
+                return dt.isoformat() + "Z"
+            return str(dt) + "Z"
+
+        growth_records = GrowthRecord.query.order_by(GrowthRecord.created_at.desc()).limit(5).all()
+        for r in growth_records:
+            child = Child.query.get(r.child_id)
+            if not child:
+                continue
+            activities.append({
+                "type": "Growth Data Recorded",
+                "category": "growth",
+                "patient": child.name,
+                "detail": f"Height: {r.height} cm, Weight: {r.weight} kg, BMI: {r.bmi}",
+                "recorded_by": "Doctor",
+                "timestamp": fmt(r.created_at or r.record_date)
+            })
+
+        vaccinations = Vaccination.query.filter_by(status="completed")\
+            .order_by(Vaccination.administered_date.desc()).limit(5).all()
+        for v in vaccinations:
+            child = Child.query.get(v.child_id)
+            if not child:
+                continue
+            activities.append({
+                "type": "Vaccine Administered",
+                "category": "vaccination",
+                "patient": child.name,
+                "detail": f"{v.vaccine_name} — {v.dose_number or 'N/A'} at {v.location or 'clinic'}",
+                "recorded_by": v.administered_by or "Doctor",
+                "timestamp": fmt(v.administered_date)
+            })
+
+        prescriptions = HealthRecord.query.filter_by(record_type="Prescription")\
+            .order_by(HealthRecord.created_at.desc()).limit(5).all()
+        for p in prescriptions:
+            child = Child.query.get(p.child_id)
+            if not child:
+                continue
+            activities.append({
+                "type": "Prescription Issued",
+                "category": "prescription",
+                "patient": child.name,
+                "detail": f"{p.medication_name or 'Medicine'} {p.medication_dosage or ''} — {p.treatment or ''}".strip(" —"),
+                "recorded_by": p.doctor_name or "Doctor",
+                "timestamp": fmt(p.created_at or p.record_date)
+            })
+
+        doctor_notes = HealthRecord.query.filter_by(record_type="Doctor Note")\
+            .order_by(HealthRecord.created_at.desc()).limit(5).all()
+        for n in doctor_notes:
+            child = Child.query.get(n.child_id)
+            if not child:
+                continue
+            activities.append({
+                "type": "Doctor Note Added",
+                "category": "note",
+                "patient": child.name,
+                "detail": n.title or "Clinical note recorded",
+                "recorded_by": n.doctor_name or "Doctor",
+                "timestamp": fmt(n.created_at or n.record_date)
+            })
+
+        doctor_visits = HealthRecord.query.filter_by(record_type="Doctor Visit")\
+            .order_by(HealthRecord.created_at.desc()).limit(5).all()
+        for v in doctor_visits:
+            child = Child.query.get(v.child_id)
+            if not child:
+                continue
+            activities.append({
+                "type": "Patient Visit Recorded",
+                "category": "visit",
+                "patient": child.name,
+                "detail": f"Diagnosis: {v.diagnosis or 'N/A'} — Treatment: {v.treatment or 'N/A'}",
+                "recorded_by": v.doctor_name or "Doctor",
+                "timestamp": fmt(v.created_at or v.record_date)
+            })
+
+        activities.sort(key=lambda x: x["timestamp"], reverse=True)
+        return jsonify(activities[:12])
+
+    except Exception as e:
+        print(f"Doctor recent activity error: {e}")
+        return jsonify({"error": str(e)}), 500
 # Admin Management Routes
 
 @app.route('/api/admin/users', methods=['GET'])
