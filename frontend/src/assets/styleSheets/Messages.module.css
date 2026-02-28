@@ -142,7 +142,7 @@
   font-weight: 600;
   font-size: 19px;
   color: white;
-  background-color: rgb(40, 166, 212);
+  background-color: #4f9cef;
 }
 .selectedUserRole {
   color: rgba(102, 102, 136, 0.681);
@@ -257,4 +257,100 @@
   border: 1px solid #e3e8ee;
   color: #2a2f45;
   border-bottom-left-radius: 4px;
+}
+
+.messageText {
+  display: block;
+}
+
+.messageTime {
+  font-size: 10px;
+  margin-top: 4px;
+  opacity: 0.7;
+  width: 100%;
+}
+
+.myBubble .messageTime {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.otherBubble .messageTime {
+  text-align: left;
+  color: #6b7280;
+}
+
+.conversationList {
+  margin-top: 15px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.chatCard {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.chatCard:hover {
+  background: #f0f0f0b0;
+}
+
+.activeCard {
+  background: #d9e8ff;
+}
+
+.activeCard .avatar {
+  background: #4f9cef;
+  color: white;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  color: rgb(0, 0, 0);
+  background: #ececec;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.cardContent {
+  flex: 1;
+}
+
+.lastMessage {
+  font-size: 0.7rem;
+  color: gray;
+  margin: 0;
+}
+
+.timestamp {
+  font-size: 0.6rem;
+  padding-bottom: 1.5rem;
+  color: gray;
+}
+
+.dateSeparatorWrapper {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.dateSeparator {
+  text-align: center;
+  margin: 10px 0;
+  font-size: 12px;
+  color: gray;
+  background: #e3e8ee4d;
+  padding: 2px 10px;
+  border-radius: 12px;
+  display: inline-block;
 }
