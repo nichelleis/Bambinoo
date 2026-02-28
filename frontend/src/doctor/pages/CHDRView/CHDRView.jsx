@@ -44,16 +44,26 @@ export default function CHDRView({ selectedChild }) {
   }
 
   const dob = selectedChild.date_of_birth;
-  const growth = selectedChild.growth || {};
+
+  // All growth records sorted by date descending
+  const allGrowth = [...(selectedChild.growthHistory || selectedChild.growth_records || [])].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
+
+  // Latest single record
+  const latestGrowth = allGrowth[0] || null;
+
+  // Next 5 after the latest (growth history)
+  const growthHistory = allGrowth.slice(1, 6);
+
   const allergies = selectedChild.allergies || [];
   const activeConditions = selectedChild.activeConditions || [];
-  const vaccines = selectedChild.vaccinations || [];
-  const healthNotes = selectedChild.healthNotes || [];
+  const vaccines = (selectedChild.vaccinations || []).slice(-5);
+  const healthNotes = (selectedChild.healthNotes || []).slice(-5);
 
   return (
     <div className="chdr-page">
 
-      
       <div className="chdr-header">
         <div className="child-info">
           <div className="avatar">{selectedChild.name[0]}</div>
@@ -108,29 +118,69 @@ export default function CHDRView({ selectedChild }) {
         {/* Growth */}
         <div className="chdrcard">
           <h4>Latest Growth Measurements</h4>
-          {growth.weight || growth.height || growth.head ? (
-            <div className="CHDRgrowth">
-              <div>
-                <strong>{growth.weight ?? "N/A"}</strong>
-                <span>kg (Weight)</span>
+
+          {latestGrowth ? (
+            <>
+              <small style={{ color: "#888", display: "block", marginBottom: "10px" }}>
+                Recorded on {formatDate(latestGrowth.date)}
+              </small>
+              <div className="CHDRgrowth">
+                <div>
+                  <strong>{latestGrowth.weight ?? "N/A"}</strong>
+                  <span>kg (Weight)</span>
+                </div>
+                <div>
+                  <strong>{latestGrowth.height ?? "N/A"}</strong>
+                  <span>cm (Height)</span>
+                </div>
+                <div>
+                  <strong>{latestGrowth.head ?? "N/A"}</strong>
+                  <span>cm (Head)</span>
+                </div>
               </div>
-              <div>
-                <strong>{growth.height ?? "N/A"}</strong>
-                <span>cm (Height)</span>
-              </div>
-              <div>
-                <strong>{growth.head ?? "N/A"}</strong>
-                <span>cm (Head)</span>
-              </div>
-            </div>
+            </>
           ) : (
             <p className="empty-text">No growth records available.</p>
+          )}
+
+          {/* Growth History */}
+          {growthHistory.length > 0 && (
+            <>
+              <h5 style={{ marginTop: "18px", marginBottom: "8px", color: "#555" }}>
+                Recent Growth History
+              </h5>
+              <ul style={{ padding: "2px 0 0 0", listStyle: "none", margin: 0 }}>
+                {growthHistory.map((g, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: "6px 6px 6px 12px",
+                      borderTop: "1px solid #f0f0f0",
+                      fontSize: "13px",
+                    }}
+                  >
+                    
+                    <span style={{ display: "flex", gap: "14px" }}>
+                      <span><strong>{g.weight ?? "N/A"}</strong> kg</span>
+                      <span><strong>{g.height ?? "N/A"}</strong> cm</span>
+                      <span><strong>{g.head ?? "N/A"}</strong> cm</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
 
         {/* Immunization */}
         <div className="chdrcard">
-          <h4>Immunization Status</h4>
+          <h4>
+            Immunization Status{" "}
+            <small style={{ fontWeight: "normal", color: "#888" }}>(Latest 5)</small>
+          </h4>
           {vaccines.length === 0 ? (
             <p className="empty-text">No vaccination records found.</p>
           ) : (
@@ -181,13 +231,16 @@ export default function CHDRView({ selectedChild }) {
 
         {/* Health Notes */}
         <div className="chdrcard">
-          <h4>Health Notes</h4>
+          <h4>
+            Health Notes{" "}
+            <small style={{ fontWeight: "normal", color: "#888" }}>(Latest 5)</small>
+          </h4>
           {healthNotes.length === 0 ? (
             <p className="empty-text">No health notes recorded.</p>
           ) : (
             <ul>
               {healthNotes.map((h, i) => (
-                <li key={i} style={{ marginBottom: "10px" }}>
+                <li key={i} style={{ marginBottom: "10px", padding: "6px 6px 6px 12px" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <strong>{h.title || h.record_type}</strong>
                     <span style={{ display: "flex", gap: "8px", alignItems: "center" }}>
