@@ -98,34 +98,16 @@ export default function ClinicalNotes({ selectedChild }) {
   return (
     <div className="cn-page">
 
-     
       <div className="cn-header">
         <div className="cn-header-left">
-          <div className="cn-avatar">{selectedChild.name[0]}</div>
           <div>
             <h2>Clinical Records</h2>
             <p>Patient: <strong>{selectedChild.name}</strong></p>
           </div>
         </div>
-        <div className="cn-stats">
-          <span className="cn-badge">📋 {allRecords.length} Total</span>
-          <span className="cn-badge note">📝 {doctorNotes.length} Notes</span>
-          <span className="cn-badge rx">💊 {prescriptions.length} Prescriptions</span>
-        </div>
+        
       </div>
 
-    
-      {longTermMeds.length > 0 && (
-        <div className="cn-alert">
-          <i className="ri-alert-line"></i>
-          <strong>Long-Term Medications:</strong>
-          {longTermMeds.map((m, i) => (
-            <span key={i} className="cn-alert-pill">
-              {m.medication_name} {m.medication_dosage} — {m.treatment}
-            </span>
-          ))}
-        </div>
-      )}
 
       <div className="cn-layout">
 
