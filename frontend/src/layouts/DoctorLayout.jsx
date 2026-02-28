@@ -66,6 +66,7 @@ export default function DoctorLayout() {
           />
           <Route path="auth" element={<Placeholder title="User Auth" />} />
         </Routes>
+        
       </main>
     </div>
   );
