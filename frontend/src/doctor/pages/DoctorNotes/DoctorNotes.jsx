@@ -227,19 +227,19 @@ export default function ClinicalNotes({ selectedChild }) {
                     </div>
 
                     {record.title && <strong className="cn-record-title">{record.title}</strong>}
-                    {record.doctor_name && <p className="cn-muted" style={{fontSize:"0.8rem"}}>👨‍⚕️ {record.doctor_name}</p>}
+                    {record.doctor_name && <p className="cn-muted" style={{fontSize:"0.8rem"}}> {record.doctor_name}</p>}
 
                     {/* Prescription details */}
                     {record.medication_name && (
                       <div className="cn-med-row">
-                        <span>💊 {record.medication_name}</span>
+                        <span>{record.medication_name}</span>
                         {record.medication_dosage && <span>• {record.medication_dosage}</span>}
                         {record.treatment        && <span>• {record.treatment}</span>}
                       </div>
                     )}
 
                     {/* Doctor visit details */}
-                    {record.diagnosis  && <p className="cn-record-text">🔍 <strong>Diagnosis:</strong> {record.diagnosis}</p>}
+                    {record.diagnosis  && <p className="cn-record-text"><strong>Diagnosis:</strong> {record.diagnosis}</p>}
                     {record.treatment && !record.medication_name &&
                       <p className="cn-record-text">💉 <strong>Treatment:</strong> {record.treatment}</p>}
 
