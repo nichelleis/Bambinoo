@@ -109,11 +109,34 @@ with app.app_context():
 
 
     db.session.add_all([
-        HealthNote(child_id=boy.id, record_type="Fever", title="Mild fever", temperature=37.8, severity="Mild"),
-        HealthNote(child_id=boy.id, record_type="Cold", title="Runny nose", severity="Mild"),
-        HealthNote(child_id=girl.id, record_type="Vaccination reaction", title="Slight swelling", severity="Mild"),
-        HealthNote(child_id=girl.id, record_type="Checkup note", title="All normal"),
-    ])
+
+    HealthNote(child_id=boy.id, record_type="Fever", title="Mild fever", temperature=37.8, severity="Mild", record_date=datetime(2024, 3, 10)),
+    HealthNote(child_id=boy.id, record_type="Cold", title="Runny nose", severity="Mild", record_date=datetime(2024, 4, 5)),
+    HealthNote(child_id=girl.id, record_type="Vaccination reaction", title="Slight swelling", severity="Mild", record_date=datetime(2024, 8, 1)),
+    HealthNote(child_id=girl.id, record_type="Checkup note", title="All normal", record_date=datetime(2024, 9, 10)),
+
+   
+    HealthNote(child_id=boy.id, record_type="Doctor Note", title="Routine checkup",
+               description="Child is healthy. Weight on track. No concerns noted.",
+               record_date=datetime(2025, 1, 15)),
+    HealthNote(child_id=girl.id, record_type="Doctor Note", title="Follow-up visit",
+               description="Mild cough observed. Advised warm fluids and rest. Monitor for 3 days.",
+               record_date=datetime(2025, 2, 20)),
+
+    
+    HealthNote(child_id=boy.id, record_type="Prescription", title="Cetirizine - 5ml",
+               medication_name="Cetirizine", medication_dosage="5ml",
+               reason="Once daily", notes="Long-term. For allergy management.",
+               record_date=datetime(2024, 6, 1)),
+    HealthNote(child_id=boy.id, record_type="Prescription", title="Amoxicillin - 250mg",
+               medication_name="Amoxicillin", medication_dosage="250mg",
+               reason="Twice daily for 7 days", notes="For ear infection. Complete full course.",
+               record_date=datetime(2024, 11, 3)),
+    HealthNote(child_id=girl.id, record_type="Prescription", title="Salbutamol - 2.5mg",
+               medication_name="Salbutamol", medication_dosage="2.5mg",
+               reason="As needed", notes="Long-term. For asthma relief via nebulizer.",
+               record_date=datetime(2024, 7, 22)),
+])
 
     db.session.add_all([
         HealthRecord(
