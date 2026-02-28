@@ -1452,6 +1452,21 @@ def get_children():
                     "notes": r.notes
                 }
                 for r in growth_history
+            ],
+            "healthRecords": [
+                {
+                    "record_type": r.record_type,
+                    "title": r.title,
+                    "doctor_name": r.doctor_name,
+                    "diagnosis": r.diagnosis,
+                    "treatment": r.treatment,
+                    "medication_name": r.medication_name,
+                    "medication_dosage": r.medication_dosage,
+                    "notes": r.notes,
+                    "record_date": r.record_date.isoformat()
+                }
+                for r in HealthRecord.query.filter_by(child_id=child.id)
+                    .order_by(HealthRecord.record_date.desc()).all()
             ]
         })
 
@@ -1574,12 +1589,11 @@ def add_vaccination(child_id):
         print(f"Vaccination record error: {e}")
         return jsonify({"error": str(e)}), 500
     
-@app.route("/children/<int:child_id>/notes", methods=["POST"])
+@app.route("/children/<int:child_id>/health-records/notes", methods=["POST"])
 @cross_origin()
-def add_health_note(child_id):
+def add_doctor_note(child_id):
     try:
         data = request.get_json()
-
         if not data:
             return jsonify({"error": "No data received"}), 400
 
@@ -1587,35 +1601,37 @@ def add_health_note(child_id):
         if not child:
             return jsonify({"error": "Child not found"}), 404
 
-        if not data.get("description"):
+        if not data.get("notes"):
             return jsonify({"error": "Note content is required"}), 400
 
-        new_note = HealthNote(
+        new_record = HealthRecord(
             child_id=child_id,
             record_type="Doctor Note",
             title=data.get("title", "Doctor Note").strip(),
-            description=data.get("description", "").strip(),
+            doctor_name=data.get("doctor_name", "").strip() or None,
+            notes=data["notes"].strip(),
             record_date=datetime.utcnow()
         )
 
-        db.session.add(new_note)
+        db.session.add(new_record)
         db.session.commit()
 
         return jsonify({
-            "message": "Note saved successfully",
-            "id": new_note.id
+            "message": "Doctor note saved successfully",
+            "id": new_record.id
         }), 201
 
     except Exception as e:
         db.session.rollback()
         print(f"Doctor note error: {e}")
         return jsonify({"error": str(e)}), 500
-@app.route("/children/<int:child_id>/medicines", methods=["POST"])
+
+
+@app.route("/children/<int:child_id>/health-records/prescriptions", methods=["POST"])
 @cross_origin()
-def add_medicine(child_id):
+def add_prescription(child_id):
     try:
         data = request.get_json()
-
         if not data:
             return jsonify({"error": "No data received"}), 400
 
@@ -1623,36 +1639,40 @@ def add_medicine(child_id):
         if not child:
             return jsonify({"error": "Child not found"}), 404
 
-        if not data.get("medicineName"):
+        if not data.get("medication_name"):
             return jsonify({"error": "Medicine name is required"}), 400
 
-        # Build title from medicine name + dosage
-        title = data["medicineName"].strip()
-        if data.get("dosage"):
-            title += f" - {data['dosage'].strip()}"
+        title = data["medication_name"].strip()
+        if data.get("medication_dosage"):
+            title += f" - {data['medication_dosage'].strip()}"
 
-        new_note = HealthNote(
+        notes_text = data.get("notes", "").strip()
+        if data.get("longTerm"):
+            notes_text = f"Long-term. {notes_text}".strip()
+
+        new_record = HealthRecord(
             child_id=child_id,
             record_type="Prescription",
             title=title,
-            medication_name=data["medicineName"].strip(),
-            medication_dosage=data.get("dosage", "").strip() or None,
-            reason=data.get("frequency", "").strip() or None,
-            notes=data.get("notes", "").strip() or None,
+            doctor_name=data.get("doctor_name", "").strip() or None,
+            medication_name=data["medication_name"].strip(),
+            medication_dosage=data.get("medication_dosage", "").strip() or None,
+            treatment=data.get("frequency", "").strip() or None,
+            notes=notes_text or None,
             record_date=datetime.utcnow()
         )
 
-        db.session.add(new_note)
+        db.session.add(new_record)
         db.session.commit()
 
         return jsonify({
             "message": "Prescription saved successfully",
-            "id": new_note.id
+            "id": new_record.id
         }), 201
 
     except Exception as e:
         db.session.rollback()
-        print(f"Medicine error: {e}")
+        print(f"Prescription error: {e}")
         return jsonify({"error": str(e)}), 500
 # Admin Management Routes
 
