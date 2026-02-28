@@ -1,5 +1,7 @@
 from app import app, db
-from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination,Allergy, ActiveCondition, PendingRegistration)
+from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination,Allergy, ActiveCondition, PendingRegistration,DoctorProfile, DoctorQualification,
+                 DoctorExperience, DoctorCertification, DoctorLanguage,
+                 DoctorExpertise, DoctorPublication, DoctorAvailability)
 from datetime import datetime, date, timedelta, UTC
 from werkzeug.security import generate_password_hash
 
@@ -454,8 +456,107 @@ with app.app_context():
             updated_at=datetime.now(UTC),
         ),
     ])
+    sarah_profile = DoctorProfile(
+        user_id          = doctor.id,
+        first_name       = "Sarah",
+        last_name        = "Mitchell",
+        title            = "Dr.",
+        gender           = "Female",
+        dob              = "1985-03-22",
+        phone            = "+94 77 456 7890",
+        email            = "doctor@test.com",
+        bio              = (
+            "Dr. Sarah Mitchell is a dedicated Pediatrician with over 12 years of "
+            "experience in child healthcare. She is committed to providing compassionate, "
+            "evidence-based care and works closely with families to support the healthy "
+            "development of every child from birth through adolescence."
+        ),
+        specialty        = "Pediatrician",
+        sub_specialty    = "Neonatal Care",
+        license_number   = "LIC-SM-2012",
+        license_expiry   = "2027-03-31",
+        slmc_number      = "SLMC-14872",
+        years_experience = "12",
+        current_hospital = "City Clinic",
+        department       = "Pediatrics",
+        consultation_fee = "3500",
+        emergency_available = True,
+        emergency_max       = "25",
+        telehealth          = True,
+    )
+    db.session.add(sarah_profile)
+    db.session.flush()   
+
+    db.session.add_all([
+        DoctorQualification(profile_id=sarah_profile.id, degree="MBBS",
+                            institution="University of Colombo", year="2008", country="Sri Lanka"),
+        DoctorQualification(profile_id=sarah_profile.id, degree="MD (Paediatrics)",
+                            institution="Postgraduate Institute of Medicine", year="2012", country="Sri Lanka"),
+        DoctorQualification(profile_id=sarah_profile.id, degree="Fellowship in Neonatal Care",
+                            institution="Royal College of Paediatrics and Child Health", year="2015", country="UK"),
+    ])
+
+
+    db.session.add_all([
+        DoctorExperience(profile_id=sarah_profile.id, role="Junior Medical Officer",
+                        hospital="National Hospital of Sri Lanka", from_date="2008-07", to_date="2010-06", current=False),
+        DoctorExperience(profile_id=sarah_profile.id, role="Registrar in Paediatrics",
+                        hospital="Lady Ridgeway Hospital for Children", from_date="2010-07", to_date="2013-12", current=False),
+        DoctorExperience(profile_id=sarah_profile.id, role="Consultant Paediatrician",
+                        hospital="City Clinic", from_date="2014-01", to_date="", current=True),
+    ])
+
+
+    db.session.add_all([
+        DoctorCertification(profile_id=sarah_profile.id,
+                            name="Board Certified Paediatrician",
+                            issuing_body="Sri Lanka College of Paediatricians",
+                            issue_date="2013-06-01", expiry_date="2028-06-01"),
+        DoctorCertification(profile_id=sarah_profile.id,
+                            name="Advanced Paediatric Life Support (APLS)",
+                            issuing_body="Advanced Life Support Group",
+                            issue_date="2022-09-15", expiry_date="2026-09-15"),
+    ])
+
+
+    db.session.add_all([
+        DoctorLanguage(profile_id=sarah_profile.id, language="English"),
+        DoctorLanguage(profile_id=sarah_profile.id, language="Sinhala"),
+        DoctorLanguage(profile_id=sarah_profile.id, language="Tamil"),
+    ])
+
+
+    db.session.add_all([
+        DoctorExpertise(profile_id=sarah_profile.id, area="Neonatal Care"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Child Growth & Nutrition"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Vaccination & Immunisation"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Paediatric Asthma Management"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Developmental Milestone Assessment"),
+    ])
+
+
+    db.session.add_all([
+        DoctorPublication(profile_id=sarah_profile.id,
+                        title="Nutritional Outcomes in Low-Birth-Weight Infants in Sri Lanka",
+                        journal="Ceylon Medical Journal", year="2016"),
+        DoctorPublication(profile_id=sarah_profile.id,
+                        title="Vaccination Coverage and Barriers in Rural Sri Lankan Communities",
+                        journal="Asia Pacific Journal of Public Health", year="2019"),
+    ])
+
+
+    db.session.add_all([
+        DoctorAvailability(profile_id=sarah_profile.id, day="Monday",    available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Tuesday",   available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Wednesday", available=True,  from_time="08:00", to_time="13:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Thursday",  available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Friday",    available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Saturday",  available=True,  from_time="09:00", to_time="12:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Sunday",    available=False, from_time="09:00", to_time="17:00"),
+    ])
 
     db.session.commit()
+
     
 
     print("Dummy data Successfully added")
