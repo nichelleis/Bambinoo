@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import "./Medicines.css";
 
+function formatDate(dateString) {
+  if (!dateString) return "N/A";
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
 export default function Medicines({ selectedChild }) {
   const [formData, setFormData] = useState({
     medicineName: "",
@@ -11,39 +20,8 @@ export default function Medicines({ selectedChild }) {
     longTerm: false,
     notes: "",
   });
-
-  const longTermMedicines = [
-    {
-      name: "Cetirizine",
-      dosage: "5ml",
-      frequency: "Once daily",
-    },
-  ];
-
-  const prescriptionHistory = [
-    {
-      name: "Cetirizine",
-      dosage: "5ml",
-      frequency: "Once daily",
-      start: "9/1/2023",
-      notes: "For allergy management",
-      longTerm: true,
-    },
-  ];
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Prescription saved:", formData);
-  };
-
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
   if (!selectedChild) {
     return (
@@ -61,9 +39,68 @@ export default function Medicines({ selectedChild }) {
     );
   }
 
+  // Pull prescriptions from real data
+  const allNotes = selectedChild.healthNotes || [];
+  const prescriptionHistory = allNotes.filter(
+    (n) => n.record_type === "Prescription"
+  );
+  const longTermMedicines = prescriptionHistory.filter(
+    (n) => n.notes && n.notes.toLowerCase().includes("long-term")
+  );
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const numericId = parseInt(selectedChild.id.replace("CH", ""));
+
+      // If long-term is checked, append to notes
+      const notesWithFlag = formData.longTerm
+        ? `Long-term. ${formData.notes}`.trim()
+        : formData.notes;
+
+      const res = await fetch(
+        `http://localhost:5000/children/${numericId}/medicines`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...formData, notes: notesWithFlag }),
+        }
+      );
+
+      const result = await res.json();
+
+      if (res.ok) {
+        setMessage("✓ Prescription saved successfully.");
+        setFormData({
+          medicineName: "",
+          dosage: "",
+          frequency: "",
+          startDate: "",
+          endDate: "",
+          longTerm: false,
+          notes: "",
+        });
+      } else {
+        setMessage(`✗ ${result.error || "Failed to save."}`);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setMessage("✗ Cannot reach server. Is Flask running?");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="medicines-page">
-      {/* HEADER */}
       <div className="medicines-header">
         <div className="child-info">
           <div className="avatar">{selectedChild.name[0]}</div>
@@ -74,29 +111,28 @@ export default function Medicines({ selectedChild }) {
         </div>
       </div>
 
-
-      <div className="critical-box">
-        <div className="critical-title">
-          <i className="ri-alert-line"></i>
-          <span>Long-Term Critical Medicines</span>
-        </div>
-
-        {longTermMedicines.map((med, index) => (
-          <div key={index} className="critical-item">
-            <div>
-              <strong>{med.name}</strong>
-              <p>
-                {med.dosage} • {med.frequency}
-              </p>
-            </div>
-            <span className="pill warning">Long-term</span>
+      {/* Long-term medicines banner */}
+      {longTermMedicines.length > 0 && (
+        <div className="critical-box">
+          <div className="critical-title">
+            <i className="ri-alert-line"></i>
+            <span>Long-Term Critical Medicines</span>
           </div>
-        ))}
-      </div>
-
+          {longTermMedicines.map((med, index) => (
+            <div key={index} className="critical-item">
+              <div>
+                <strong>{med.medication_name}</strong>
+                <p>
+                  {med.medication_dosage} • {med.reason}
+                </p>
+              </div>
+              <span className="pill warning">Long-term</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="medicines-layout">
-
         <form className="medicine-form" onSubmit={handleSubmit}>
           <h3>+ Prescribe Medicine</h3>
 
@@ -105,7 +141,9 @@ export default function Medicines({ selectedChild }) {
             type="text"
             name="medicineName"
             placeholder="e.g. Amoxicillin, Ibuprofen"
+            value={formData.medicineName}
             onChange={handleChange}
+            required
           />
 
           <div className="form-row">
@@ -115,16 +153,17 @@ export default function Medicines({ selectedChild }) {
                 type="text"
                 name="dosage"
                 placeholder="e.g. 250mg, 5ml"
+                value={formData.dosage}
                 onChange={handleChange}
               />
             </div>
-
             <div>
               <label>Frequency</label>
               <input
                 type="text"
                 name="frequency"
                 placeholder="e.g. Twice daily"
+                value={formData.frequency}
                 onChange={handleChange}
               />
             </div>
@@ -136,15 +175,16 @@ export default function Medicines({ selectedChild }) {
               <input
                 type="date"
                 name="startDate"
+                value={formData.startDate}
                 onChange={handleChange}
               />
             </div>
-
             <div>
               <label>End Date</label>
               <input
                 type="date"
                 name="endDate"
+                value={formData.endDate}
                 onChange={handleChange}
               />
             </div>
@@ -155,6 +195,7 @@ export default function Medicines({ selectedChild }) {
               <input
                 type="checkbox"
                 name="longTerm"
+                checked={formData.longTerm}
                 onChange={handleChange}
               />
               <span>
@@ -168,34 +209,42 @@ export default function Medicines({ selectedChild }) {
           <textarea
             name="notes"
             placeholder="Administration instructions, warnings, interactions..."
+            value={formData.notes}
             onChange={handleChange}
           />
 
-          <button type="submit" className="primary-btn">
-            Save Prescription
+          {message && (
+            <p style={{ color: message.startsWith("✓") ? "green" : "red", fontSize: "0.85rem" }}>
+              {message}
+            </p>
+          )}
+
+          <button type="submit" className="primary-btn" disabled={saving}>
+            {saving ? "Saving..." : "Save Prescription"}
           </button>
         </form>
 
-  
         <div className="medicine-history">
           <h3>Prescription History</h3>
-
-          {prescriptionHistory.map((item, index) => (
-            <div key={index} className="history-card">
-              <div>
-                <strong>{item.name}</strong>
-                <p>
-                  Dosage: {item.dosage} • {item.frequency}
-                </p>
-                <p>Started: {item.start}</p>
-                <small>{item.notes}</small>
+          {prescriptionHistory.length === 0 ? (
+            <p className="muted">No prescriptions recorded yet.</p>
+          ) : (
+            prescriptionHistory.map((item, index) => (
+              <div key={index} className="history-card">
+                <div>
+                  <strong>{item.medication_name}</strong>
+                  <p>
+                    Dosage: {item.medication_dosage || "N/A"} • {item.reason || "N/A"}
+                  </p>
+                  <p>Recorded: {formatDate(item.record_date)}</p>
+                  {item.notes && <small>{item.notes}</small>}
+                </div>
+                {item.notes && item.notes.toLowerCase().includes("long-term") && (
+                  <span className="pill warning">Long-term</span>
+                )}
               </div>
-
-              {item.longTerm && (
-                <span className="pill warning">Long-term</span>
-              )}
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
