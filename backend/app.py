@@ -1879,6 +1879,239 @@ def get_doctor_recent_activity():
     except Exception as e:
         print(f"Doctor recent activity error: {e}")
         return jsonify({"error": str(e)}), 500
+@app.route("/doctor-profile", methods=["GET"])
+@jwt_required()
+def get_doctor_profile():
+    try:
+        user_id = int(get_jwt_identity())
+        user    = User.query.get(user_id)
+
+        if not user or user.role not in ("doctor", "admin"):
+            return jsonify({"message": "Unauthorized"}), 403
+
+        profile = DoctorProfile.query.filter_by(user_id=user_id).first()
+
+        if not profile:
+            return jsonify({
+                "avatar": None,
+                "basic": {
+                    "firstName": "", "lastName": "", "title": "Dr.",
+                    "gender": "", "dob": "",
+                    "phone": user.phone or "", "email": user.email or "", "bio": ""
+                },
+                "professional": {
+                    "specialty": "", "subSpecialty": "", "licenseNumber": "",
+                    "licenseExpiry": "", "slmcNumber": "", "yearsExperience": "",
+                    "currentHospital": "", "department": "", "consultationFee": ""
+                },
+                "qualifications":  [],
+                "experience":      [],
+                "certifications":  [],
+                "languages":       [],
+                "expertise":       [],
+                "publications":    [],
+                "availability":    [],
+                "emergency": {"available": False, "maxPatients": "", "telehealth": False}
+            }), 200
+
+        return jsonify({
+            "avatar": profile.avatar,
+            "basic": {
+                "firstName":  profile.first_name or "",
+                "lastName":   profile.last_name  or "",
+                "title":      profile.title      or "Dr.",
+                "gender":     profile.gender     or "",
+                "dob":        profile.dob        or "",
+                "phone":      profile.phone      or "",
+                "email":      profile.email      or "",
+                "bio":        profile.bio        or ""
+            },
+            "professional": {
+                "specialty":       profile.specialty        or "",
+                "subSpecialty":    profile.sub_specialty    or "",
+                "licenseNumber":   profile.license_number   or "",
+                "licenseExpiry":   profile.license_expiry   or "",
+                "slmcNumber":      profile.slmc_number      or "",
+                "yearsExperience": profile.years_experience or "",
+                "currentHospital": profile.current_hospital or "",
+                "department":      profile.department       or "",
+                "consultationFee": profile.consultation_fee or ""
+            },
+            "qualifications": [
+                {
+                    "degree":      q.degree      or "",
+                    "institution": q.institution or "",
+                    "year":        q.year        or "",
+                    "country":     q.country     or ""
+                }
+                for q in profile.qualifications
+            ],
+            "experience": [
+                {
+                    "role":     e.role      or "",
+                    "hospital": e.hospital  or "",
+                    "from":     e.from_date or "",
+                    "to":       e.to_date   or "",
+                    "current":  e.current
+                }
+                for e in profile.experience
+            ],
+            "certifications": [
+                {
+                    "name":        c.name         or "",
+                    "issuingBody": c.issuing_body or "",
+                    "issueDate":   c.issue_date   or "",
+                    "expiryDate":  c.expiry_date  or ""
+                }
+                for c in profile.certifications
+            ],
+            "languages": [l.language for l in profile.languages],
+            "expertise":  [x.area    for x in profile.expertise],
+            "publications": [
+                {
+                    "title":   p.title   or "",
+                    "journal": p.journal or "",
+                    "year":    p.year    or ""
+                }
+                for p in profile.publications
+            ],
+            "availability": [
+                {
+                    "day":       a.day,
+                    "available": a.available,
+                    "from":      a.from_time or "09:00",
+                    "to":        a.to_time   or "17:00"
+                }
+                for a in sorted(
+                    profile.availability,
+                    key=lambda x: _DAYS_ORDER.index(x.day) if x.day in _DAYS_ORDER else 99
+                )
+            ],
+            "emergency": {
+                "available":   profile.emergency_available,
+                "maxPatients": profile.emergency_max or "",
+                "telehealth":  profile.telehealth
+            }
+        }), 200
+
+    except Exception as e:
+        print(f"GET /doctor-profile error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/doctor-profile", methods=["PUT"])
+@jwt_required()
+def save_doctor_profile():
+    try:
+        user_id = int(get_jwt_identity())
+        user    = User.query.get(user_id)
+
+        if not user or user.role not in ("doctor", "admin"):
+            return jsonify({"message": "Unauthorized"}), 403
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        basic        = data.get("basic",        {})
+        professional = data.get("professional", {})
+        emergency    = data.get("emergency",    {})
+
+        profile = DoctorProfile.query.filter_by(user_id=user_id).first()
+        if not profile:
+            profile = DoctorProfile(user_id=user_id)
+            db.session.add(profile)
+            db.session.flush()
+
+        profile.avatar         = data.get("avatar")
+        profile.first_name     = basic.get("firstName", "")
+        profile.last_name      = basic.get("lastName",  "")
+        profile.title          = basic.get("title",     "Dr.")
+        profile.gender         = basic.get("gender",    "")
+        profile.dob            = basic.get("dob",       "")
+        profile.phone          = basic.get("phone",     "")
+        profile.email          = basic.get("email",     "")
+        profile.bio            = basic.get("bio",       "")
+        profile.specialty        = professional.get("specialty",        "")
+        profile.sub_specialty    = professional.get("subSpecialty",     "")
+        profile.license_number   = professional.get("licenseNumber",    "")
+        profile.license_expiry   = professional.get("licenseExpiry",    "")
+        profile.slmc_number      = professional.get("slmcNumber",       "")
+        profile.years_experience = professional.get("yearsExperience",  "")
+        profile.current_hospital = professional.get("currentHospital",  "")
+        profile.department       = professional.get("department",       "")
+        profile.consultation_fee = professional.get("consultationFee",  "")
+        profile.emergency_available = bool(emergency.get("available",   False))
+        profile.emergency_max       = str( emergency.get("maxPatients", ""))
+        profile.telehealth          = bool(emergency.get("telehealth",  False))
+        profile.updated_at          = datetime.utcnow()
+
+        DoctorQualification.query.filter_by(profile_id=profile.id).delete()
+        for q in data.get("qualifications", []):
+            db.session.add(DoctorQualification(
+                profile_id  = profile.id,
+                degree      = q.get("degree",      ""),
+                institution = q.get("institution", ""),
+                year        = q.get("year",        ""),
+                country     = q.get("country",     "")
+            ))
+
+        DoctorExperience.query.filter_by(profile_id=profile.id).delete()
+        for e in data.get("experience", []):
+            db.session.add(DoctorExperience(
+                profile_id = profile.id,
+                role       = e.get("role",     ""),
+                hospital   = e.get("hospital", ""),
+                from_date  = e.get("from",     ""),
+                to_date    = e.get("to",       ""),
+                current    = bool(e.get("current", False))
+            ))
+
+        DoctorCertification.query.filter_by(profile_id=profile.id).delete()
+        for c in data.get("certifications", []):
+            db.session.add(DoctorCertification(
+                profile_id   = profile.id,
+                name         = c.get("name",        ""),
+                issuing_body = c.get("issuingBody", ""),
+                issue_date   = c.get("issueDate",   ""),
+                expiry_date  = c.get("expiryDate",  "")
+            ))
+
+        DoctorLanguage.query.filter_by(profile_id=profile.id).delete()
+        for lang in data.get("languages", []):
+            db.session.add(DoctorLanguage(profile_id=profile.id, language=lang))
+
+        DoctorExpertise.query.filter_by(profile_id=profile.id).delete()
+        for area in data.get("expertise", []):
+            db.session.add(DoctorExpertise(profile_id=profile.id, area=area))
+
+        DoctorPublication.query.filter_by(profile_id=profile.id).delete()
+        for p in data.get("publications", []):
+            db.session.add(DoctorPublication(
+                profile_id = profile.id,
+                title      = p.get("title",   ""),
+                journal    = p.get("journal", ""),
+                year       = p.get("year",    "")
+            ))
+
+        DoctorAvailability.query.filter_by(profile_id=profile.id).delete()
+        for a in data.get("availability", []):
+            db.session.add(DoctorAvailability(
+                profile_id = profile.id,
+                day        = a.get("day",       ""),
+                available  = bool(a.get("available", False)),
+                from_time  = a.get("from",      "09:00"),
+                to_time    = a.get("to",        "17:00")
+            ))
+
+        db.session.commit()
+        return jsonify({"message": "Profile saved successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"PUT /doctor-profile error: {e}")
+        return jsonify({"error": str(e)}), 500
+
 # Admin Management Routes
 
 @app.route('/api/admin/users', methods=['GET'])
