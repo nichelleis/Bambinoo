@@ -116,22 +116,97 @@ with app.app_context():
     ])
 
     db.session.add_all([
-        HealthRecord(
-            child_id=boy.id,
-            record_type="Doctor Visit",
-            title="Routine check",
-            doctor_name="Dr. Sarah Mitchell",
-            diagnosis="Healthy",
-            treatment="None"
-        ),
-        HealthRecord(
-            child_id=girl.id,
-            record_type="Doctor Visit",
-            title="Cold symptoms",
-            doctor_name="Dr. Sarah Mitchell",
-            diagnosis="Viral cold",
-            treatment="Rest and fluids"
-        ),
+    
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Doctor Visit",
+        title="Routine check",
+        doctor_name="Dr. Sarah Mitchell",
+        diagnosis="Healthy",
+        treatment="None",
+        record_date=datetime(2024, 3, 10)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Doctor Visit",
+        title="Cold symptoms",
+        doctor_name="Dr. Sarah Mitchell",
+        diagnosis="Viral cold",
+        treatment="Rest and fluids",
+        record_date=datetime(2024, 4, 5)
+    ),
+
+
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Doctor Note",
+        title="Follow-up observation",
+        doctor_name="Dr. Sarah Mitchell",
+        notes="Child is recovering well. No fever for 3 days. Continue monitoring.",
+        record_date=datetime(2024, 6, 15)
+    ),
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Doctor Note",
+        title="Weight concern flagged",
+        doctor_name="Dr. Sarah Mitchell",
+        notes="Weight slightly below average for age. Recommended nutritional supplements and follow-up in 4 weeks.",
+        record_date=datetime(2024, 9, 20)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Doctor Note",
+        title="Asthma management review",
+        doctor_name="Dr. Sarah Mitchell",
+        notes="Asthma well-controlled. No recent attacks. Continue current inhaler regimen.",
+        record_date=datetime(2024, 8, 12)
+    ),
+
+
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Prescription",
+        title="Cetirizine - 5ml",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Cetirizine",
+        medication_dosage="5ml",
+        treatment="Once daily at bedtime",
+        notes="Long-term. For chronic allergy management. Review after 3 months.",
+        record_date=datetime(2024, 6, 1)
+    ),
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Prescription",
+        title="Amoxicillin - 250mg",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Amoxicillin",
+        medication_dosage="250mg",
+        treatment="Twice daily for 7 days",
+        notes="For ear infection. Complete full course even if symptoms improve.",
+        record_date=datetime(2024, 11, 3)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Prescription",
+        title="Salbutamol - 2.5mg",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Salbutamol",
+        medication_dosage="2.5mg",
+        treatment="As needed via nebulizer",
+        notes="Long-term. For asthma relief. Use during attacks only.",
+        record_date=datetime(2024, 7, 22)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Prescription",
+        title="Paracetamol - 120mg",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Paracetamol",
+        medication_dosage="120mg",
+        treatment="Every 6 hours when needed",
+        notes="For fever management. Do not exceed 4 doses in 24 hours.",
+        record_date=datetime(2024, 10, 5)
+    ),
     ])
 
     db.session.add_all([
