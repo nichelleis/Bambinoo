@@ -545,3 +545,61 @@
   .dp-footer { flex-direction: column; align-items: flex-end; }
   .dp-page { padding: 1.25rem 1rem 7rem; }
 }
+Doctorprofile css additions · CSS
+Copy
+
+
+
+.dp-cancel-btn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dp-cancel-btn:hover {
+  background: #f3f4f6;
+}
+
+.dp-view-value {
+  padding: 8px 10px;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #111827;
+  min-height: 36px;
+  line-height: 1.5;
+}
+
+.dp-view-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dp-view-entry:last-child {
+  border-bottom: none;
+}
+
+.dp-view-entry-number {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
