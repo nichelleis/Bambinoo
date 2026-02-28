@@ -10,6 +10,7 @@ import Immunizations from "../doctor/pages/Immunizations/Immunizations";
 import DoctorNotes from "../doctor/pages/DoctorNotes/DoctorNotes";
 import Messages from "../doctor/pages/Messages/Messages";
 import AIAnalytics from "../doctor/pages/AIAnalytics/AIAnalytics";
+import DoctorProfile from "../doctor/pages/DoctorProfile/DoctorProfile";
 import "../doctor/components/DoctorLayout.css";
 
 function Placeholder({ title }) {
@@ -65,6 +66,10 @@ export default function DoctorLayout() {
             element={<AIAnalytics selectedChild={selectedChild} />}
           />
           <Route path="auth" element={<Placeholder title="User Auth" />} />
+          <Route
+            path="doctorprofile"
+            element={<DoctorProfile selectedChild={selectedChild} />}
+          />
         </Routes>
         
       </main>
