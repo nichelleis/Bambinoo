@@ -26,7 +26,7 @@ export default function Sidebar() {
         <NavLink to="/doctor/growth">Growth Data</NavLink>
         <NavLink to="/doctor/immunizations">Immunizations</NavLink>
         <NavLink to="/doctor/doctornotes">Doctor Notes</NavLink>
-        <NavLink to="/doctor/medicines">Medicines</NavLink>
+        
       </div>
 
       <div className="menu-section">
