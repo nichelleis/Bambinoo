@@ -1,0 +1,71 @@
+.chart-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.5rem 1.2rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-container::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(109,40,217,0.06) 0%,
+    rgba(214,51,132,0.04) 50%,
+    transparent 70%);
+  pointer-events: none;
+}
+
+.chart-container h3 {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+}
+
+.chart-subtitle {
+  font-size: 0.73rem;
+  color: var(--text-sub);
+  font-family: var(--font-body);
+  margin-bottom: 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+.chart-container > .recharts-responsive-container,
+.chart-container > div:last-child {
+  flex: 1;
+  min-height: 220px;
+}
+
+.recharts-legend-item-text {
+  color: var(--text-sub) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.73rem !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: var(--text-sub) !important;
+}
+
+.recharts-default-tooltip {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  color: var(--text-main) !important;
+  font-family: var(--font-body) !important;
+}
