@@ -1680,6 +1680,13 @@ def get_doctor_recent_activity():
     try:
         activities = []
 
+        def fmt(dt):
+            if not dt:
+                return ""
+            if hasattr(dt, 'isoformat'):
+                return dt.isoformat() + "Z"
+            return str(dt) + "Z"
+
         growth_records = GrowthRecord.query.order_by(GrowthRecord.created_at.desc()).limit(5).all()
         for r in growth_records:
             child = Child.query.get(r.child_id)
@@ -1691,7 +1698,7 @@ def get_doctor_recent_activity():
                 "patient": child.name,
                 "detail": f"Height: {r.height} cm, Weight: {r.weight} kg, BMI: {r.bmi}",
                 "recorded_by": "Doctor",
-                "timestamp": r.created_at.isoformat() if r.created_at else r.record_date.isoformat()
+                "timestamp": fmt(r.created_at or r.record_date)
             })
 
         vaccinations = Vaccination.query.filter_by(status="completed")\
@@ -1706,7 +1713,7 @@ def get_doctor_recent_activity():
                 "patient": child.name,
                 "detail": f"{v.vaccine_name} — {v.dose_number or 'N/A'} at {v.location or 'clinic'}",
                 "recorded_by": v.administered_by or "Doctor",
-                "timestamp": v.administered_date.isoformat() if v.administered_date else ""
+                "timestamp": fmt(v.administered_date)
             })
 
         prescriptions = HealthRecord.query.filter_by(record_type="Prescription")\
@@ -1721,7 +1728,7 @@ def get_doctor_recent_activity():
                 "patient": child.name,
                 "detail": f"{p.medication_name or 'Medicine'} {p.medication_dosage or ''} — {p.treatment or ''}".strip(" —"),
                 "recorded_by": p.doctor_name or "Doctor",
-                "timestamp": p.created_at.isoformat() if p.created_at else p.record_date.isoformat()
+                "timestamp": fmt(p.created_at or p.record_date)
             })
 
         doctor_notes = HealthRecord.query.filter_by(record_type="Doctor Note")\
@@ -1736,7 +1743,7 @@ def get_doctor_recent_activity():
                 "patient": child.name,
                 "detail": n.title or "Clinical note recorded",
                 "recorded_by": n.doctor_name or "Doctor",
-                "timestamp": n.created_at.isoformat() if n.created_at else n.record_date.isoformat()
+                "timestamp": fmt(n.created_at or n.record_date)
             })
 
         doctor_visits = HealthRecord.query.filter_by(record_type="Doctor Visit")\
@@ -1751,11 +1758,10 @@ def get_doctor_recent_activity():
                 "patient": child.name,
                 "detail": f"Diagnosis: {v.diagnosis or 'N/A'} — Treatment: {v.treatment or 'N/A'}",
                 "recorded_by": v.doctor_name or "Doctor",
-                "timestamp": v.created_at.isoformat() if v.created_at else v.record_date.isoformat()
+                "timestamp": fmt(v.created_at or v.record_date)
             })
 
         activities.sort(key=lambda x: x["timestamp"], reverse=True)
-
         return jsonify(activities[:12])
 
     except Exception as e:

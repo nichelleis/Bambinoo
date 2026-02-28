@@ -11,11 +11,21 @@ const CATEGORY_CONFIG = {
 
 function timeAgo(isoString) {
   if (!isoString) return "";
-  const diff = Math.floor((Date.now() - new Date(isoString)) / 1000);
+  const date = new Date(isoString);
+  const now  = new Date();
+  const diff = Math.floor((now - date) / 1000);
   if (diff < 60)    return `${diff}s ago`;
   if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  return new Date(isoString).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ${Math.floor((diff % 3600) / 60)}m ago`;
+  const isThisYear = date.getFullYear() === now.getFullYear();
+  return date.toLocaleDateString("en-GB", {
+    day:   "2-digit",
+    month: "short",
+    ...(isThisYear ? {} : { year: "numeric" }),
+    hour:   "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
 const RecentActivity = () => {
