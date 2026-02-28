@@ -1362,6 +1362,118 @@ class ActiveCondition(db.Model):
 def calculate_age(dob):
     today = date.today()
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+class DoctorProfile(db.Model):
+    __tablename__ = "doctor_profile"
+
+    id             = db.Column(db.Integer, primary_key=True)
+    user_id        = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, unique=True)
+    avatar         = db.Column(db.Text)
+    first_name     = db.Column(db.String(100))
+    last_name      = db.Column(db.String(100))
+    title          = db.Column(db.String(20))
+    gender         = db.Column(db.String(30))
+    dob            = db.Column(db.String(20))
+    phone          = db.Column(db.String(30))
+    email          = db.Column(db.String(120))
+    bio            = db.Column(db.Text)
+    specialty        = db.Column(db.String(100))
+    sub_specialty    = db.Column(db.String(100))
+    license_number   = db.Column(db.String(50))
+    license_expiry   = db.Column(db.String(20))
+    slmc_number      = db.Column(db.String(50))
+    years_experience = db.Column(db.String(10))
+    current_hospital = db.Column(db.String(200))
+    department       = db.Column(db.String(100))
+    consultation_fee = db.Column(db.String(20))
+    emergency_available = db.Column(db.Boolean, default=False)
+    emergency_max       = db.Column(db.String(10))
+    telehealth          = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship("User", backref="doctor_profile")
+    qualifications = db.relationship("DoctorQualification", backref="profile", cascade="all, delete-orphan")
+    experience     = db.relationship("DoctorExperience",     backref="profile", cascade="all, delete-orphan")
+    certifications = db.relationship("DoctorCertification",  backref="profile", cascade="all, delete-orphan")
+    languages      = db.relationship("DoctorLanguage",       backref="profile", cascade="all, delete-orphan")
+    expertise      = db.relationship("DoctorExpertise",      backref="profile", cascade="all, delete-orphan")
+    publications   = db.relationship("DoctorPublication",    backref="profile", cascade="all, delete-orphan")
+    availability   = db.relationship("DoctorAvailability",   backref="profile", cascade="all, delete-orphan")
+
+
+class DoctorQualification(db.Model):
+    __tablename__ = "doctor_qualification"
+
+    id          = db.Column(db.Integer, primary_key=True)
+    profile_id  = db.Column(db.Integer, db.ForeignKey("doctor_profile.id"), nullable=False)
+    degree      = db.Column(db.String(100))
+    institution = db.Column(db.String(200))
+    year        = db.Column(db.String(10))
+    country     = db.Column(db.String(100))
+
+
+class DoctorExperience(db.Model):
+    __tablename__ = "doctor_experience"
+
+    id          = db.Column(db.Integer, primary_key=True)
+    profile_id  = db.Column(db.Integer, db.ForeignKey("doctor_profile.id"), nullable=False)
+    role        = db.Column(db.String(100))
+    hospital    = db.Column(db.String(200))
+    from_date   = db.Column(db.String(20))
+    to_date     = db.Column(db.String(20))
+    current     = db.Column(db.Boolean, default=False)
+
+
+class DoctorCertification(db.Model):
+    __tablename__ = "doctor_certification"
+
+    id           = db.Column(db.Integer, primary_key=True)
+    profile_id   = db.Column(db.Integer, db.ForeignKey("doctor_profile.id"), nullable=False)
+    name         = db.Column(db.String(200))
+    issuing_body = db.Column(db.String(200))
+    issue_date   = db.Column(db.String(20))
+    expiry_date  = db.Column(db.String(20))
+
+
+class DoctorLanguage(db.Model):
+    __tablename__ = "doctor_language"
+
+    id         = db.Column(db.Integer, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey("doctor_profile.id"), nullable=False)
+    language   = db.Column(db.String(100))
+
+
+class DoctorExpertise(db.Model):
+    __tablename__ = "doctor_expertise"
+
+    id         = db.Column(db.Integer, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey("doctor_profile.id"), nullable=False)
+    area       = db.Column(db.String(200))
+
+
+class DoctorPublication(db.Model):
+    __tablename__ = "doctor_publication"
+
+    id         = db.Column(db.Integer, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey("doctor_profile.id"), nullable=False)
+    title      = db.Column(db.String(300))
+    journal    = db.Column(db.String(200))
+    year       = db.Column(db.String(10))
+
+
+class DoctorAvailability(db.Model):
+    __tablename__ = "doctor_availability"
+
+    id         = db.Column(db.Integer, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey("doctor_profile.id"), nullable=False)
+    day        = db.Column(db.String(20))
+    available  = db.Column(db.Boolean, default=False)
+    from_time  = db.Column(db.String(10))
+    to_time    = db.Column(db.String(10))
+
+
+_DAYS_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+
 
 
 
