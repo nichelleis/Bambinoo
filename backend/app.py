@@ -1426,6 +1426,67 @@ def get_children():
         })
 
     return jsonify(response)
+@app.route("/children/<int:child_id>/growth", methods=["POST"])
+@cross_origin()
+def add_growth_record(child_id):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data received"}), 400
+
+        child = Child.query.get(child_id)
+        if not child:
+            return jsonify({"error": "Child not found"}), 404
+
+        try:
+            record_date = datetime.strptime(data["date"], "%Y-%m-%d")
+        except (ValueError, KeyError):
+            return jsonify({"error": "Invalid or missing date"}), 400
+
+        # Safe conversion — avoids crash on empty strings
+        def to_float(val):
+            try:
+                return float(val) if val not in (None, "", " ") else None
+            except (ValueError, TypeError):
+                return None
+
+        weight = to_float(data.get("weight"))
+        height = to_float(data.get("height"))
+        head   = to_float(data.get("head"))
+
+        if not weight or not height:
+            return jsonify({"error": "Weight and height are required"}), 400
+
+        age_at_record = (record_date.date() - child.date_of_birth).days
+
+        height_m = height / 100
+        bmi = round(weight / (height_m ** 2), 2) if height_m > 0 else None
+
+        new_record = GrowthRecord(
+            child_id=child_id,
+            record_date=record_date,
+            weight=weight,
+            height=height,
+            head_circumference=head,
+            bmi=bmi,
+            age_at_record=age_at_record,
+            notes=data.get("notes", "")
+        )
+
+        db.session.add(new_record)
+        db.session.commit()
+
+        return jsonify({
+            "message": "Growth record saved successfully",
+            "id": new_record.id,
+            "bmi": bmi
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Growth record error: {e}")   # <-- This will show in your Flask terminal
+        return jsonify({"error": str(e)}), 500
 
 # Admin Management Routes
 

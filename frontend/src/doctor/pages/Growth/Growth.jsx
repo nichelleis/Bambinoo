@@ -39,7 +39,7 @@ export default function Growth({ selectedChild }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setMessage("");
@@ -51,15 +51,18 @@ export default function Growth({ selectedChild }) {
         body: JSON.stringify(form),
       });
 
+      const result = await res.json();   // Always parse the response
+
       if (res.ok) {
         setMessage("✓ Growth record saved successfully.");
         setForm({ date: "", weight: "", height: "", head: "", notes: "" });
       } else {
-        setMessage("✗ Failed to save. Please try again.");
+        // Now shows the actual backend error message
+        setMessage(`✗ ${result.error || "Failed to save. Please try again."}`);
       }
     } catch (err) {
-      console.error("Error saving growth:", err);
-      setMessage("✗ Server error. Please try again.");
+      console.error("Fetch error:", err);   // Check browser console
+      setMessage("✗ Cannot reach server. Is Flask running?");
     } finally {
       setSaving(false);
     }
