@@ -1573,6 +1573,43 @@ def add_vaccination(child_id):
         db.session.rollback()
         print(f"Vaccination record error: {e}")
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/children/<int:child_id>/notes", methods=["POST"])
+@cross_origin()
+def add_health_note(child_id):
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "No data received"}), 400
+
+        child = Child.query.get(child_id)
+        if not child:
+            return jsonify({"error": "Child not found"}), 404
+
+        if not data.get("description"):
+            return jsonify({"error": "Note content is required"}), 400
+
+        new_note = HealthNote(
+            child_id=child_id,
+            record_type="Doctor Note",
+            title=data.get("title", "Doctor Note").strip(),
+            description=data.get("description", "").strip(),
+            record_date=datetime.utcnow()
+        )
+
+        db.session.add(new_note)
+        db.session.commit()
+
+        return jsonify({
+            "message": "Note saved successfully",
+            "id": new_note.id
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Doctor note error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # Admin Management Routes
 
