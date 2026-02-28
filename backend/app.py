@@ -1452,6 +1452,21 @@ def get_children():
                     "notes": r.notes
                 }
                 for r in growth_history
+            ],
+            "healthRecords": [
+                {
+                    "record_type": r.record_type,
+                    "title": r.title,
+                    "doctor_name": r.doctor_name,
+                    "diagnosis": r.diagnosis,
+                    "treatment": r.treatment,
+                    "medication_name": r.medication_name,
+                    "medication_dosage": r.medication_dosage,
+                    "notes": r.notes,
+                    "record_date": r.record_date.isoformat()
+                }
+                for r in HealthRecord.query.filter_by(child_id=child.id)
+                    .order_by(HealthRecord.record_date.desc()).all()
             ]
         })
 
