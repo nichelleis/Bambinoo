@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./ClinicalNotes.css";
+import "./DoctorNotes.css";
 
 function formatDate(dateString) {
   if (!dateString) return "N/A";
