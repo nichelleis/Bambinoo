@@ -1,27 +1,60 @@
 import "./DoctorGrowth.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function formatDate(dateString) {
-  if (!dateString) return "N/A";
-  return new Date(dateString).toLocaleDateString();
+const API_BASE = "http://localhost:5000";
+
+function formatDate(dateStr) {
+  if (!dateStr) return "N/A";
+  return new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric", month: "short", year: "numeric",
+  });
 }
 
+
+function GrowthRow({ record, isNew }) {
+  return (
+    <tr className={isNew ? "row--new" : ""}>
+      <td>{formatDate(record.record_date)}</td>
+      <td>{record.weight ? `${record.weight} kg` : "N/A"}</td>
+      <td>{record.height ? `${record.height} cm` : "N/A"}</td>
+      <td>{record.head   ? `${record.head} cm`   : "N/A"}</td>
+      {record.notes && <td className="notes-cell">{record.notes}</td>}
+      {!record.notes && <td className="notes-cell">—</td>}
+    </tr>
+  );
+}
+
+
 export default function Growth({ selectedChild }) {
-  const [form, setForm] = useState({
-    date: "",
-    weight: "",
-    height: "",
-    head: "",
-    notes: "",
-  });
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [history, setHistory]   = useState([]);
+  const [newId, setNewId]       = useState(null);   
+  const [saving, setSaving]     = useState(false);
+  const [error, setError]       = useState("");
+  const [success, setSuccess]   = useState("");
+
+  const emptyForm = { date: "", weight: "", height: "", head: "", notes: "" };
+  const [form, setForm] = useState(emptyForm);
+
+  useEffect(() => {
+    if (!selectedChild) return;
+
+    if (selectedChild.growthHistory) {
+      setHistory(selectedChild.growthHistory);
+      return;
+    }
+
+    const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
+    fetch(`${API_BASE}/children/${numericId}/growth`)
+      .then(r => r.json())
+      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .catch(() => setHistory([]));
+  }, [selectedChild]);
 
   if (!selectedChild) {
     return (
       <div className="growth-empty">
         <div className="growth-empty-card">
-          <i className="ri-line-chart-line"></i>
+          <i className="ri-line-chart-line" />
           <h2>No Patient Selected</h2>
           <p>
             Please search and select a patient to view
@@ -33,40 +66,53 @@ export default function Growth({ selectedChild }) {
     );
   }
 
-  const growthHistory = selectedChild.growthHistory || [];
+  function handleChange(e) {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError(""); setSuccess("");
+
     setSaving(true);
-    setMessage("");
+    const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
+
     try {
-      const numericId = parseInt(selectedChild.id.replace("CH", ""));
-      const res = await fetch(`http://localhost:5000/children/${numericId}/growth`, {
+      const res = await fetch(`${API_BASE}/children/${numericId}/growth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
-      const result = await res.json();   // Always parse the response
+      const result = await res.json();
 
-      if (res.ok) {
-        setMessage("✓ Growth record saved successfully.");
-        setForm({ date: "", weight: "", height: "", head: "", notes: "" });
-      } else {
-        // Now shows the actual backend error message
-        setMessage(`✗ ${result.error || "Failed to save. Please try again."}`);
+      if (!res.ok) {
+        setError(result.error || "Failed to save. Please try again.");
+        return;
       }
-    } catch (err) {
-      console.error("Fetch error:", err);   // Check browser console
-      setMessage("✗ Cannot reach server. Is Flask running?");
+
+      const newRecord = {
+        id:          result.id,
+        record_date: form.date,
+        weight:      form.weight,
+        height:      form.height,
+        head:        form.head,
+        notes:       form.notes,
+      };
+
+      setHistory(prev => [newRecord, ...prev]);
+      setNewId(newRecord.id ?? 0);
+      setTimeout(() => setNewId(null), 3000);
+
+      setForm(emptyForm);
+      setSuccess("Growth record saved successfully!");
+      setTimeout(() => setSuccess(""), 3500);
+    } catch {
+      setError("Cannot reach server. Is Flask running?");
     } finally {
       setSaving(false);
     }
-  };
+  }
 
   return (
     <div className="growth-page">
@@ -76,79 +122,110 @@ const handleSubmit = async (e) => {
       </div>
 
       <div className="growth-grid">
-
-        {/* Add New Measurement */}
+        {/* ── Form ── */}
         <div className="growth-card">
-          <h4>+ Add New Measurement</h4>
-          <form onSubmit={handleSubmit} className="growth-form">
+          <h4>Add New Measurement</h4>
+          <form className="growth-form" onSubmit={handleSubmit}>
             <div className="growth-row">
               <div className="growth-field">
-                <label>Date</label>
-                <input type="date" name="date" value={form.date} onChange={handleChange} required />
+                <label>Date <span style={{ color: "var(--danger)" }}>*</span></label>
+                <input
+                  type="date"
+                  name="date"
+                  value={form.date}
+                  onChange={handleChange}
+                  required
+                />
               </div>
               <div className="growth-field">
-                <label>Weight (kg)</label>
-                <input type="number" step="0.1" name="weight" placeholder="e.g. 12.5" value={form.weight} onChange={handleChange} required />
+                <label>Weight (kg) <span style={{ color: "var(--danger)" }}>*</span></label>
+                <input
+                  type="number"
+                  step="0.1"
+                  name="weight"
+                  placeholder="e.g. 12.5"
+                  value={form.weight}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
 
             <div className="growth-row">
               <div className="growth-field">
-                <label>Height (cm)</label>
-                <input type="number" step="0.1" name="height" placeholder="e.g. 85.0" value={form.height} onChange={handleChange} required />
+                <label>Height (cm) <span style={{ color: "var(--danger)" }}>*</span></label>
+                <input
+                  type="number"
+                  step="0.1"
+                  name="height"
+                  placeholder="e.g. 85.0"
+                  value={form.height}
+                  onChange={handleChange}
+                  required
+                />
               </div>
               <div className="growth-field">
                 <label>Head Circumference (cm)</label>
-                <input type="number" step="0.1" name="head" placeholder="Optional" value={form.head} onChange={handleChange} />
+                <input
+                  type="number"
+                  step="0.1"
+                  name="head"
+                  placeholder="Optional"
+                  value={form.head}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
             <div className="growth-field">
               <label>Notes</label>
-              <textarea name="notes" placeholder="Any additional observations..." value={form.notes} onChange={handleChange} />
+              <textarea
+                name="notes"
+                placeholder="Any additional observations..."
+                value={form.notes}
+                onChange={handleChange}
+              />
             </div>
 
-            {message && (
-              <p style={{ color: message.startsWith("✓") ? "green" : "red", fontSize: "0.85rem" }}>
-                {message}
-              </p>
-            )}
+            {error   && <p className="form-error">{error}</p>}
+            {success && <p className="form-success">{success}</p>}
 
             <button type="submit" className="growth-save-btn" disabled={saving}>
-              {saving ? "Saving..." : "Save Growth Data"}
+              {saving ? "Saving…" : "Save Growth Data"}
             </button>
           </form>
         </div>
 
-        {/* Growth History */}
+        {/* ── History ── */}
         <div className="growth-card">
           <h4>Growth History</h4>
-          {growthHistory.length === 0 ? (
+          {history.length === 0 ? (
             <p className="empty-text">No growth records found.</p>
           ) : (
-            <table className="growth-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Weight</th>
-                  <th>Height</th>
-                  <th>Head</th>
-                </tr>
-              </thead>
-              <tbody>
-                {growthHistory.map((r, i) => (
-                  <tr key={i}>
-                    <td>{formatDate(r.record_date)}</td>
-                    <td>{r.weight ? `${r.weight} kg` : "N/A"}</td>
-                    <td>{r.height ? `${r.height} cm` : "N/A"}</td>
-                    <td>{r.head ? `${r.head} cm` : "N/A"}</td>
+            <div className="growth-table-wrapper">
+              <table className="growth-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Weight</th>
+                    <th>Height</th>
+                    <th>Head</th>
+                    <th>Notes</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {history.map((r, i) => (
+                    <GrowthRow
+                      key={r.id ?? i}
+                      record={r}
+                      isNew={r.id != null && r.id === newId}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
-
       </div>
     </div>
   );
