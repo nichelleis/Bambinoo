@@ -2153,14 +2153,15 @@ def save_doctor_profile():
 
 # Admin Management Routes
 
+
 @app.route('/api/admin/users', methods=['GET'])
 @jwt_required()
 def get_admin_users():
     try:
         user_id = get_jwt_identity()
-        user = User.query.get(user_id)
+        current_user = db.session.get(User, int(user_id))
         
-        if not user or user.role.lower() != 'admin':
+        if not current_user or current_user.role.lower() != 'admin':
             return jsonify({"message": "Unauthorized"}), 403
 
         users = User.query.all()
@@ -2170,6 +2171,7 @@ def get_admin_users():
                 "username": u.username,
                 "email": u.email,
                 "phone": u.phone,
+                "MOH_ID": u.MOH_ID, 
                 "role": u.role
             } for u in users
         ]), 200
@@ -2181,25 +2183,101 @@ def get_admin_users():
 def create_staff_user():
     try:
         user_id = get_jwt_identity()
-        admin = User.query.get(user_id)
+        admin = db.session.get(User, int(user_id))
         if not admin or admin.role.lower() != 'admin':
             return jsonify({"message": "Unauthorized"}), 403
 
         data = request.get_json()
+        
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({"message": "Email already registered"}), 400
+
         new_user = User(
             username=data['username'],
             email=data['email'],
-            password_hash=generate_password_hash(data['password']),
-            role=data.get('role', 'doctor')
+            phone=data.get('phone'),
+            MOH_ID=data.get('moh_id') or data.get('MOH_ID'),
+            role=data.get('role', 'doctor'),
+            password_hash=generate_password_hash(data['password'])
         )
+        
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({"message": "User created"}), 201
+        return jsonify({"message": "Staff created successfully"}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 500
 
+@app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
+@jwt_required()
+def update_user(user_id):
+    try:
+        admin_id = get_jwt_identity()
+        admin = db.session.get(User, int(admin_id))
+        if not admin or admin.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        user = db.session.get(User, user_id)
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+
+        data = request.get_json()
+
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        user.phone = data.get('phone', user.phone)
+        user.MOH_ID = data.get('moh_id', user.MOH_ID) or data.get('MOH_ID', user.MOH_ID)
+        user.role = data.get('role', user.role)
+
+        if data.get('password'):
+            user.password_hash = generate_password_hash(data['password'])
+
+        db.session.commit()
+        return jsonify({"message": "User updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 500
+
+from flask import jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+@app.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+    try:
+        current_admin_id = int(get_jwt_identity())
+        admin_user = db.session.get(User, current_admin_id)
+        
+        if not admin_user or admin_user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        if user_id == current_admin_id:
+            return jsonify({"message": "Cannot delete your own account"}), 400
+
+        user_to_delete = db.session.get(User, user_id)
+        if not user_to_delete:
+            return jsonify({"message": "User not found"}), 404
+
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        
+        return jsonify({"message": "User deleted successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 500
+
+# SocketIO and Main Block 
+
+@socketio.on("connect")
+def handle_connect(auth):
+    token = auth.get("token")
+    try:
+        decoded = decode_token(token)
+        user_id = decoded["sub"]
+        join_room(f"user_{user_id}")
+    except Exception as e:
+        print("Socket connection error:", e)
+
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5000)
-
-
