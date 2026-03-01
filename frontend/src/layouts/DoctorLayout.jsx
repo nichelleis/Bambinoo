@@ -7,11 +7,10 @@ import SearchChild from "../doctor/pages/searchchild/SearchChild";
 import CHDRView from "../doctor/pages/CHDRView/CHDRView";
 import Growth from "../doctor/pages/Growth/Growth";
 import Immunizations from "../doctor/pages/Immunizations/Immunizations";
-
-import Medicines from "../doctor/pages/Medicines/Medicines";
 import DoctorNotes from "../doctor/pages/DoctorNotes/DoctorNotes";
 import Messages from "../doctor/pages/Messages/Messages";
 import AIAnalytics from "../doctor/pages/AIAnalytics/AIAnalytics";
+import DoctorProfile from "../doctor/pages/DoctorProfile/DoctorProfile";
 import "../doctor/components/DoctorLayout.css";
 
 function Placeholder({ title }) {
@@ -52,12 +51,7 @@ export default function DoctorLayout() {
             element={<Immunizations selectedChild={selectedChild} />}
           />
 
-          
-
-          <Route
-            path="medicines"
-            element={<Medicines selectedChild={selectedChild} />}
-          />
+                  
           <Route
             path="doctornotes"
             element={<DoctorNotes selectedChild={selectedChild} />}
@@ -72,7 +66,12 @@ export default function DoctorLayout() {
             element={<AIAnalytics selectedChild={selectedChild} />}
           />
           <Route path="auth" element={<Placeholder title="User Auth" />} />
+          <Route
+            path="doctorprofile"
+            element={<DoctorProfile selectedChild={selectedChild} />}
+          />
         </Routes>
+        
       </main>
     </div>
   );
