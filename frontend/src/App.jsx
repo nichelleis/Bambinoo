@@ -14,7 +14,7 @@ function App() {
       <Route path="/register" element={<RegistrationForm />} />
       <Route path="/admin/*" element={<AdminLayout />} />
       <Route path="/doctor/*" element={<DoctorLayout />} />
-      <Route path="/nurse" element={<NurseLayout />} />
+      <Route path="/nurse/*" element={<NurseLayout />} />
       <Route path="/parent/*" element={<ParentLayout />} />
     </Routes>
   );
