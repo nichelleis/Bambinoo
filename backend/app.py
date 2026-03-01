@@ -2156,40 +2156,50 @@ def save_doctor_profile():
 @app.route('/api/admin/users', methods=['GET'])
 @jwt_required()
 def get_admin_users():
-    """Fetches all users from the database for the Admin panel"""
     try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
         
-        current_user_id = get_jwt_identity()
-        admin_user = User.query.get(current_user_id)
-        
-        if not admin_user or admin_user.role != 'admin':
-            return jsonify({"message": "Unauthorized access. Admins only."}), 403
+        if not user or user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
 
-        
         users = User.query.all()
-        
-        
-        output = []
-        for u in users:
-            output.append({
+        return jsonify([
+            {
                 "id": u.id,
                 "username": u.username,
                 "email": u.email,
-                "role": u.role,
-                "phone": u.phone
-            })
-            
-        return jsonify(output), 200
+                "phone": u.phone,
+                "role": u.role
+            } for u in users
+        ]), 200
     except Exception as e:
-        print(f"Admin API Error: {str(e)}")
-        return jsonify({"message": "Server error", "details": str(e)}), 500
+        return jsonify({"message": str(e)}), 500
+
+@app.route('/api/admin/create-user', methods=['POST'])
+@jwt_required()
+def create_staff_user():
+    try:
+        user_id = get_jwt_identity()
+        admin = User.query.get(user_id)
+        if not admin or admin.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        data = request.get_json()
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            password_hash=generate_password_hash(data['password']),
+            role=data.get('role', 'doctor')
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "User created"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 500
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True, port=5000)
 
 
-
-if __name__ == "__main__":
-    socketio.run(
-        app,
-        debug=os.getenv("FLASK_DEBUG") == "1",
-        port=int(os.getenv("PORT", 5000)),
-        use_reloader=False
-    )
