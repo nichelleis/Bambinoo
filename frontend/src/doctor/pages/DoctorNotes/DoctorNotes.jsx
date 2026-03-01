@@ -19,7 +19,7 @@ function getStyle(type) {
 }
 
 export default function ClinicalNotes({ selectedChild }) {
-  // "note" | "prescription"
+
   const [activeMode, setActiveMode] = useState("note");
   const [records, setRecords] = useState([]);
   const [noteForm, setNoteForm] = useState({ title: "", doctor_name: "", notes: "" });
@@ -32,7 +32,7 @@ export default function ClinicalNotes({ selectedChild }) {
   const [noteMsg, setNoteMsg] = useState("");
   const [medMsg,  setMedMsg]  = useState("");
 
-  // Seed local records from prop whenever the selected child changes
+ 
   useEffect(() => {
     setRecords(selectedChild?.healthRecords || []);
     setNoteMsg("");
@@ -79,14 +79,14 @@ export default function ClinicalNotes({ selectedChild }) {
       );
       const result = await res.json();
       if (res.ok) {
-        // Optimistically prepend the new record to local state
+
         const newRecord = {
           record_type: "Doctor Note",
           record_date: new Date().toISOString(),
           title: noteForm.title,
           doctor_name: noteForm.doctor_name,
           notes: noteForm.notes,
-          ...result, // use server response if it returns the full record
+          ...result, 
         };
         setRecords(prev => [newRecord, ...prev]);
         setNoteMsg("✓ Note saved.");
@@ -109,7 +109,7 @@ export default function ClinicalNotes({ selectedChild }) {
       );
       const result = await res.json();
       if (res.ok) {
-        // Optimistically prepend the new prescription to local state
+       
         const newRecord = {
           record_type: "Prescription",
           record_date: new Date().toISOString(),
@@ -120,7 +120,7 @@ export default function ClinicalNotes({ selectedChild }) {
           notes: medForm.longTerm
             ? `Long-term. ${medForm.notes}`.trim()
             : medForm.notes,
-          ...result, // use server response if it returns the full record
+          ...result, 
         };
         setRecords(prev => [newRecord, ...prev]);
         setMedMsg("✓ Prescription saved.");
@@ -144,7 +144,6 @@ export default function ClinicalNotes({ selectedChild }) {
         </div>
       </div>
 
-      {/* Mode Toggle */}
       <div className="cn-mode-toggle">
         <button
           className={`cn-mode-btn ${activeMode === "note" ? "active-note" : ""}`}
@@ -162,7 +161,7 @@ export default function ClinicalNotes({ selectedChild }) {
 
       <div className="cn-layout">
 
-        {/* LEFT: Form — switches based on mode */}
+  
         <div className="cn-forms">
 
           {activeMode === "note" && (
@@ -243,7 +242,7 @@ export default function ClinicalNotes({ selectedChild }) {
 
         </div>
 
-        {/* RIGHT: History filtered by active mode */}
+    
         <div className="cn-history">
           <div className="cn-history-header">
             <h3>
@@ -289,7 +288,7 @@ export default function ClinicalNotes({ selectedChild }) {
 
                     {record.diagnosis && <p className="cn-record-text"><strong>Diagnosis:</strong> {record.diagnosis}</p>}
                     {record.treatment && !record.medication_name &&
-                      <p className="cn-record-text">💉 <strong>Treatment:</strong> {record.treatment}</p>}
+                      <p className="cn-record-text"><strong>Treatment:</strong> {record.treatment}</p>}
 
                     {cleanNotes && <p className="cn-record-notes">{cleanNotes}</p>}
                   </div>
