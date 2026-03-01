@@ -1,5 +1,7 @@
 from app import app, db
-from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination,Allergy, ActiveCondition, PendingRegistration)
+from app import (User, Child, GrowthRecord, HealthNote, HealthRecord, Appointment, Milestone, Vaccination,Allergy, ActiveCondition, PendingRegistration,DoctorProfile, DoctorQualification,
+                 DoctorExperience, DoctorCertification, DoctorLanguage,
+                 DoctorExpertise, DoctorPublication, DoctorAvailability)
 from datetime import datetime, date, timedelta, UTC
 from werkzeug.security import generate_password_hash
 
@@ -7,18 +9,18 @@ with app.app_context():
     db.drop_all()
     db.create_all()
 
-    admin = User(username="admin", email="admin@test.com", password_hash=generate_password_hash("admin123"), role="admin")
-    doctor = User(username="doctor", email="doctor@test.com", password_hash=generate_password_hash("doctor123"), role="doctor")
-    nurse = User(username="nurse", email="nurse@test.com", password_hash=generate_password_hash("nurse123"), role="nurse")
-    parent_male = User(username="parent_male", email="father@test.com", password_hash=generate_password_hash("parent123"), role="parent")
-    parent_female = User(username="parent_female", email="mother@test.com", password_hash=generate_password_hash("parent123"), role="parent")
+    admin = User(username="admin", email="admin@test.com", password_hash=generate_password_hash("admin123"), role="admin", MOH_ID="CHDR-admin-001")
+    doctor = User(username="doctor", email="doctor@test.com", password_hash=generate_password_hash("doctor123"), role="doctor", MOH_ID="CHDR-doctor-001")
+    nurse = User(username="nurse", email="nurse@test.com", password_hash=generate_password_hash("nurse123"), role="nurse", MOH_ID="CHDR-nurse-001")
+    parent_male = User(username="parent_male", email="father@test.com", password_hash=generate_password_hash("parent123"), role="parent", MOH_ID="CHDR-2026-001")
+    parent_female = User(username="parent_female", email="mother@test.com", password_hash=generate_password_hash("parent123"), role="parent", MOH_ID="CHDR-2026-002")
 
     db.session.add_all([admin, doctor, nurse, parent_male, parent_female])
     db.session.commit()  
 
 
-    boy = Child(parent_id=parent_male.id, name="Noah Fernando", date_of_birth=date(2024, 1, 10), gender="Male", blood="O+")    
-    girl = Child(parent_id=parent_female.id, name="Emma Silva", date_of_birth=date(2024, 6, 15), gender="Female", blood="B-")
+    boy = Child(parent_id=parent_male.id, name="Noah Fernando", date_of_birth=date(2024, 1, 10), gender="Male" )    
+    girl = Child(parent_id=parent_female.id, name="Emma Silva", date_of_birth=date(2024, 6, 15), gender="Female")
 
     db.session.add_all([boy, girl])
     db.session.commit()
@@ -116,22 +118,97 @@ with app.app_context():
     ])
 
     db.session.add_all([
-        HealthRecord(
-            child_id=boy.id,
-            record_type="Doctor Visit",
-            title="Routine check",
-            doctor_name="Dr. Sarah Mitchell",
-            diagnosis="Healthy",
-            treatment="None"
-        ),
-        HealthRecord(
-            child_id=girl.id,
-            record_type="Doctor Visit",
-            title="Cold symptoms",
-            doctor_name="Dr. Sarah Mitchell",
-            diagnosis="Viral cold",
-            treatment="Rest and fluids"
-        ),
+    
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Doctor Visit",
+        title="Routine check",
+        doctor_name="Dr. Sarah Mitchell",
+        diagnosis="Healthy",
+        treatment="None",
+        record_date=datetime(2024, 3, 10)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Doctor Visit",
+        title="Cold symptoms",
+        doctor_name="Dr. Sarah Mitchell",
+        diagnosis="Viral cold",
+        treatment="Rest and fluids",
+        record_date=datetime(2024, 4, 5)
+    ),
+
+
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Doctor Note",
+        title="Follow-up observation",
+        doctor_name="Dr. Sarah Mitchell",
+        notes="Child is recovering well. No fever for 3 days. Continue monitoring.",
+        record_date=datetime(2024, 6, 15)
+    ),
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Doctor Note",
+        title="Weight concern flagged",
+        doctor_name="Dr. Sarah Mitchell",
+        notes="Weight slightly below average for age. Recommended nutritional supplements and follow-up in 4 weeks.",
+        record_date=datetime(2024, 9, 20)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Doctor Note",
+        title="Asthma management review",
+        doctor_name="Dr. Sarah Mitchell",
+        notes="Asthma well-controlled. No recent attacks. Continue current inhaler regimen.",
+        record_date=datetime(2024, 8, 12)
+    ),
+
+
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Prescription",
+        title="Cetirizine - 5ml",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Cetirizine",
+        medication_dosage="5ml",
+        treatment="Once daily at bedtime",
+        notes="Long-term. For chronic allergy management. Review after 3 months.",
+        record_date=datetime(2024, 6, 1)
+    ),
+    HealthRecord(
+        child_id=boy.id,
+        record_type="Prescription",
+        title="Amoxicillin - 250mg",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Amoxicillin",
+        medication_dosage="250mg",
+        treatment="Twice daily for 7 days",
+        notes="For ear infection. Complete full course even if symptoms improve.",
+        record_date=datetime(2024, 11, 3)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Prescription",
+        title="Salbutamol - 2.5mg",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Salbutamol",
+        medication_dosage="2.5mg",
+        treatment="As needed via nebulizer",
+        notes="Long-term. For asthma relief. Use during attacks only.",
+        record_date=datetime(2024, 7, 22)
+    ),
+    HealthRecord(
+        child_id=girl.id,
+        record_type="Prescription",
+        title="Paracetamol - 120mg",
+        doctor_name="Dr. Sarah Mitchell",
+        medication_name="Paracetamol",
+        medication_dosage="120mg",
+        treatment="Every 6 hours when needed",
+        notes="For fever management. Do not exceed 4 doses in 24 hours.",
+        record_date=datetime(2024, 10, 5)
+    ),
     ])
 
     db.session.add_all([
@@ -379,8 +456,107 @@ with app.app_context():
             updated_at=datetime.now(UTC),
         ),
     ])
+    sarah_profile = DoctorProfile(
+        user_id          = doctor.id,
+        first_name       = "Sarah",
+        last_name        = "Mitchell",
+        title            = "Dr.",
+        gender           = "Female",
+        dob              = "1985-03-22",
+        phone            = "+94 77 456 7890",
+        email            = "doctor@test.com",
+        bio              = (
+            "Dr. Sarah Mitchell is a dedicated Pediatrician with over 12 years of "
+            "experience in child healthcare. She is committed to providing compassionate, "
+            "evidence-based care and works closely with families to support the healthy "
+            "development of every child from birth through adolescence."
+        ),
+        specialty        = "Pediatrician",
+        sub_specialty    = "Neonatal Care",
+        license_number   = "LIC-SM-2012",
+        license_expiry   = "2027-03-31",
+        slmc_number      = "SLMC-14872",
+        years_experience = "12",
+        current_hospital = "City Clinic",
+        department       = "Pediatrics",
+        consultation_fee = "3500",
+        emergency_available = True,
+        emergency_max       = "25",
+        telehealth          = True,
+    )
+    db.session.add(sarah_profile)
+    db.session.flush()   
+
+    db.session.add_all([
+        DoctorQualification(profile_id=sarah_profile.id, degree="MBBS",
+                            institution="University of Colombo", year="2008", country="Sri Lanka"),
+        DoctorQualification(profile_id=sarah_profile.id, degree="MD (Paediatrics)",
+                            institution="Postgraduate Institute of Medicine", year="2012", country="Sri Lanka"),
+        DoctorQualification(profile_id=sarah_profile.id, degree="Fellowship in Neonatal Care",
+                            institution="Royal College of Paediatrics and Child Health", year="2015", country="UK"),
+    ])
+
+
+    db.session.add_all([
+        DoctorExperience(profile_id=sarah_profile.id, role="Junior Medical Officer",
+                        hospital="National Hospital of Sri Lanka", from_date="2008-07", to_date="2010-06", current=False),
+        DoctorExperience(profile_id=sarah_profile.id, role="Registrar in Paediatrics",
+                        hospital="Lady Ridgeway Hospital for Children", from_date="2010-07", to_date="2013-12", current=False),
+        DoctorExperience(profile_id=sarah_profile.id, role="Consultant Paediatrician",
+                        hospital="City Clinic", from_date="2014-01", to_date="", current=True),
+    ])
+
+
+    db.session.add_all([
+        DoctorCertification(profile_id=sarah_profile.id,
+                            name="Board Certified Paediatrician",
+                            issuing_body="Sri Lanka College of Paediatricians",
+                            issue_date="2013-06-01", expiry_date="2028-06-01"),
+        DoctorCertification(profile_id=sarah_profile.id,
+                            name="Advanced Paediatric Life Support (APLS)",
+                            issuing_body="Advanced Life Support Group",
+                            issue_date="2022-09-15", expiry_date="2026-09-15"),
+    ])
+
+
+    db.session.add_all([
+        DoctorLanguage(profile_id=sarah_profile.id, language="English"),
+        DoctorLanguage(profile_id=sarah_profile.id, language="Sinhala"),
+        DoctorLanguage(profile_id=sarah_profile.id, language="Tamil"),
+    ])
+
+
+    db.session.add_all([
+        DoctorExpertise(profile_id=sarah_profile.id, area="Neonatal Care"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Child Growth & Nutrition"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Vaccination & Immunisation"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Paediatric Asthma Management"),
+        DoctorExpertise(profile_id=sarah_profile.id, area="Developmental Milestone Assessment"),
+    ])
+
+
+    db.session.add_all([
+        DoctorPublication(profile_id=sarah_profile.id,
+                        title="Nutritional Outcomes in Low-Birth-Weight Infants in Sri Lanka",
+                        journal="Ceylon Medical Journal", year="2016"),
+        DoctorPublication(profile_id=sarah_profile.id,
+                        title="Vaccination Coverage and Barriers in Rural Sri Lankan Communities",
+                        journal="Asia Pacific Journal of Public Health", year="2019"),
+    ])
+
+
+    db.session.add_all([
+        DoctorAvailability(profile_id=sarah_profile.id, day="Monday",    available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Tuesday",   available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Wednesday", available=True,  from_time="08:00", to_time="13:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Thursday",  available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Friday",    available=True,  from_time="08:00", to_time="16:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Saturday",  available=True,  from_time="09:00", to_time="12:00"),
+        DoctorAvailability(profile_id=sarah_profile.id, day="Sunday",    available=False, from_time="09:00", to_time="17:00"),
+    ])
 
     db.session.commit()
+
     
 
     print("Dummy data Successfully added")
