@@ -1701,6 +1701,40 @@ def add_vaccination(child_id):
         print(f"Vaccination record error: {e}")
         return jsonify({"error": str(e)}), 500
     
+@app.route("/children/<int:child_id>/health-records", methods=["GET"])
+@cross_origin()
+def get_health_records(child_id):
+    child = Child.query.get(child_id)
+    if not child:
+        return jsonify({"error": "Child not found"}), 404
+
+    record_type = request.args.get("type")          
+
+    query = HealthRecord.query.filter_by(child_id=child_id)
+    if record_type:
+        query = query.filter_by(record_type=record_type)
+
+    records = query.order_by(HealthRecord.record_date.desc()).all()
+
+    return jsonify([
+        {
+            "id":               r.id,
+            "record_type":      r.record_type,
+            "title":            r.title,
+            "doctor_name":      r.doctor_name,
+            # ── Doctor Note fields ──
+            "diagnosis":        r.diagnosis,
+            "treatment":        r.treatment,
+            "notes":            r.notes,
+            # ── Prescription fields ──
+            "medication_name":  r.medication_name,
+            "medication_dosage": r.medication_dosage,
+            "record_date":      r.record_date.isoformat() if r.record_date else None,
+        }
+        for r in records
+    ]), 200
+
+
 @app.route("/children/<int:child_id>/health-records/notes", methods=["POST"])
 @cross_origin()
 def add_doctor_note(child_id):
@@ -1721,6 +1755,8 @@ def add_doctor_note(child_id):
             record_type="Doctor Note",
             title=data.get("title", "Doctor Note").strip(),
             doctor_name=data.get("doctor_name", "").strip() or None,
+            diagnosis=data.get("diagnosis", "").strip() or None,
+            treatment=data.get("treatment", "").strip() or None,
             notes=data["notes"].strip(),
             record_date=datetime.utcnow()
         )
@@ -1730,13 +1766,15 @@ def add_doctor_note(child_id):
 
         return jsonify({
             "message": "Doctor note saved successfully",
-            "id": new_record.id
+            "id": new_record.id,
+            "record_date": new_record.record_date.isoformat()
         }), 201
 
     except Exception as e:
         db.session.rollback()
         print(f"Doctor note error: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route("/children/<int:child_id>/health-records/prescriptions", methods=["POST"])
@@ -1779,7 +1817,8 @@ def add_prescription(child_id):
 
         return jsonify({
             "message": "Prescription saved successfully",
-            "id": new_record.id
+            "id": new_record.id,
+            "record_date": new_record.record_date.isoformat()
         }), 201
 
     except Exception as e:
