@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./DoctorNotes.css";
 
 function formatDate(dateString) {
@@ -21,6 +21,7 @@ function getStyle(type) {
 export default function ClinicalNotes({ selectedChild }) {
   // "note" | "prescription"
   const [activeMode, setActiveMode] = useState("note");
+  const [records, setRecords] = useState([]);
   const [noteForm, setNoteForm] = useState({ title: "", doctor_name: "", notes: "" });
   const [medForm, setMedForm]   = useState({
     medication_name: "", medication_dosage: "", frequency: "",
@@ -30,6 +31,13 @@ export default function ClinicalNotes({ selectedChild }) {
   const [savingMed,  setSavingMed]  = useState(false);
   const [noteMsg, setNoteMsg] = useState("");
   const [medMsg,  setMedMsg]  = useState("");
+
+  // Seed local records from prop whenever the selected child changes
+  useEffect(() => {
+    setRecords(selectedChild?.healthRecords || []);
+    setNoteMsg("");
+    setMedMsg("");
+  }, [selectedChild]);
 
   if (!selectedChild) {
     return (
@@ -44,11 +52,11 @@ export default function ClinicalNotes({ selectedChild }) {
   }
 
   const numericId     = parseInt(selectedChild.id.replace("CH", ""));
-  const allRecords    = selectedChild.healthRecords || [];
-  const doctorNotes   = allRecords
+
+  const doctorNotes   = records
     .filter(r => r.record_type === "Doctor Note")
     .slice().sort((a, b) => new Date(b.record_date) - new Date(a.record_date));
-  const prescriptions = allRecords
+  const prescriptions = records
     .filter(r => r.record_type === "Prescription")
     .slice().sort((a, b) => new Date(b.record_date) - new Date(a.record_date));
 
@@ -70,8 +78,22 @@ export default function ClinicalNotes({ selectedChild }) {
         { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(noteForm) }
       );
       const result = await res.json();
-      if (res.ok) { setNoteMsg("✓ Note saved."); setNoteForm({ title: "", doctor_name: "", notes: "" }); }
-      else          setNoteMsg(`✗ ${result.error || "Failed."}`);
+      if (res.ok) {
+        // Optimistically prepend the new record to local state
+        const newRecord = {
+          record_type: "Doctor Note",
+          record_date: new Date().toISOString(),
+          title: noteForm.title,
+          doctor_name: noteForm.doctor_name,
+          notes: noteForm.notes,
+          ...result, // use server response if it returns the full record
+        };
+        setRecords(prev => [newRecord, ...prev]);
+        setNoteMsg("✓ Note saved.");
+        setNoteForm({ title: "", doctor_name: "", notes: "" });
+      } else {
+        setNoteMsg(`✗ ${result.error || "Failed."}`);
+      }
     } catch { setNoteMsg("✗ Cannot reach server."); }
     finally   { setSavingNote(false); }
   };
@@ -87,9 +109,25 @@ export default function ClinicalNotes({ selectedChild }) {
       );
       const result = await res.json();
       if (res.ok) {
+        // Optimistically prepend the new prescription to local state
+        const newRecord = {
+          record_type: "Prescription",
+          record_date: new Date().toISOString(),
+          medication_name: medForm.medication_name,
+          medication_dosage: medForm.medication_dosage,
+          frequency: medForm.frequency,
+          doctor_name: medForm.doctor_name,
+          notes: medForm.longTerm
+            ? `Long-term. ${medForm.notes}`.trim()
+            : medForm.notes,
+          ...result, // use server response if it returns the full record
+        };
+        setRecords(prev => [newRecord, ...prev]);
         setMedMsg("✓ Prescription saved.");
         setMedForm({ medication_name: "", medication_dosage: "", frequency: "", doctor_name: "", longTerm: false, notes: "" });
-      } else setMedMsg(`✗ ${result.error || "Failed."}`);
+      } else {
+        setMedMsg(`✗ ${result.error || "Failed."}`);
+      }
     } catch { setMedMsg("✗ Cannot reach server."); }
     finally   { setSavingMed(false); }
   };
