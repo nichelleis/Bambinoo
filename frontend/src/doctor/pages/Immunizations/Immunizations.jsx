@@ -1,24 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Immunizations.css";
 
-const Immunizations = ({ selectedChild }) => {
-  const [formData, setFormData] = useState({
-    vaccineName: "",
-    dateAdministered: "",
-    doseNumber: "",
-    batchNumber: "",
-    nextDueDate: "",
-    administeredBy: "",
-    notes: "",
+const API_BASE = "http://localhost:5000";
+
+function formatDate(dateStr) {
+  if (!dateStr) return "N/A";
+  return new Date(dateStr).toLocaleDateString("en-GB", {
+    day: "numeric", month: "short", year: "numeric",
   });
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+}
+
+
+
+function VaccinationCard({ item }) {
+  return (
+    <div className="history-card">
+      <div className="history-left">
+        <strong>{item.vaccine_name}</strong>
+        {item.administered_by && (
+          <p><span className="label">By:</span>{item.administered_by}</p>
+        )}
+        <p><span className="label">Administered:</span>{formatDate(item.administered_date)}</p>
+        {item.batch_number && (
+          <p><span className="label">Batch:</span>{item.batch_number}</p>
+        )}
+        {item.due_date && (
+          <p className="next-dose">Next due: {formatDate(item.due_date)}</p>
+        )}
+        {item.notes && (
+          <p className="notes-text">{item.notes}</p>
+        )}
+      </div>
+      <span className="dose-badge">{item.dose_number || "—"}</span>
+    </div>
+  );
+}
+
+
+const Immunizations = ({ selectedChild }) => {
+  const [history, setHistory]       = useState([]);
+  const [loading, setLoading]       = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [error, setError]           = useState("");
+  const [success, setSuccess]       = useState("");
+
+  const emptyForm = {
+    vaccineName:      "",
+    dateAdministered: "",
+    doseNumber:       "",
+    batchNumber:      "",
+    nextDueDate:      "",
+    administeredBy:   "",
+    notes:            "",
+  };
+  const [formData, setFormData] = useState(emptyForm);
+
+  useEffect(() => {
+    if (!selectedChild) return;
+
+    if (selectedChild.vaccinations) {
+      setHistory(selectedChild.vaccinations);
+      return;
+    }
+
+    const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
+    setLoading(true);
+    fetch(`${API_BASE}/children/${numericId}/vaccinations`)
+      .then(r => r.json())
+      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .catch(() => setHistory([]))
+      .finally(() => setLoading(false));
+  }, [selectedChild]);
 
   if (!selectedChild) {
     return (
       <div className="immunization-empty">
         <div className="empty-card">
-          <i className="ri-syringe-line"></i>
+          <i className="ri-syringe-line" />
           <h2>No Patient Selected</h2>
           <p>
             Please search and select a patient to
@@ -30,53 +88,57 @@ const Immunizations = ({ selectedChild }) => {
     );
   }
 
-  // Use real vaccination data from selectedChild
-  const immunizationHistory = selectedChild.vaccinations || [];
+  function handleChange(e) {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError(""); setSuccess("");
+
+    if (!formData.vaccineName.trim()) {
+      setError("Vaccine name is required.");
+      return;
+    }
+
     setSaving(true);
-    setMessage("");
+    const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
 
     try {
-      const numericId = parseInt(selectedChild.id.replace("CH", ""));
-
-      const res = await fetch(
-        `http://localhost:5000/children/${numericId}/vaccinations`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`${API_BASE}/children/${numericId}/vaccinations`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
       const result = await res.json();
 
-      if (res.ok) {
-        setMessage("✓ Vaccination recorded successfully.");
-        setFormData({
-          vaccineName: "",
-          dateAdministered: "",
-          doseNumber: "",
-          batchNumber: "",
-          nextDueDate: "",
-          administeredBy: "",
-          notes: "",
-        });
-      } else {
-        setMessage(`✗ ${result.error || "Failed to save."}`);
+      if (!res.ok) {
+        setError(result.error || "Failed to save vaccination.");
+        return;
       }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setMessage("✗ Cannot reach server. Is Flask running?");
+
+      const newRecord = {
+        id:                result.id,
+        vaccine_name:      formData.vaccineName,
+        administered_date: formData.dateAdministered,
+        dose_number:       formData.doseNumber,
+        batch_number:      formData.batchNumber,
+        due_date:          formData.nextDueDate,
+        administered_by:   formData.administeredBy,
+        notes:             formData.notes,
+      };
+      setHistory(prev => [newRecord, ...prev]);
+
+      setFormData(emptyForm);
+      setSuccess("Vaccination recorded successfully!");
+      setTimeout(() => setSuccess(""), 3500);
+    } catch {
+      setError("Cannot reach server. Is Flask running?");
     } finally {
       setSaving(false);
     }
-  };
+  }
 
   return (
     <div className="immunizations-page">
@@ -88,18 +150,20 @@ const Immunizations = ({ selectedChild }) => {
       </div>
 
       <div className="immunization-layout">
+        {/* ── Form ── */}
         <form className="immunization-form" onSubmit={handleSubmit}>
-          <h3>+ Record New Immunization</h3>
+          <h3>Record New Immunization</h3>
 
-          <label>Vaccine Name</label>
-          <input
-            type="text"
-            name="vaccineName"
-            placeholder="e.g. MMR, DTaP, Polio"
-            value={formData.vaccineName}
-            onChange={handleChange}
-            required
-          />
+          <div>
+            <label>Vaccine Name <span style={{ color: "var(--danger)" }}>*</span></label>
+            <input
+              type="text"
+              name="vaccineName"
+              placeholder="e.g. MMR, DTaP, Polio"
+              value={formData.vaccineName}
+              onChange={handleChange}
+            />
+          </div>
 
           <div className="form-row">
             <div>
@@ -109,7 +173,6 @@ const Immunizations = ({ selectedChild }) => {
                 name="dateAdministered"
                 value={formData.dateAdministered}
                 onChange={handleChange}
-                required
               />
             </div>
             <div>
@@ -146,53 +209,49 @@ const Immunizations = ({ selectedChild }) => {
             </div>
           </div>
 
-          <label>Administered By</label>
-          <input
-            type="text"
-            name="administeredBy"
-            placeholder="Dr. Smith"
-            value={formData.administeredBy}
-            onChange={handleChange}
-          />
+          <div>
+            <label>Administered By</label>
+            <input
+              type="text"
+              name="administeredBy"
+              placeholder="e.g. Dr. Sarah Mitchell"
+              value={formData.administeredBy}
+              onChange={handleChange}
+            />
+          </div>
 
-          <label>Notes</label>
-          <textarea
-            name="notes"
-            placeholder="Any reactions or observations..."
-            value={formData.notes}
-            onChange={handleChange}
-          />
+          <div>
+            <label>Notes</label>
+            <textarea
+              name="notes"
+              placeholder="Any reactions or observations..."
+              value={formData.notes}
+              onChange={handleChange}
+            />
+          </div>
 
-          {message && (
-            <p style={{ color: message.startsWith("✓") ? "green" : "red", fontSize: "0.85rem" }}>
-              {message}
-            </p>
-          )}
+          {error   && <p className="form-error">{error}</p>}
+          {success && <p className="form-success">{success}</p>}
 
           <button type="submit" className="primary-btn" disabled={saving}>
-            {saving ? "Saving..." : "Record Immunization"}
+            {saving ? "Saving…" : "Record Immunization"}
           </button>
         </form>
 
+        {/* ── History ── */}
         <div className="immunization-history">
           <h3>Immunization History</h3>
 
-          {immunizationHistory.length === 0 ? (
+          {loading ? (
+            <p className="empty-text">Loading…</p>
+          ) : history.length === 0 ? (
             <p className="empty-text">No immunization records found.</p>
           ) : (
-            immunizationHistory.map((item, index) => (
-              <div key={index} className="history-card">
-                <div className="history-left">
-                  <strong>{item.vaccine_name}</strong>
-                  <p>Administered: {item.administered_date || "N/A"}</p>
-                  <p>By: {item.administered_by || "N/A"}</p>
-                  {item.due_date && (
-                    <p className="next-dose">Next due: {item.due_date}</p>
-                  )}
-                </div>
-                <span className="dose-badge">{item.dose_number || "—"}</span>
-              </div>
-            ))
+            <div className="history-list">
+              {history.map((item, index) => (
+                <VaccinationCard key={item.id ?? index} item={item} />
+              ))}
+            </div>
           )}
         </div>
       </div>
