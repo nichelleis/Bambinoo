@@ -13,7 +13,9 @@ function calculateAge(dobString) {
 
 function formatDate(dateString) {
   if (!dateString) return "N/A";
-  return new Date(dateString).toLocaleDateString();
+  return new Date(dateString).toLocaleDateString("en-GB", {
+    day: "numeric", month: "short", year: "numeric",
+  });
 }
 
 function getSeverityClass(severity) {
@@ -162,7 +164,6 @@ export default function CHDRView({ selectedChild }) {
                       fontSize: "13px",
                     }}
                   >
-                    
                     <span style={{ display: "flex", gap: "14px" }}>
                       <span><strong>{g.weight ?? "N/A"}</strong> kg</span>
                       <span><strong>{g.height ?? "N/A"}</strong> cm</span>
@@ -187,9 +188,6 @@ export default function CHDRView({ selectedChild }) {
             <>
               <p>
                 <strong>Total Immunizations</strong>
-                <span className="count">
-                  {vaccines.filter(v => v.status === "completed").length} / {vaccines.length}
-                </span>
               </p>
               <ul>
                 {vaccines.map((v, i) => (
