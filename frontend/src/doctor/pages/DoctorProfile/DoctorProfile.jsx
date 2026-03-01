@@ -294,7 +294,6 @@ export default function DoctorProfile() {
       <div className="dp-body">
         <StatusBanner status={status} />
 
-        {/* ══ 1. PERSONAL INFO ══════════════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader  title="Personal Information" />
 
@@ -344,7 +343,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 2. PROFESSIONAL DETAILS ═══════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Professional Details" />
 
@@ -396,7 +394,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 3. QUALIFICATIONS ═════════════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Academic Qualifications" />
 
@@ -442,7 +439,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 4. WORK EXPERIENCE ════════════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Work Experience" />
 
@@ -494,7 +490,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 5. CERTIFICATIONS ════════════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Certifications & Board Memberships" />
 
@@ -540,7 +535,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 6. AREAS OF EXPERTISE ════════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Areas of Expertise" />
           {editing ? (
@@ -553,7 +547,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 7. LANGUAGES ═════════════════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Languages Spoken" />
           {editing ? (
@@ -566,7 +559,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 8. PUBLICATIONS & RESEARCH ═══════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Publications & Research" />
 
@@ -608,7 +600,6 @@ export default function DoctorProfile() {
           )}
         </section>
 
-        {/* ══ 9. AVAILABILITY ══════════════════════════════════════════════ */}
         <section className="dp-card">
           <SectionHeader title="Consultation Availability" />
 
@@ -681,7 +672,6 @@ export default function DoctorProfile() {
 
       </div>
 
-      {/* ── sticky footer (only in edit mode) ── */}
       {editing && (
         <div className="dp-footer">
           <p className="dp-footer-note">Changes are saved to your profile and visible to clinic administrators.</p>
