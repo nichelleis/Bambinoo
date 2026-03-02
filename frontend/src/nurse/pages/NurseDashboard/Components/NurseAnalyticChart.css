@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap');
+
+:root {
+  --nac-bg:         #fdf5f7;
+  --nac-surface:    #ffffff;
+  --nac-border:     #f0d9df;
+  --nac-pink:       #c2607a;
+  --nac-pink-dim:   rgba(194,96,122,0.1);
+  --nac-pink-light: #fce8ed;
+  --nac-rose:       #a8485f;
+  --nac-blue:       #3b7dd8;
+  --nac-text:       #2e1a20;
+  --nac-muted:      #9c7080;
+  --nac-radius:     14px;
+  --nac-font:       'Nunito', sans-serif;
+  --nac-body:       'Lato', sans-serif;
+  --nac-shadow:     0 2px 12px rgba(194,96,122,0.08);
+  --nac-shadow-md:  0 4px 24px rgba(194,96,122,0.13);
+}
+
+.nac-container {
+  background: var(--nac-surface);
+  border: 1.5px solid var(--nac-border);
+  border-top: 4px solid var(--nac-pink);
+  border-radius: var(--nac-radius);
+  padding: 1.5rem 1.5rem 1rem;
+  box-shadow: var(--nac-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+  min-height: 320px;
+  transition: box-shadow 0.2s;
+}
+
+.nac-container:hover {
+  box-shadow: var(--nac-shadow-md);
+}
+
+.nac-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.nac-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.nac-title {
+  font-family: var(--nac-font);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--nac-text);
+  margin: 0;
+}
+
+.nac-subtitle {
+  font-family: var(--nac-body);
+  font-size: 0.76rem;
+  color: var(--nac-muted);
+  margin: 0;
+}
+
+.nac-badge {
+  padding: 0.28rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--nac-font);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.nac-badge--active {
+  background: var(--nac-pink-light);
+  border: 1px solid rgba(194,96,122,0.3);
+  color: var(--nac-pink);
+}
+
+.nac-badge--empty {
+  background: #faf3f5;
+  border: 1px solid var(--nac-border);
+  color: var(--nac-muted);
+}
+
+.nac-tooltip {
+  background: #fff;
+  border: 1.5px solid var(--nac-border);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.75rem;
+  box-shadow: var(--nac-shadow-md);
+}
+
+.nac-tooltip-label {
+  font-family: var(--nac-font);
+  font-weight: 700;
+  color: var(--nac-text);
+  margin: 0 0 0.3rem;
+}
+
+.nac-tooltip-value {
+  font-family: var(--nac-body);
+  margin: 0.15rem 0 0;
+}

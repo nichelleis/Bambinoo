@@ -52,8 +52,9 @@ const formatRecordDate = (isoString) => {
 
 const buildChartData = (child) => {
   if (!child?.growthHistory?.length) return null;
-  const mapped = child.growthHistory
+  const mapped = [...child.growthHistory]
     .filter((r) => r.weight != null)
+    .sort((a, b) => new Date(a.record_date) - new Date(b.record_date))
     .map((r) => ({
       month: formatRecordDate(r.record_date),
       weight: r.weight,
@@ -154,7 +155,6 @@ const AnalyticChart = () => {
             wrapperStyle={{ fontSize: "0.7rem", color: "rgba(241,245,249,0.55)" }}
           />
 
-          {/* Weight line — always shown */}
           <Line
             type="monotone"
             dataKey="weight"
@@ -165,7 +165,6 @@ const AnalyticChart = () => {
             name="Weight (kg)"
           />
 
-          {/* Height line — only shown when no child selected (sample mode) */}
           {!isChildSelected && (
             <Line
               type="monotone"
