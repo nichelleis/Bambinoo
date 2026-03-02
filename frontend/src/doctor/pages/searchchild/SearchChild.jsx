@@ -10,6 +10,12 @@ const SearchChild = ({ onSelect }) => {
 
   useEffect(() => {
     fetchChildren();
+
+    // Restore previously selected child from localStorage
+    const stored = localStorage.getItem("selectedChild");
+    if (stored) {
+      setSelectedChild(JSON.parse(stored));
+    }
   }, []);
 
   const fetchChildren = async () => {
@@ -33,7 +39,15 @@ const SearchChild = ({ onSelect }) => {
 
   const handleSelect = (child) => {
     setSelectedChild(child);
+    // Persist to localStorage so the Dashboard chart can read it
+    localStorage.setItem("selectedChild", JSON.stringify(child));
     if (onSelect) onSelect(child);
+  };
+
+  const handleClear = () => {
+    setSelectedChild(null);
+    localStorage.removeItem("selectedChild");
+    if (onSelect) onSelect(null);
   };
 
   return (
@@ -58,6 +72,21 @@ const SearchChild = ({ onSelect }) => {
           <span>CURRENTLY SELECTED</span>
           <strong>{selectedChild.name}</strong>
           <span className="status">Active</span>
+          <button
+            onClick={handleClear}
+            style={{
+              marginLeft: "auto",
+              background: "rgba(255,255,255,0.1)",
+              border: "none",
+              borderRadius: "6px",
+              color: "#f1f5f9",
+              cursor: "pointer",
+              padding: "2px 10px",
+              fontSize: "0.75rem",
+            }}
+          >
+            Clear
+          </button>
         </div>
       )}
 
