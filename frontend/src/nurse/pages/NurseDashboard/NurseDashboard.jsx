@@ -16,6 +16,7 @@ const NurseDashboard = () => {
         <StatCard title="Quick Patient Search" value="Find Patient" icon="🔍" color="blue" onClick={() => navigate("/nurse/search")} />
         <StatCard title="Growth Records" value="Record Growth" icon="📏" color="pink" onClick={() => navigate("/nurse/growth")} />
         <StatCard title="Immunizations" value="Record Vaccine" icon="💉" color="teal" onClick={() => navigate("/nurse/immunizations")} />
+          <StatCard title="User Authentication" value="Manage Access" icon="🔐" color="purple" onClick={() => navigate("/nurse/auth")} />
 
       </div>
 
