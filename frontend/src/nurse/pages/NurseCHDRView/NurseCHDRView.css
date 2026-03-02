@@ -1,0 +1,543 @@
+/* ═══════════════════════════════════════════════
+   NurseCHDRView.css  —  Nurse Care Theme
+   Warm white / rose / soft green palette
+   ═══════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap');
+
+/* ── Tokens ── */
+:root {
+  --n-bg:           #f0f4f9;
+  --n-surface:      #ffffff;
+  --n-card:         #ffffff;
+  --n-border:       #dce4ef;
+  --n-rose:         #3b7dd8;
+  --n-rose-dim:     rgba(59,125,216,0.1);
+  --n-green:        #2e86c1;
+  --n-green-dim:    rgba(46,134,193,0.1);
+  --n-amber:        #f59e0b;
+  --n-amber-dim:    rgba(245,158,11,0.1);
+  --n-danger:       #dc2626;
+  --n-danger-dim:   rgba(220,38,38,0.08);
+  --n-text:         #1e293b;
+  --n-muted:        #7a8fa8;
+  --n-subtle:       #f4f7fb;
+  --n-radius:       14px;
+  --n-font:         'Nunito', sans-serif;
+  --n-body:         'Lato', sans-serif;
+  --n-shadow:       0 2px 12px rgba(59,125,216,0.07);
+  --n-shadow-md:    0 4px 24px rgba(59,125,216,0.11);
+}
+
+/* ── Empty state ── */
+.nurse-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 60vh;
+  background: var(--n-bg);
+}
+
+.nurse-empty-card {
+  text-align: center;
+  padding: 3rem 4rem;
+  background: var(--n-surface);
+  border: 1.5px dashed var(--n-border);
+  border-radius: 20px;
+  box-shadow: var(--n-shadow);
+}
+
+.nurse-empty-card i {
+  font-size: 2.8rem;
+  color: var(--n-rose);
+  opacity: 0.6;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.nurse-empty-card h2 {
+  font-family: var(--n-font);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--n-text);
+  margin: 0 0 0.5rem;
+}
+
+.nurse-empty-card p {
+  font-family: var(--n-body);
+  color: var(--n-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── Page ── */
+.nurse-page {
+  background: var(--n-bg);
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: var(--n-body);
+  color: var(--n-text);
+}
+
+/* ── Header ── */
+.nurse-header {
+  background: linear-gradient(135deg, #fff 60%, #eef4fd 100%);
+  border: 1.5px solid var(--n-border);
+  border-top: 4px solid var(--n-rose);
+  border-radius: var(--n-radius);
+  padding: 1.4rem 1.8rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--n-shadow);
+}
+
+.nurse-patient-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nurse-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--n-rose), #60a5fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--n-font);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px var(--n-rose-dim);
+}
+
+.nurse-patient-info h2 {
+  font-family: var(--n-font);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--n-text);
+  margin: 0 0 0.15rem;
+}
+
+.nurse-patient-info p {
+  font-size: 0.78rem;
+  color: var(--n-rose);
+  margin: 0;
+  font-weight: 600;
+  font-family: var(--n-font);
+}
+
+.nurse-role-badge {
+  background: var(--n-rose-dim);
+  border: 1px solid rgba(232,99,122,0.25);
+  color: var(--n-rose);
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  font-family: var(--n-font);
+  letter-spacing: 0.05em;
+}
+
+/* ── Stat cards ── */
+.nurse-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.nurse-stat {
+  background: var(--n-surface);
+  border: 1.5px solid var(--n-border);
+  border-radius: var(--n-radius);
+  padding: 1.1rem 1.3rem;
+  box-shadow: var(--n-shadow);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.nurse-stat:hover {
+  box-shadow: var(--n-shadow-md);
+  border-color: var(--n-rose);
+}
+
+.nurse-stat::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--n-rose), var(--n-green));
+  border-radius: 0 0 var(--n-radius) var(--n-radius);
+}
+
+.nurse-stat span {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--n-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.45rem;
+}
+
+.nurse-stat strong {
+  display: block;
+  font-family: var(--n-font);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--n-text);
+}
+
+.nurse-stat small {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--n-green);
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+
+/* ── Allergy alert ── */
+.nurse-alert {
+  background: var(--n-danger-dim);
+  border: 1.5px solid rgba(220,38,38,0.2);
+  border-left: 5px solid var(--n-danger);
+  border-radius: var(--n-radius);
+  padding: 1rem 1.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.nurse-alert h4 {
+  font-family: var(--n-font);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--n-danger);
+  margin: 0 0 0.55rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nurse-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.nurse-tag {
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  font-family: var(--n-font);
+  background: rgba(220,38,38,0.1);
+  color: var(--n-danger);
+  border: 1px solid rgba(220,38,38,0.25);
+}
+
+/* ── Grid ── */
+.nurse-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.1rem;
+}
+
+/* ── Card ── */
+.nurse-card {
+  background: var(--n-card);
+  border: 1.5px solid var(--n-border);
+  border-radius: var(--n-radius);
+  padding: 1.4rem;
+  box-shadow: var(--n-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  transition: box-shadow 0.2s;
+}
+
+.nurse-card:hover {
+  box-shadow: var(--n-shadow-md);
+}
+
+/* ── Card inner — consistent across all 4 cards ── */
+.nurse-card-title {
+  font-family: var(--n-font);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--n-text);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.nurse-card-title i {
+  color: var(--n-rose);
+  font-size: 1rem;
+}
+
+.nurse-card-sub {
+  font-size: 0.7rem;
+  color: var(--n-muted);
+  font-weight: 500;
+}
+
+.nurse-divider {
+  height: 1px;
+  background: var(--n-border);
+  margin: 0;
+}
+
+.nurse-empty-text {
+  color: var(--n-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  text-align: center;
+  padding: 0.75rem 0;
+  margin: 0;
+}
+
+/* ── Growth metrics ── */
+.nurse-growth-boxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+}
+
+.nurse-metric {
+  background: var(--n-subtle);
+  border: 1.5px solid var(--n-border);
+  border-radius: 10px;
+  padding: 0.8rem;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.nurse-metric:hover {
+  border-color: var(--n-green);
+}
+
+.nurse-metric strong {
+  display: block;
+  font-family: var(--n-font);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--n-green);
+}
+
+.nurse-metric span {
+  display: block;
+  font-size: 0.67rem;
+  color: var(--n-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-top: 0.2rem;
+  font-weight: 600;
+}
+
+.nurse-recorded {
+  font-size: 0.73rem;
+  color: var(--n-muted);
+  text-align: center;
+}
+
+.nurse-count {
+  font-size: 0.78rem;
+  color: var(--n-muted);
+  margin: 0;
+  text-align: center;
+}
+
+.nurse-history-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--n-muted);
+  margin: 0;
+  text-align: center;
+}
+
+.nurse-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.nurse-history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  background: var(--n-subtle);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  border: 1px solid var(--n-border);
+}
+
+.nurse-history-row__date {
+  color: var(--n-muted);
+  font-size: 0.72rem;
+}
+
+.nurse-history-row__vals {
+  display: flex;
+  gap: 1rem;
+}
+
+.nurse-history-row__vals strong {
+  color: var(--n-green);
+  font-family: var(--n-font);
+}
+
+/* ── Uniform list rows across all cards ── */
+.nurse-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.nurse-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1rem;
+  background: var(--n-subtle);
+  border: 1px solid var(--n-border);
+  border-radius: 9px;
+  font-size: 0.83rem;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nurse-li-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.nurse-li-right small {
+  font-size: 0.68rem;
+  color: var(--n-muted);
+}
+
+/* nurse-count defined above with nurse-recorded */
+
+/* ── Badges ── */
+.nurse-badge {
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--n-font);
+  text-transform: capitalize;
+}
+
+.nurse-badge--active,
+.nurse-badge--completed {
+  background: var(--n-green-dim);
+  color: var(--n-green);
+  border: 1px solid rgba(56,184,154,0.3);
+}
+
+.nurse-badge--pending {
+  background: var(--n-amber-dim);
+  color: var(--n-amber);
+  border: 1px solid rgba(245,158,11,0.3);
+}
+
+.nurse-badge--warning {
+  background: rgba(251,146,60,0.12);
+  color: #f97316;
+  border: 1px solid rgba(251,146,60,0.3);
+}
+
+.nurse-badge--danger {
+  background: var(--n-danger-dim);
+  color: var(--n-danger);
+  border: 1px solid rgba(220,38,38,0.25);
+}
+
+/* ── Health note items — same row style as nurse-list li ── */
+.nurse-note-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.65rem 1rem;
+  background: var(--n-subtle);
+  border: 1px solid var(--n-border);
+  border-radius: 9px;
+  border-left: 3px solid var(--n-rose);
+  box-sizing: border-box;
+  width: 100%;
+  transition: box-shadow 0.2s;
+}
+
+.nurse-note-item:hover {
+  box-shadow: var(--n-shadow);
+}
+
+.nurse-note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.nurse-note-header strong {
+  font-family: var(--n-font);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--n-text);
+}
+
+.nurse-note-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.nurse-note-meta small {
+  font-size: 0.68rem;
+  color: var(--n-muted);
+}
+
+.nurse-note-type {
+  font-size: 0.71rem;
+  color: var(--n-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.nurse-note-detail {
+  font-size: 0.8rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .nurse-page    { padding: 1rem; }
+  .nurse-header  { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .nurse-grid    { grid-template-columns: 1fr; }
+  .nurse-growth-boxes { grid-template-columns: repeat(3, 1fr); }
+}

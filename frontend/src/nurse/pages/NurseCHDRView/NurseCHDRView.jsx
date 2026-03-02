@@ -18,12 +18,12 @@ function formatDate(dateString) {
   });
 }
 
-function getSeverityClass(severity) {
+function getSeverityBadge(severity) {
   if (!severity) return "";
   const s = severity.toLowerCase();
-  if (s === "mild")     return "pending";
-  if (s === "moderate") return "warning";
-  if (s === "severe")   return "danger";
+  if (s === "mild")     return "nurse-badge--pending";
+  if (s === "moderate") return "nurse-badge--warning";
+  if (s === "severe")   return "nurse-badge--danger";
   return "";
 }
 
@@ -31,9 +31,9 @@ export default function NurseCHDRView({ selectedChild }) {
 
   if (!selectedChild) {
     return (
-      <div className="chdr-empty">
-        <div className="chdrempty-card">
-          <i className="ri-file-list-3-line" />
+      <div className="nurse-empty">
+        <div className="nurse-empty-card">
+          <i className="ri-nurse-line" />
           <h2>No Patient Selected</h2>
           <p>
             Please search and select a patient to view their
@@ -60,36 +60,37 @@ export default function NurseCHDRView({ selectedChild }) {
   const healthNotes      = (selectedChild.healthNotes    || []).slice(-5);
 
   return (
-    <div className="chdr-page">
+    <div className="nurse-page">
 
       {/* ── Header ── */}
-      <div className="chdr-header">
-        <div className="child-info">
-          <div className="avatar">{selectedChild.name[0]}</div>
+      <div className="nurse-header">
+        <div className="nurse-patient-info">
+          <div className="nurse-avatar">{selectedChild.name[0]}</div>
           <div>
             <h2>{selectedChild.name}</h2>
-            <p>Child Health Development Record (CHDR)</p>
+            <p>Child Health Development Record — Nurse View</p>
           </div>
         </div>
+        <div className="nurse-role-badge">CHDR · NURSE</div>
       </div>
 
       {/* ── Stat cards ── */}
-      <div className="chdr-stats">
-        <div className="stat-card">
+      <div className="nurse-stats">
+        <div className="nurse-stat">
           <span>Date of Birth</span>
           <strong>{formatDate(dob)}</strong>
           <small>{dob ? calculateAge(dob) : "N/A"}</small>
         </div>
-        <div className="chdrstat-card">
+        <div className="nurse-stat">
           <span>Gender</span>
           <strong>{selectedChild.gender || "N/A"}</strong>
         </div>
-        <div className="chdrstat-card">
+        <div className="nurse-stat">
           <span>Allergies</span>
           <strong>{allergies.length}</strong>
           <small>recorded</small>
         </div>
-        <div className="chdrstat-card">
+        <div className="nurse-stat">
           <span>Active Conditions</span>
           <strong>{activeConditions.length}</strong>
         </div>
@@ -97,54 +98,59 @@ export default function NurseCHDRView({ selectedChild }) {
 
       {/* ── Allergy alert ── */}
       {allergies.length > 0 && (
-        <div className="alert-box">
+        <div className="nurse-alert">
           <h4>⚠ Known Allergies</h4>
-          <div className="tags">
+          <div className="nurse-tags">
             {allergies.map((a, i) => (
-              <span key={i} className="tag danger">{a}</span>
+              <span key={i} className="nurse-tag">{a}</span>
             ))}
           </div>
         </div>
       )}
 
       {/* ── Main grid ── */}
-      <div className="chdr-grid">
+      <div className="nurse-grid">
 
         {/* ── Growth ── */}
-        <div className="chdrcard">
-          <h4>Latest Growth Measurements</h4>
+        <div className="nurse-card">
+          <h4 className="nurse-card-title">
+            <i className="ri-ruler-line" /> Growth Measurements
+          </h4>
+          <div className="nurse-divider" />
           {latestGrowth ? (
             <>
-              <small>Recorded on {formatDate(latestGrowth.date || latestGrowth.record_date)}</small>
-              <div className="CHDRgrowth">
-                <div>
+              <p className="nurse-recorded">
+                Recorded: {formatDate(latestGrowth.date || latestGrowth.record_date)}
+              </p>
+              <div className="nurse-growth-boxes">
+                <div className="nurse-metric">
                   <strong>{latestGrowth.weight ?? "N/A"}</strong>
-                  <span>kg (Weight)</span>
+                  <span>kg · Weight</span>
                 </div>
-                <div>
+                <div className="nurse-metric">
                   <strong>{latestGrowth.height ?? "N/A"}</strong>
-                  <span>cm (Height)</span>
+                  <span>cm · Height</span>
                 </div>
-                <div>
+                <div className="nurse-metric">
                   <strong>{latestGrowth.head ?? "N/A"}</strong>
-                  <span>cm (Head)</span>
+                  <span>cm · Head</span>
                 </div>
               </div>
             </>
           ) : (
-            <p className="empty-text">No growth records available.</p>
+            <p className="nurse-empty-text">No growth records available.</p>
           )}
 
           {growthHistory.length > 0 && (
             <>
-              <h5>Recent Growth History</h5>
-              <ul className="growth-history-list">
+              <p className="nurse-history-label">Previous Entries</p>
+              <ul className="nurse-history-list">
                 {growthHistory.map((g, i) => (
-                  <li key={i} className="growth-history-row">
-                    <span className="growth-history-row__date">
+                  <li key={i} className="nurse-history-row">
+                    <span className="nurse-history-row__date">
                       {formatDate(g.date || g.record_date)}
                     </span>
-                    <span className="growth-history-row__values">
+                    <span className="nurse-history-row__vals">
                       <span><strong>{g.weight ?? "N/A"}</strong> kg</span>
                       <span><strong>{g.height ?? "N/A"}</strong> cm</span>
                       <span><strong>{g.head   ?? "N/A"}</strong> cm</span>
@@ -157,18 +163,22 @@ export default function NurseCHDRView({ selectedChild }) {
         </div>
 
         {/* ── Immunization ── */}
-        <div className="chdrcard">
-          <h4>Immunization Status <small className="panel-sub">(Latest 5)</small></h4>
+        <div className="nurse-card">
+          <h4 className="nurse-card-title">
+            <i className="ri-syringe-line" /> Immunization Status{" "}
+            <span className="nurse-card-sub">(Latest 5)</span>
+          </h4>
+          <div className="nurse-divider" />
           {vaccines.length === 0 ? (
-            <p className="empty-text">No vaccination records found.</p>
+            <p className="nurse-empty-text">No vaccination records found.</p>
           ) : (
             <>
-              <p>Total Immunizations: {vaccines.length}</p>
-              <ul>
+              <p className="nurse-count">Total Immunizations: {vaccines.length}</p>
+              <ul className="nurse-list">
                 {vaccines.map((v, i) => (
                   <li key={i}>
                     <span>{v.vaccine_name}{v.dose_number ? ` (${v.dose_number})` : ""}</span>
-                    <span className="li-right">
+                    <div className="nurse-li-right">
                       <small>
                         {v.administered_date
                           ? formatDate(v.administered_date)
@@ -176,10 +186,10 @@ export default function NurseCHDRView({ selectedChild }) {
                           ? `Due: ${formatDate(v.due_date)}`
                           : "N/A"}
                       </small>
-                      <span className={`status ${v.status === "completed" ? "active" : "pending"}`}>
+                      <span className={`nurse-badge ${v.status === "completed" ? "nurse-badge--completed" : "nurse-badge--pending"}`}>
                         {v.status || "—"}
                       </span>
-                    </span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -188,16 +198,19 @@ export default function NurseCHDRView({ selectedChild }) {
         </div>
 
         {/* ── Active Conditions ── */}
-        <div className="chdrcard">
-          <h4>Active Conditions</h4>
+        <div className="nurse-card">
+          <h4 className="nurse-card-title">
+            <i className="ri-heart-pulse-line" /> Active Conditions
+          </h4>
+          <div className="nurse-divider" />
           {activeConditions.length === 0 ? (
-            <p className="empty-text">No active conditions recorded.</p>
+            <p className="nurse-empty-text">No active conditions recorded.</p>
           ) : (
-            <ul>
+            <ul className="nurse-list">
               {activeConditions.map((condition, i) => (
-                <li key={i} className="condition-item">
+                <li key={i}>
                   <span>{condition}</span>
-                  <span className="status active">active</span>
+                  <span className="nurse-badge nurse-badge--active">active</span>
                 </li>
               ))}
             </ul>
@@ -205,31 +218,35 @@ export default function NurseCHDRView({ selectedChild }) {
         </div>
 
         {/* ── Health Notes ── */}
-        <div className="chdrcard">
-          <h4>Health Notes <small className="panel-sub">(Latest 5)</small></h4>
+        <div className="nurse-card">
+          <h4 className="nurse-card-title">
+            <i className="ri-clipboard-line" /> Health Notes{" "}
+            <span className="nurse-card-sub">(Latest 5)</span>
+          </h4>
+          <div className="nurse-divider" />
           {healthNotes.length === 0 ? (
-            <p className="empty-text">No health notes recorded.</p>
+            <p className="nurse-empty-text">No health notes recorded.</p>
           ) : (
-            <ul className="health-notes-list">
+            <ul className="nurse-list">
               {healthNotes.map((h, i) => (
-                <li key={i} className="health-note-item">
-                  <div className="health-note-item__header">
+                <li key={i} className="nurse-note-item">
+                  <div className="nurse-note-header">
                     <strong>{h.title || h.record_type}</strong>
-                    <div className="health-note-item__meta">
+                    <div className="nurse-note-meta">
                       <small>{formatDate(h.record_date)}</small>
                       {h.severity && (
-                        <span className={`status ${getSeverityClass(h.severity)}`}>
+                        <span className={`nurse-badge ${getSeverityBadge(h.severity)}`}>
                           {h.severity}
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className="health-note-item__type">{h.record_type}</span>
+                  <span className="nurse-note-type">{h.record_type}</span>
                   {h.temperature && (
-                    <div className="health-note-item__detail">🌡 {h.temperature}°C</div>
+                    <div className="nurse-note-detail">🌡 {h.temperature}°C</div>
                   )}
                   {h.description && (
-                    <div className="health-note-item__detail">{h.description}</div>
+                    <div className="nurse-note-detail">{h.description}</div>
                   )}
                 </li>
               ))}
