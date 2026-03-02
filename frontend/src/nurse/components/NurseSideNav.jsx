@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import "./NurseSideNav.css";
+import "./NurseSideNavigation.css";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ export default function Sidebar() {
         <NavLink to="/nurse/chdr">CHDR View</NavLink>
         <NavLink to="/nurse/growth">Growth Data</NavLink>
         <NavLink to="/nurse/immunizations">Immunizations</NavLink>
-        <NavLink to="/nurse/notes">Nurse Notes</NavLink> 
+        
       </div>
       
       <div className="menu-section">
