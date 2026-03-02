@@ -1,11 +1,8 @@
-/* ═══════════════════════════════════════════════
-   NurseCHDRView.css  —  Nurse Care Theme
-   Warm white / rose / soft green palette
-   ═══════════════════════════════════════════════ */
+
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap');
 
-/* ── Tokens ── */
+
 :root {
   --n-bg:           #f0f4f9;
   --n-surface:      #ffffff;
@@ -29,7 +26,7 @@
   --n-shadow-md:    0 4px 24px rgba(59,125,216,0.11);
 }
 
-/* ── Empty state ── */
+
 .nurse-empty {
   display: flex;
   align-items: center;
@@ -72,7 +69,7 @@
   margin: 0;
 }
 
-/* ── Page ── */
+
 .nurse-page {
   background: var(--n-bg);
   min-height: 100vh;
@@ -81,7 +78,7 @@
   color: var(--n-text);
 }
 
-/* ── Header ── */
+
 .nurse-header {
   background: linear-gradient(135deg, #fff 60%, #eef4fd 100%);
   border: 1.5px solid var(--n-border);
@@ -145,7 +142,7 @@
   letter-spacing: 0.05em;
 }
 
-/* ── Stat cards ── */
+
 .nurse-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
@@ -204,7 +201,7 @@
   font-weight: 600;
 }
 
-/* ── Allergy alert ── */
+
 .nurse-alert {
   background: var(--n-danger-dim);
   border: 1.5px solid rgba(220,38,38,0.2);
@@ -241,14 +238,14 @@
   border: 1px solid rgba(220,38,38,0.25);
 }
 
-/* ── Grid ── */
+
 .nurse-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.1rem;
 }
 
-/* ── Card ── */
+
 .nurse-card {
   background: var(--n-card);
   border: 1.5px solid var(--n-border);
@@ -265,7 +262,6 @@
   box-shadow: var(--n-shadow-md);
 }
 
-/* ── Card inner — consistent across all 4 cards ── */
 .nurse-card-title {
   font-family: var(--n-font);
   font-size: 1rem;
@@ -305,7 +301,6 @@
   margin: 0;
 }
 
-/* ── Growth metrics ── */
 .nurse-growth-boxes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -401,7 +396,6 @@
   font-family: var(--n-font);
 }
 
-/* ── Uniform list rows across all cards ── */
 .nurse-list {
   list-style: none;
   margin: 0;
@@ -438,9 +432,7 @@
   color: var(--n-muted);
 }
 
-/* nurse-count defined above with nurse-recorded */
 
-/* ── Badges ── */
 .nurse-badge {
   padding: 0.22rem 0.65rem;
   border-radius: 999px;
@@ -475,7 +467,6 @@
   border: 1px solid rgba(220,38,38,0.25);
 }
 
-/* ── Health note items — same row style as nurse-list li ── */
 .nurse-note-item {
   display: flex;
   flex-direction: column;
@@ -534,7 +525,7 @@
   line-height: 1.5;
 }
 
-/* ── Responsive ── */
+
 @media (max-width: 768px) {
   .nurse-page    { padding: 1rem; }
   .nurse-header  { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
