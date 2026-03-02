@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:            #fdf4f7;
+  --surface:       #ffffff;
+  --surface-alt:   #fce7f3;
+  --border:        #f9a8d4;
+
+  --primary:       #db2777;
+  --primary-light: #fce7f3;
+  --primary-dark:  #9d174d;
+
+  --teal:          #0d9488;
+  --teal-light:    #ccfbf1;
+  --blue:          #2563eb;
+  --blue-light:    #e6f0ff;
+  --purple:        #7c3aed;
+  --purple-light:  #ede9fe;
+
+  --text-primary:  #3b0a20;
+  --text-muted:    #9d6b7f;
+
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  22px;
+
+  --shadow-sm:  0 2px 8px rgba(219,39,119,.08);
+  --shadow-md:  0 8px 28px rgba(219,39,119,.16);
+
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body:    'DM Sans', sans-serif;
+  --t: 0.22s ease;
+}
+
+.nursedashboard {
+  padding: 1.75rem 2rem 2.5rem;
+  background: var(--bg);
+  min-height: 100vh;
+  font-family: var(--font-body);
+  animation: fadeUp 0.35s ease both;
+}
+
+
+.nursestat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 900px) {
+  .nursestat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .nursestat-grid { grid-template-columns: 1fr; }
+  .nursedashboard { padding: 1.25rem 1rem 2rem; }
+}
+
+
+.doctorbottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .doctorbottom-grid { grid-template-columns: 1fr; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
