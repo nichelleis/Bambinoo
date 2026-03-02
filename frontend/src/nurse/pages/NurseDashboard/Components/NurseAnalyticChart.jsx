@@ -23,19 +23,10 @@ const STATIC_DATA = [
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div
-        style={{
-          background: "rgba(15,16,28,0.95)",
-          border: "1px solid rgba(255,255,255,0.1)",
-          borderRadius: "10px",
-          padding: "0.6rem 0.9rem",
-          fontSize: "0.72rem",
-          color: "#f1f5f9",
-        }}
-      >
-        <p style={{ marginBottom: "0.3rem", fontWeight: 600 }}>{label}</p>
+      <div className="nac-tooltip">
+        <p className="nac-tooltip-label">{label}</p>
         {payload.map((p, i) => (
-          <p key={i} style={{ color: p.color }}>
+          <p key={i} style={{ color: p.color }} className="nac-tooltip-value">
             {p.name}: {p.value}
           </p>
         ))}
@@ -52,8 +43,9 @@ const formatRecordDate = (isoString) => {
 
 const buildChartData = (child) => {
   if (!child?.growthHistory?.length) return null;
-  const mapped = child.growthHistory
+  const mapped = [...child.growthHistory]
     .filter((r) => r.weight != null)
+    .sort((a, b) => new Date(a.record_date) - new Date(b.record_date))
     .map((r) => ({
       month: formatRecordDate(r.record_date),
       weight: r.weight,
@@ -61,7 +53,7 @@ const buildChartData = (child) => {
   return mapped.length > 0 ? mapped : null;
 };
 
-const AnalyticChart = () => {
+const NurseAnalyticChart = () => {
   const [chartData, setChartData] = useState(STATIC_DATA);
   const [selectedChild, setSelectedChild] = useState(null);
 
@@ -90,43 +82,27 @@ const AnalyticChart = () => {
   const isChildSelected = !!selectedChild;
 
   return (
-    <div className="chart-container">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <h3>
+    <div className="nac-container">
+      <div className="nac-header">
+        <div className="nac-header-left">
+          <h3 className="nac-title">
             {isChildSelected
               ? `Weight Trend — ${selectedChild.name}`
               : "Child Growth Trends"}
           </h3>
-          <p className="chart-subtitle">
+          <p className="nac-subtitle">
             {isChildSelected
-              ? `Weight (kg) over all recorded visits`
+              ? "Weight (kg) over all recorded visits"
               : "Height (cm) & Weight (kg) — sample data"}
           </p>
         </div>
 
         {isChildSelected ? (
-          <span style={{
-            background: "rgba(59,130,246,0.15)",
-            border: "1px solid rgba(59,130,246,0.35)",
-            borderRadius: "20px",
-            padding: "3px 10px",
-            fontSize: "0.68rem",
-            color: "#93c5fd",
-            whiteSpace: "nowrap",
-          }}>
+          <span className="nac-badge nac-badge--active">
             📊 {selectedChild.name}
           </span>
         ) : (
-          <span style={{
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "20px",
-            padding: "3px 10px",
-            fontSize: "0.68rem",
-            color: "rgba(241,245,249,0.4)",
-            whiteSpace: "nowrap",
-          }}>
+          <span className="nac-badge nac-badge--empty">
             No child selected
           </span>
         )}
@@ -134,15 +110,15 @@ const AnalyticChart = () => {
 
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData} margin={{ top: 4, right: 10, left: -20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(194,96,122,0.1)" />
           <XAxis
             dataKey="month"
-            tick={{ fill: "rgba(241,245,249,0.45)", fontSize: 11 }}
+            tick={{ fill: "#9c7080", fontSize: 11, fontFamily: "Lato, sans-serif" }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: "rgba(241,245,249,0.45)", fontSize: 11 }}
+            tick={{ fill: "#9c7080", fontSize: 11, fontFamily: "Lato, sans-serif" }}
             axisLine={false}
             tickLine={false}
             domain={["auto", "auto"]}
@@ -151,29 +127,27 @@ const AnalyticChart = () => {
           <Legend
             iconType="circle"
             iconSize={7}
-            wrapperStyle={{ fontSize: "0.7rem", color: "rgba(241,245,249,0.55)" }}
+            wrapperStyle={{ fontSize: "0.72rem", color: "#9c7080", fontFamily: "Lato, sans-serif" }}
           />
 
-          {/* Weight line — always shown */}
           <Line
             type="monotone"
             dataKey="weight"
-            stroke="#ec4899"
+            stroke="#c2607a"
             strokeWidth={2.5}
-            dot={{ r: 3, fill: "#ec4899", strokeWidth: 0 }}
-            activeDot={{ r: 5 }}
+            dot={{ r: 3.5, fill: "#c2607a", strokeWidth: 0 }}
+            activeDot={{ r: 5.5, fill: "#a8485f" }}
             name="Weight (kg)"
           />
 
-        
           {!isChildSelected && (
             <Line
               type="monotone"
               dataKey="height"
-              stroke="#3b82f6"
+              stroke="#3b7dd8"
               strokeWidth={2.5}
-              dot={{ r: 3, fill: "#3b82f6", strokeWidth: 0 }}
-              activeDot={{ r: 5 }}
+              dot={{ r: 3.5, fill: "#3b7dd8", strokeWidth: 0 }}
+              activeDot={{ r: 5.5, fill: "#2e5fa8" }}
               name="Height (cm)"
             />
           )}
@@ -183,4 +157,4 @@ const AnalyticChart = () => {
   );
 };
 
-export default AnalyticChart;
+export default NurseAnalyticChart;
