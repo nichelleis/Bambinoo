@@ -1,4 +1,4 @@
-import "./DoctorAi.css";
+import "./NurseAIAnalytics";
 import React, { useState } from "react";
 
 
