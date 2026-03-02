@@ -7,7 +7,6 @@ import NurseSearchChild from "../nurse/pages/NurseSearchChild/NurseSearchChild";
 import NurseCHDRView from "../nurse/pages/NurseCHDRView/NurseCHDRView";
 import NurseGrowth from "../nurse/pages/NurseGrowth/NurseGrowth";
 import NurseImmunizations from "../nurse/pages/NurseImmunizations/NurseImmunizations";
-import NurseNotes from "../nurse/pages/NurseNotes/NurseNotes";
 import NurseMessages from "../nurse/pages/NurseMessages/NurseMessages";
 import NurseAIAnalytics from "../nurse/pages/NurseAIAnalytics/NurseAIAnalytics";
 import NurseDoctorProfile from "../nurse/pages/NurseProfile/NurseProfile";
@@ -49,10 +48,7 @@ export default function NurseLayout() {
             element={<NurseImmunizations selectedChild={selectedChild} />}
           />
 
-          <Route
-            path="notes"
-            element={<NurseNotes selectedChild={selectedChild} />}
-          />
+          
 
           <Route
             path="messaging"
