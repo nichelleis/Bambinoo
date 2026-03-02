@@ -193,6 +193,7 @@
   color: var(--text-muted);
 }
 
+/* ── Alert box ── */
 .alert-box {
   background: var(--danger-light);
   border: 1.5px solid #fca5a5;
@@ -240,6 +241,7 @@
   .chdr-page  { padding: 1rem; }
 }
 
+/* ── Base card ── */
 .chdrcard {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -279,30 +281,47 @@
   margin-bottom: 0.85rem;
 }
 
+/* ── Growth measurements — centered 3-column layout ── */
 .CHDRgrowth {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-top: 0.25rem;
 }
 
 .CHDRgrowth div {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  text-align: center;
+  padding: 1.25rem 0.75rem;
+  border-right: 1px solid var(--border);
+}
+
+.CHDRgrowth div:last-child {
+  border-right: none;
 }
 
 .CHDRgrowth strong {
   font-family: var(--font-display);
-  font-size: 1.9rem;
+  font-size: 2.1rem;
   color: var(--primary-dark);
   line-height: 1;
 }
 
 .CHDRgrowth span {
-  font-size: 0.75rem;
+  font-size: 0.73rem;
   color: var(--text-muted);
+  font-weight: 500;
 }
 
+/* ── Growth history list ── */
 .growth-history-list {
   list-style: none;
   margin-top: 0.5rem;
@@ -312,14 +331,15 @@
 }
 
 .growth-history-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
   padding: 0.6rem 0.9rem;
   font-size: 0.84rem;
   color: var(--text-primary);
   border-bottom: 1px solid var(--border);
   transition: background var(--t);
+  gap: 0.75rem;
 }
 
 .growth-history-row:last-child {
@@ -333,17 +353,28 @@
 .growth-history-row__date {
   font-size: 0.75rem;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .growth-history-row__values {
   display: flex;
-  gap: 1rem;
+  justify-content: flex-end;
+  gap: 1.25rem;
+}
+
+.growth-history-row__values span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  min-width: 55px;
+  text-align: right;
 }
 
 .growth-history-row__values span strong {
   color: var(--primary-dark);
+  font-weight: 600;
 }
 
+/* ── Immunisation / condition list items ── */
 .chdrcard > p {
   font-size: 0.8rem;
   color: var(--text-muted);
@@ -367,10 +398,10 @@
   background: var(--surface-alt);
   border-left: 3px solid var(--primary);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  padding: 0.6rem 0.85rem;
+  padding: 0.65rem 1rem;
   font-size: 0.86rem;
   color: var(--text-primary);
-  gap: 0.5rem;
+  gap: 0.75rem;
   transition: background var(--t);
 }
 
@@ -383,25 +414,29 @@
   color: var(--text-muted);
 }
 
-.chdrcard > p + p,
-.chdrcard p:has(.status) {
+.li-right {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: var(--surface-alt);
-  border-left: 3px solid var(--success);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  padding: 0.65rem 0.9rem;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  transition: background var(--t);
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.condition-item {
+  border-left-color: var(--success) !important;
+}
+
+/* ── Health notes ── */
+.health-notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .health-note-item {
   background: var(--surface-alt);
   border-left: 3px solid var(--primary);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  padding: 0.7rem 0.9rem;
+  padding: 0.75rem 1rem;
   transition: background var(--t);
 }
 
@@ -412,20 +447,22 @@
 .health-note-item__header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.25rem;
 }
 
 .health-note-item__header strong {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--text-primary);
+  line-height: 1.3;
 }
 
 .health-note-item__meta {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .health-note-item__meta small {
@@ -443,9 +480,10 @@
 .health-note-item__detail {
   font-size: 0.8rem;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
+/* ── Status badges ── */
 .status {
   display: inline-block;
   font-size: 0.68rem;
@@ -488,38 +526,11 @@
   color: var(--text-muted);
 }
 
-.li-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.condition-item {
-  border-left-color: var(--success) !important;
-}
-
-.health-notes-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.health-notes-list .health-note-item {
-  display: block !important;
-  background: var(--surface-alt);
-  border-left: 3px solid var(--primary);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  padding: 0.7rem 0.9rem;
-  transition: background var(--t);
-}
-
-.health-notes-list .health-note-item:hover {
-  background: var(--primary-light);
-}
-
 .empty-text {
   color: var(--text-muted);
   font-size: 0.88rem;
+  text-align: center;
+  padding: 1.5rem 0;
 }
 
 @keyframes fadeUp {

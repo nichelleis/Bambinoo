@@ -71,7 +71,6 @@ export default function CHDRView({ selectedChild }) {
             <p>Child Health Development Record (CHDR)</p>
           </div>
         </div>
-        <button className="export-btn">Export CHDR</button>
       </div>
 
       {/* ── Stat cards ── */}

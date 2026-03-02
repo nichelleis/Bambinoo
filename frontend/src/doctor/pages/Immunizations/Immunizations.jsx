@@ -10,8 +10,6 @@ function formatDate(dateStr) {
   });
 }
 
-
-
 function VaccinationCard({ item }) {
   return (
     <div className="history-card">
@@ -24,9 +22,6 @@ function VaccinationCard({ item }) {
         {item.batch_number && (
           <p><span className="label">Batch:</span>{item.batch_number}</p>
         )}
-        {item.due_date && (
-          <p className="next-dose">Next due: {formatDate(item.due_date)}</p>
-        )}
         {item.notes && (
           <p className="notes-text">{item.notes}</p>
         )}
@@ -36,20 +31,18 @@ function VaccinationCard({ item }) {
   );
 }
 
-
 const Immunizations = ({ selectedChild }) => {
-  const [history, setHistory]       = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [saving, setSaving]         = useState(false);
-  const [error, setError]           = useState("");
-  const [success, setSuccess]       = useState("");
+  const [history, setHistory]   = useState([]);
+  const [loading, setLoading]   = useState(false);
+  const [saving, setSaving]     = useState(false);
+  const [error, setError]       = useState("");
+  const [success, setSuccess]   = useState("");
 
   const emptyForm = {
     vaccineName:      "",
     dateAdministered: "",
     doseNumber:       "",
     batchNumber:      "",
-    nextDueDate:      "",
     administeredBy:   "",
     notes:            "",
   };
@@ -124,7 +117,6 @@ const Immunizations = ({ selectedChild }) => {
         administered_date: formData.dateAdministered,
         dose_number:       formData.doseNumber,
         batch_number:      formData.batchNumber,
-        due_date:          formData.nextDueDate,
         administered_by:   formData.administeredBy,
         notes:             formData.notes,
       };
@@ -150,7 +142,6 @@ const Immunizations = ({ selectedChild }) => {
       </div>
 
       <div className="immunization-layout">
-        {/* ── Form ── */}
         <form className="immunization-form" onSubmit={handleSubmit}>
           <h3>Record New Immunization</h3>
 
@@ -187,26 +178,15 @@ const Immunizations = ({ selectedChild }) => {
             </div>
           </div>
 
-          <div className="form-row">
-            <div>
-              <label>Batch Number</label>
-              <input
-                type="text"
-                name="batchNumber"
-                placeholder="Optional"
-                value={formData.batchNumber}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label>Next Due Date</label>
-              <input
-                type="date"
-                name="nextDueDate"
-                value={formData.nextDueDate}
-                onChange={handleChange}
-              />
-            </div>
+          <div>
+            <label>Batch Number</label>
+            <input
+              type="text"
+              name="batchNumber"
+              placeholder="Optional"
+              value={formData.batchNumber}
+              onChange={handleChange}
+            />
           </div>
 
           <div>
@@ -238,7 +218,6 @@ const Immunizations = ({ selectedChild }) => {
           </button>
         </form>
 
-        {/* ── History ── */}
         <div className="immunization-history">
           <h3>Immunization History</h3>
 

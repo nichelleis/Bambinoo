@@ -22,9 +22,11 @@ export default function ClinicalNotes({ selectedChild }) {
 
   const [activeMode, setActiveMode] = useState("note");
   const [records, setRecords] = useState([]);
-  const [noteForm, setNoteForm] = useState({ title: "", doctor_name: "", notes: "" });
-  const [medForm, setMedForm]   = useState({
-    medication_name: "", medication_dosage: "", frequency: "",
+  const [noteForm, setNoteForm] = useState({
+    title: "", doctor_name: "", diagnosis: "", treatment: "", notes: "",
+  });
+  const [medForm, setMedForm] = useState({
+    medication_name: "", medication_dosage: "",
     doctor_name: "", longTerm: false, notes: "",
   });
   const [savingNote, setSavingNote] = useState(false);
@@ -32,7 +34,6 @@ export default function ClinicalNotes({ selectedChild }) {
   const [noteMsg, setNoteMsg] = useState("");
   const [medMsg,  setMedMsg]  = useState("");
 
- 
   useEffect(() => {
     setRecords(selectedChild?.healthRecords || []);
     setNoteMsg("");
@@ -51,7 +52,7 @@ export default function ClinicalNotes({ selectedChild }) {
     );
   }
 
-  const numericId     = parseInt(selectedChild.id.replace("CH", ""));
+  const numericId = parseInt(selectedChild.id.replace("CH", ""));
 
   const doctorNotes   = records
     .filter(r => r.record_type === "Doctor Note")
@@ -79,18 +80,19 @@ export default function ClinicalNotes({ selectedChild }) {
       );
       const result = await res.json();
       if (res.ok) {
-
         const newRecord = {
           record_type: "Doctor Note",
           record_date: new Date().toISOString(),
-          title: noteForm.title,
+          title:       noteForm.title,
           doctor_name: noteForm.doctor_name,
-          notes: noteForm.notes,
-          ...result, 
+          diagnosis:   noteForm.diagnosis,
+          treatment:   noteForm.treatment,
+          notes:       noteForm.notes,
+          ...result,
         };
         setRecords(prev => [newRecord, ...prev]);
         setNoteMsg("✓ Note saved.");
-        setNoteForm({ title: "", doctor_name: "", notes: "" });
+        setNoteForm({ title: "", doctor_name: "", diagnosis: "", treatment: "", notes: "" });
       } else {
         setNoteMsg(`✗ ${result.error || "Failed."}`);
       }
@@ -109,22 +111,20 @@ export default function ClinicalNotes({ selectedChild }) {
       );
       const result = await res.json();
       if (res.ok) {
-       
         const newRecord = {
-          record_type: "Prescription",
-          record_date: new Date().toISOString(),
-          medication_name: medForm.medication_name,
+          record_type:       "Prescription",
+          record_date:       new Date().toISOString(),
+          medication_name:   medForm.medication_name,
           medication_dosage: medForm.medication_dosage,
-          frequency: medForm.frequency,
-          doctor_name: medForm.doctor_name,
+          doctor_name:       medForm.doctor_name,
           notes: medForm.longTerm
             ? `Long-term. ${medForm.notes}`.trim()
             : medForm.notes,
-          ...result, 
+          ...result,
         };
         setRecords(prev => [newRecord, ...prev]);
         setMedMsg("✓ Prescription saved.");
-        setMedForm({ medication_name: "", medication_dosage: "", frequency: "", doctor_name: "", longTerm: false, notes: "" });
+        setMedForm({ medication_name: "", medication_dosage: "", doctor_name: "", longTerm: false, notes: "" });
       } else {
         setMedMsg(`✗ ${result.error || "Failed."}`);
       }
@@ -161,7 +161,6 @@ export default function ClinicalNotes({ selectedChild }) {
 
       <div className="cn-layout">
 
-  
         <div className="cn-forms">
 
           {activeMode === "note" && (
@@ -179,13 +178,23 @@ export default function ClinicalNotes({ selectedChild }) {
                     value={noteForm.doctor_name} onChange={handleNoteChange} />
                 </div>
                 <div className="cn-field">
+                  <label>Diagnosis</label>
+                  <input type="text" name="diagnosis" placeholder="e.g. Viral infection"
+                    value={noteForm.diagnosis} onChange={handleNoteChange} />
+                </div>
+                <div className="cn-field">
+                  <label>Treatment</label>
+                  <input type="text" name="treatment" placeholder="e.g. Rest and fluids"
+                    value={noteForm.treatment} onChange={handleNoteChange} />
+                </div>
+                <div className="cn-field">
                   <label>Note *</label>
                   <textarea name="notes" rows={4}
-                    placeholder="Observations, diagnosis, follow-up instructions..."
+                    placeholder="Observations, follow-up instructions..."
                     value={noteForm.notes} onChange={handleNoteChange} required />
                 </div>
                 {noteMsg && <p className={noteMsg.startsWith("✓") ? "cn-success" : "cn-error"}>{noteMsg}</p>}
-                <button type="submit" className="cn-btn" disabled={savingNote}>
+                <button type="submit" className="cn-btn cn-btn-top" disabled={savingNote}>
                   <i className="ri-save-line"></i> {savingNote ? "Saving..." : "Save Note"}
                 </button>
               </form>
@@ -201,17 +210,10 @@ export default function ClinicalNotes({ selectedChild }) {
                   <input type="text" name="medication_name" placeholder="e.g. Amoxicillin"
                     value={medForm.medication_name} onChange={handleMedChange} required />
                 </div>
-                <div className="cn-row">
-                  <div className="cn-field">
-                    <label>Dosage</label>
-                    <input type="text" name="medication_dosage" placeholder="e.g. 250mg"
-                      value={medForm.medication_dosage} onChange={handleMedChange} />
-                  </div>
-                  <div className="cn-field">
-                    <label>Frequency</label>
-                    <input type="text" name="frequency" placeholder="e.g. Twice daily"
-                      value={medForm.frequency} onChange={handleMedChange} />
-                  </div>
+                <div className="cn-field">
+                  <label>Dosage</label>
+                  <input type="text" name="medication_dosage" placeholder="e.g. 250mg"
+                    value={medForm.medication_dosage} onChange={handleMedChange} />
                 </div>
                 <div className="cn-field">
                   <label>Doctor Name</label>
@@ -233,7 +235,7 @@ export default function ClinicalNotes({ selectedChild }) {
                     value={medForm.notes} onChange={handleMedChange} />
                 </div>
                 {medMsg && <p className={medMsg.startsWith("✓") ? "cn-success" : "cn-error"}>{medMsg}</p>}
-                <button type="submit" className="cn-btn rx-btn" disabled={savingMed}>
+                <button type="submit" className="cn-btn rx-btn cn-btn-top" disabled={savingMed}>
                   <i className="ri-save-line"></i> {savingMed ? "Saving..." : "Save Prescription"}
                 </button>
               </form>
@@ -242,7 +244,6 @@ export default function ClinicalNotes({ selectedChild }) {
 
         </div>
 
-    
         <div className="cn-history">
           <div className="cn-history-header">
             <h3>
