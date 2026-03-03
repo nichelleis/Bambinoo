@@ -32,7 +32,7 @@ const NurseSearchChild = ({ onSelect }) => {
     const filtered = children.filter(
       (child) =>
         child.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        child.id.toLowerCase().includes(searchTerm.toLowerCase())
+        child.id.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     setFilteredChildren(filtered);
   }, [searchTerm, children]);
@@ -64,25 +64,29 @@ const NurseSearchChild = ({ onSelect }) => {
       </div>
 
       <span className="result-count">
-        {filteredChildren.length} child(ren) found
+        {filteredChildren.length} children found
       </span>
 
       {selectedChild && (
         <div className="selected-child">
           <span>CURRENTLY SELECTED</span>
           <strong>{selectedChild.name}</strong>
-          <span className="status">Active</span>
+          <span className="status">
+            <span className="status-dot"></span>
+            Active
+          </span>
           <button
             onClick={handleClear}
             style={{
               marginLeft: "auto",
-              background: "rgba(255,255,255,0.1)",
+              background: "rgb(235, 166, 166)",
               border: "none",
               borderRadius: "6px",
-              color: "#f1f5f9",
+              color: "#c72c2c",
               cursor: "pointer",
-              padding: "2px 10px",
-              fontSize: "0.75rem",
+              padding: "3px 12px",
+              fontSize: "0.8rem",
+              fontWeight: "500",
             }}
           >
             Clear
@@ -112,9 +116,6 @@ const NurseSearchChild = ({ onSelect }) => {
               </p>
               <p>
                 <strong>Email:</strong> {child.phone}
-              </p>
-              <p>
-                <strong>Blood Type:</strong> {child.blood}
               </p>
 
               <div className="allergy-tags">
