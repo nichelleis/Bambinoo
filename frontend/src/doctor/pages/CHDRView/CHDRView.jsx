@@ -14,21 +14,22 @@ function calculateAge(dobString) {
 function formatDate(dateString) {
   if (!dateString) return "N/A";
   return new Date(dateString).toLocaleDateString("en-GB", {
-    day: "numeric", month: "short", year: "numeric",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 }
 
 function getSeverityClass(severity) {
   if (!severity) return "";
   const s = severity.toLowerCase();
-  if (s === "mild")     return "pending";
+  if (s === "mild") return "pending";
   if (s === "moderate") return "warning";
-  if (s === "severe")   return "danger";
+  if (s === "severe") return "danger";
   return "";
 }
 
 export default function CHDRView({ selectedChild }) {
-
   if (!selectedChild) {
     return (
       <div className="chdr-empty">
@@ -47,21 +48,20 @@ export default function CHDRView({ selectedChild }) {
 
   const dob = selectedChild.date_of_birth;
 
-  const allGrowth = [...(selectedChild.growthHistory || selectedChild.growth_records || [])].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
-  );
+  const allGrowth = [
+    ...(selectedChild.growthHistory || selectedChild.growth_records || []),
+  ].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  const latestGrowth  = allGrowth[0] || null;
+  const latestGrowth = allGrowth[0] || null;
   const growthHistory = allGrowth.slice(1, 6);
 
-  const allergies        = selectedChild.allergies        || [];
+  const allergies = selectedChild.allergies || [];
   const activeConditions = selectedChild.activeConditions || [];
-  const vaccines         = (selectedChild.vaccinations || []).slice(-5);
-  const healthNotes      = (selectedChild.healthNotes    || []).slice(-5);
+  const vaccines = (selectedChild.vaccinations || []).slice(-5);
+  const healthNotes = (selectedChild.healthNotes || []).slice(-5);
 
   return (
     <div className="chdr-page">
-
       {/* ── Header ── */}
       <div className="chdr-header">
         <div className="child-info">
@@ -101,7 +101,9 @@ export default function CHDRView({ selectedChild }) {
           <h4>⚠ Known Allergies</h4>
           <div className="tags">
             {allergies.map((a, i) => (
-              <span key={i} className="tag danger">{a}</span>
+              <span key={i} className="tag danger">
+                {a}
+              </span>
             ))}
           </div>
         </div>
@@ -109,13 +111,15 @@ export default function CHDRView({ selectedChild }) {
 
       {/* ── Main grid ── */}
       <div className="chdr-grid">
-
         {/* ── Growth ── */}
         <div className="chdrcard">
           <h4>Latest Growth Measurements</h4>
           {latestGrowth ? (
             <>
-              <small>Recorded on {formatDate(latestGrowth.date || latestGrowth.record_date)}</small>
+              <small>
+                Recorded on{" "}
+                {formatDate(latestGrowth.date || latestGrowth.record_date)}
+              </small>
               <div className="CHDRgrowth">
                 <div>
                   <strong>{latestGrowth.weight ?? "N/A"}</strong>
@@ -145,9 +149,15 @@ export default function CHDRView({ selectedChild }) {
                       {formatDate(g.date || g.record_date)}
                     </span>
                     <span className="growth-history-row__values">
-                      <span><strong>{g.weight ?? "N/A"}</strong> kg</span>
-                      <span><strong>{g.height ?? "N/A"}</strong> cm</span>
-                      <span><strong>{g.head   ?? "N/A"}</strong> cm</span>
+                      <span>
+                        <strong>{g.weight ?? "N/A"}</strong> kg
+                      </span>
+                      <span>
+                        <strong>{g.height ?? "N/A"}</strong> cm
+                      </span>
+                      <span>
+                        <strong>{g.head ?? "N/A"}</strong> cm
+                      </span>
                     </span>
                   </li>
                 ))}
@@ -158,7 +168,9 @@ export default function CHDRView({ selectedChild }) {
 
         {/* ── Immunization ── */}
         <div className="chdrcard">
-          <h4>Immunization Status <small className="panel-sub">(Latest 5)</small></h4>
+          <h4>
+            Immunization Status <small className="panel-sub">(Latest 5)</small>
+          </h4>
           {vaccines.length === 0 ? (
             <p className="empty-text">No vaccination records found.</p>
           ) : (
@@ -167,16 +179,21 @@ export default function CHDRView({ selectedChild }) {
               <ul>
                 {vaccines.map((v, i) => (
                   <li key={i}>
-                    <span>{v.vaccine_name}{v.dose_number ? ` (${v.dose_number})` : ""}</span>
+                    <span>
+                      {v.vaccine_name}
+                      {v.dose_number ? ` (${v.dose_number})` : ""}
+                    </span>
                     <span className="li-right">
                       <small>
                         {v.administered_date
                           ? formatDate(v.administered_date)
                           : v.due_date
-                          ? `Due: ${formatDate(v.due_date)}`
-                          : "N/A"}
+                            ? `Due: ${formatDate(v.due_date)}`
+                            : "N/A"}
                       </small>
-                      <span className={`status ${v.status === "completed" ? "active" : "pending"}`}>
+                      <span
+                        className={`status ${v.status === "completed" ? "active" : "pending"}`}
+                      >
                         {v.status || "—"}
                       </span>
                     </span>
@@ -206,7 +223,9 @@ export default function CHDRView({ selectedChild }) {
 
         {/* ── Health Notes ── */}
         <div className="chdrcard">
-          <h4>Health Notes <small className="panel-sub">(Latest 5)</small></h4>
+          <h4>
+            Health Notes <small className="panel-sub">(Latest 5)</small>
+          </h4>
           {healthNotes.length === 0 ? (
             <p className="empty-text">No health notes recorded.</p>
           ) : (
@@ -218,25 +237,84 @@ export default function CHDRView({ selectedChild }) {
                     <div className="health-note-item__meta">
                       <small>{formatDate(h.record_date)}</small>
                       {h.severity && (
-                        <span className={`status ${getSeverityClass(h.severity)}`}>
+                        <span
+                          className={`status ${getSeverityClass(h.severity)}`}
+                        >
                           {h.severity}
                         </span>
                       )}
                     </div>
                   </div>
-                  <span className="health-note-item__type">{h.record_type}</span>
+                  <span className="health-note-item__type">
+                    {h.record_type}
+                  </span>
                   {h.temperature && (
-                    <div className="health-note-item__detail">🌡 {h.temperature}°C</div>
+                    <div className="health-note-item__detail">
+                      🌡 {h.temperature}°C
+                    </div>
                   )}
                   {h.description && (
-                    <div className="health-note-item__detail">{h.description}</div>
+                    <div className="health-note-item__detail">
+                      {h.description}
+                    </div>
                   )}
                 </li>
               ))}
             </ul>
           )}
         </div>
+      </div>
 
+      {/*full vaccination history table*/}
+      <div className="nurse-card nurse-card--full">
+        <h4 className="nurse-card-title">
+          <i className="ri-syringe-line" /> Complete Vaccination History
+        </h4>
+        <div className="nurse-divider" />
+
+        {(selectedChild.vaccinations || []).length === 0 ? (
+          <p className="nurse-empty-text">No vaccination records available.</p>
+        ) : (
+          <div className="nurse-table-wrapper">
+            <table className="nurse-table">
+              <thead>
+                <tr>
+                  <th>Vaccine</th>
+                  <th>Date Given</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(selectedChild.vaccinations || []).map((v, i) => (
+                  <tr key={i}>
+                    <td>
+                      <strong>
+                        {v.vaccine_name}
+                        {v.dose_number ? ` (${v.dose_number})` : ""}
+                      </strong>
+                    </td>
+                    <td>
+                      {v.administered_date
+                        ? formatDate(v.administered_date)
+                        : "—"}
+                    </td>
+                    <td>
+                      <span
+                        className={`nurse-badge ${
+                          v.status === "completed"
+                            ? "nurse-badge--completed"
+                            : "nurse-badge--pending"
+                        }`}
+                      >
+                        {v.status || "—"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

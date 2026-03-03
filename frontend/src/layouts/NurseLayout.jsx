@@ -48,10 +48,7 @@ export default function NurseLayout() {
             element={<NurseImmunizations selectedChild={selectedChild} />}
           />
 
-          <Route
-            path="messaging"
-            element={<NurseMessages selectedChild={selectedChild} />}
-          />
+          <Route path="messaging" element={<NurseMessages />} />
 
           <Route
             path="ai-analytics"
