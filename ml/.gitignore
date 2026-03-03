@@ -1,0 +1,35 @@
+# Raw dataset
+data/raw/
+
+# Processed data files
+data/processed/*.csv
+data/processed/*.npz
+data/processed/*.pkl
+
+# Trained model files
+data/models/*.keras
+data/models/*.h5
+data/models/*.pkl
+
+# Keep these tracked
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/models/.gitkeep
+
+# Jupyter checkpoints
+notebooks/.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# TensorBoard logs
+logs/
+
+# Virtual environment
+.venv/
+venv/
+growth_env/
