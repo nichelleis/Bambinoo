@@ -12,12 +12,12 @@ import {
 } from "recharts";
 
 const STATIC_DATA = [
-  { month: "Jan", height: 85, weight: 12 },
-  { month: "Feb", height: 87, weight: 12.5 },
-  { month: "Mar", height: 89, weight: 13 },
-  { month: "Apr", height: 91, weight: 13.6 },
-  { month: "May", height: 93, weight: 14 },
-  { month: "Jun", height: 95, weight: 14.5 },
+  { month: "Jan", height: 0, weight: 0 },
+  { month: "Feb", height: 0, weight: 0 },
+  { month: "Mar", height: 0, weight: 0 },
+  { month: "Apr", height: 0, weight: 0 },
+  { month: "May", height: 0, weight: 0 },
+  { month: "Jun", height: 0, weight: 0 },
 ];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -49,6 +49,7 @@ const buildChartData = (child) => {
     .map((r) => ({
       month: formatRecordDate(r.record_date),
       weight: r.weight,
+      height: r.height,
     }));
   return mapped.length > 0 ? mapped : null;
 };
@@ -91,9 +92,7 @@ const NurseAnalyticChart = () => {
               : "Child Growth Trends"}
           </h3>
           <p className="nac-subtitle">
-            {isChildSelected
-              ? "Weight (kg) over all recorded visits"
-              : "Height (cm) & Weight (kg) — sample data"}
+            Height (cm) & Weight (kg) over all recorded visits
           </p>
         </div>
 
@@ -102,23 +101,32 @@ const NurseAnalyticChart = () => {
             📊 {selectedChild.name}
           </span>
         ) : (
-          <span className="nac-badge nac-badge--empty">
-            No child selected
-          </span>
+          <span className="nac-badge nac-badge--empty">No child selected</span>
         )}
       </div>
 
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 4, right: 10, left: -20, bottom: 0 }}>
+        <LineChart
+          data={chartData}
+          margin={{ top: 4, right: 10, left: -20, bottom: 0 }}
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(194,96,122,0.1)" />
           <XAxis
             dataKey="month"
-            tick={{ fill: "#9c7080", fontSize: 11, fontFamily: "Lato, sans-serif" }}
+            tick={{
+              fill: "#9c7080",
+              fontSize: 11,
+              fontFamily: "Lato, sans-serif",
+            }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: "#9c7080", fontSize: 11, fontFamily: "Lato, sans-serif" }}
+            tick={{
+              fill: "#9c7080",
+              fontSize: 11,
+              fontFamily: "Lato, sans-serif",
+            }}
             axisLine={false}
             tickLine={false}
             domain={["auto", "auto"]}
@@ -127,7 +135,11 @@ const NurseAnalyticChart = () => {
           <Legend
             iconType="circle"
             iconSize={7}
-            wrapperStyle={{ fontSize: "0.72rem", color: "#9c7080", fontFamily: "Lato, sans-serif" }}
+            wrapperStyle={{
+              fontSize: "0.72rem",
+              color: "#9c7080",
+              fontFamily: "Lato, sans-serif",
+            }}
           />
 
           <Line
@@ -140,17 +152,15 @@ const NurseAnalyticChart = () => {
             name="Weight (kg)"
           />
 
-          {!isChildSelected && (
-            <Line
-              type="monotone"
-              dataKey="height"
-              stroke="#3b7dd8"
-              strokeWidth={2.5}
-              dot={{ r: 3.5, fill: "#3b7dd8", strokeWidth: 0 }}
-              activeDot={{ r: 5.5, fill: "#2e5fa8" }}
-              name="Height (cm)"
-            />
-          )}
+          <Line
+            type="monotone"
+            dataKey="height"
+            stroke="#3b7dd8"
+            strokeWidth={2.5}
+            dot={{ r: 3.5, fill: "#3b7dd8", strokeWidth: 0 }}
+            activeDot={{ r: 5.5, fill: "#2e5fa8" }}
+            name="Height (cm)"
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

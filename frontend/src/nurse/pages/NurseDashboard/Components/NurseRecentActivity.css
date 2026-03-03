@@ -97,6 +97,7 @@
   gap: 0.65rem;
   overflow-y: auto;
   padding-right: 4px;
+  padding-left: 0px;
 }
 
 .activity-list::-webkit-scrollbar {
