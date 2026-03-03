@@ -1,9 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap");
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 .nursestat-card {
-  background: #ffffff;
   border: 1px solid #f9a8d4;
   border-radius: 16px;
   padding: 1.4rem 1.5rem;
@@ -13,9 +18,12 @@
   flex-direction: column;
   gap: 0.4rem;
   box-shadow: 0 2px 10px rgba(219, 39, 119, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
   overflow: hidden;
-  font-family: 'DM Sans', sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 .nursestat-card::before {
@@ -59,7 +67,7 @@
 }
 
 .nursestat-card p {
-  font-family: 'DM Serif Display', Georgia, serif;
+  font-family: "DM Serif Display", Georgia, serif;
   font-size: 1.3rem;
   color: #831843;
   line-height: 1.1;
@@ -71,7 +79,9 @@
   right: 1.1rem;
   font-size: 1rem;
   color: #f9a8d4;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .nursestat-card:hover .nursestat-card-arrow {
@@ -81,12 +91,13 @@
 
 /* ── Color variants ── */
 .nursestat-card[data-color="pink"] {
-  border-color: #f9a8d4;
+  border-color: #f8c4e0;
   background: #fff0f7;
 }
 
 .nursestat-card[data-color="blue"] {
   border-color: #bfdbfe;
+  background: #bfdbfe53;
 }
 
 .nursestat-card[data-color="blue"] p {
@@ -94,7 +105,7 @@
 }
 
 .nursestat-card[data-color="blue"] .nursestat-card-arrow {
-  color: #bfdbfe;
+  color: #a4c6ef;
 }
 
 .nursestat-card[data-color="blue"]:hover {
@@ -111,7 +122,8 @@
 }
 
 .nursestat-card[data-color="teal"] {
-  border-color: #99f6e4;
+  border-color: #8af3de;
+  background: #99f6e336;
 }
 
 .nursestat-card[data-color="teal"] p {
@@ -119,7 +131,7 @@
 }
 
 .nursestat-card[data-color="teal"] .nursestat-card-arrow {
-  color: #99f6e4;
+  color: #5ac8b2;
 }
 
 .nursestat-card[data-color="teal"]:hover {
@@ -136,7 +148,8 @@
 }
 
 .nursestat-card[data-color="purple"] {
-  border-color: #ddd6fe;
+  border-color: #cbc3f0;
+  background: #ddd6fe98;
 }
 
 .nursestat-card[data-color="purple"] p {
@@ -144,7 +157,7 @@
 }
 
 .nursestat-card[data-color="purple"] .nursestat-card-arrow {
-  color: #ddd6fe;
+  color: #8372d1;
 }
 
 .nursestat-card[data-color="purple"]:hover {

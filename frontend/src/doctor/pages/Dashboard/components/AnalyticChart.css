@@ -4,6 +4,8 @@
   border-radius: var(--radius);
   padding: 1.4rem 1.5rem 1.2rem;
   box-shadow: var(--shadow-sm);
+  border-top: 4px solid var(--nac-blue);
+
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -13,17 +15,19 @@
 }
 
 .chart-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -30px;
   right: -30px;
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(109,40,217,0.06) 0%,
-    rgba(214,51,132,0.04) 50%,
-    transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(109, 40, 217, 0.06) 0%,
+    rgba(214, 51, 132, 0.04) 50%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 

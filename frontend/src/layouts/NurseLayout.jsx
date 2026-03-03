@@ -7,10 +7,10 @@ import NurseSearchChild from "../nurse/pages/NurseSearchChild/NurseSearchChild";
 import NurseCHDRView from "../nurse/pages/NurseCHDRView/NurseCHDRView";
 import NurseGrowth from "../nurse/pages/NurseGrowth/NurseGrowth";
 import NurseImmunizations from "../nurse/pages/NurseImmunizations/NurseImmunizations";
-import NurseMessages from "../nurse/pages/NurseMessages/NurseMessages";
 import NurseAIAnalytics from "../nurse/pages/NurseAIAnalytics/NurseAIAnalytics";
 import NurseDoctorProfile from "../nurse/pages/NurseProfile/NurseProfile";
 import "../nurse/components/NurseLayout.css";
+import NurseMessages from "../nurse/pages/NurseMessages/NurseMessages";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -48,12 +48,7 @@ export default function NurseLayout() {
             element={<NurseImmunizations selectedChild={selectedChild} />}
           />
 
-          
-
-          <Route
-            path="messaging"
-            element={<NurseMessages selectedChild={selectedChild} />}
-          />
+          <Route path="messaging" element={<NurseMessages />} />
 
           <Route
             path="ai-analytics"

@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
-import Plotly from 'plotly.js-dist';
-import styles from '../../assets/styleSheets/Analytics.module.css';
-
+import { useState, useEffect } from "react";
+import Plotly from "plotly.js-dist";
+import styles from "../../assets/styleSheets/Analytics.module.css";
 
 function Analytics() {
   const [childData, setChildData] = useState({
-    measurements: []
+    measurements: [],
   });
   const [vaccineRecords, setVaccineRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,11 +17,11 @@ function Analytics() {
 
         const [childRes, vaccineRes] = await Promise.all([
           fetch("http://127.0.0.1:5000/analize", {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           fetch("http://127.0.0.1:5000/vaccine", {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
         const child = await childRes.json();
@@ -32,7 +31,6 @@ function Analytics() {
         setVaccineRecords(vaccines);
 
         setSelectedChild(child.id);
-
       } catch (err) {
         console.error("Failed to load analytics:", err);
       }
@@ -42,7 +40,6 @@ function Analytics() {
 
     loadData();
   }, []);
-
 
   const calculateBMI = (weight, height) => {
     const heightInMeters = height / 100;
@@ -60,51 +57,219 @@ function Analytics() {
   useEffect(() => {
     if (!childData?.measurements?.length) return;
 
-    const dates = childData.measurements.map(m => m.date);
-    const heights = childData.measurements.map(m => m.height);
-    const weights = childData.measurements.map(m => m.weight);
-    const bmis = childData.measurements.map(m => calculateBMI(m.weight, m.height));
-    const bmiColors = bmis.map(bmi => getBMIRiskLevel(parseFloat(bmi), childData.age).color);
+    const dates = childData.measurements.map((m) => m.date);
+    const heights = childData.measurements.map((m) => m.height);
+    const weights = childData.measurements.map((m) => m.weight);
+    const bmis = childData.measurements.map((m) =>
+      calculateBMI(m.weight, m.height),
+    );
+    const bmiColors = bmis.map(
+      (bmi) => getBMIRiskLevel(parseFloat(bmi), childData.age).color,
+    );
 
-    Plotly.react('heightChart', [
-      { x: dates, y: heights, type: 'scatter', mode: 'lines+markers', name: 'Child Height', line: { color: '#3b82f6', width: 3 }, marker: { size: 10, color: '#3b82f6' } },
-      { x: dates, y: dates.map(() => 115), type: 'scatter', mode: 'lines', name: '95th Percentile', line: { color: '#10b981', dash: 'dash', width: 2 } },
-      { x: dates, y: dates.map(() => 107), type: 'scatter', mode: 'lines', name: '50th Percentile', line: { color: '#f59e0b', dash: 'dot', width: 2 } },
-      { x: dates, y: dates.map(() => 100), type: 'scatter', mode: 'lines', name: '5th Percentile', line: { color: '#dc2626', dash: 'dash', width: 2 } }
-    ], {
-      title: { text: 'Height Growth Over Time', font: { size: 18, color: '#1e293b' } },
-      xaxis: { title: { text: 'Measurement Date', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      yaxis: { title: { text: 'Height (cm)', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff'
-    }, { responsive: true });
+    Plotly.react(
+      "heightChart",
+      [
+        {
+          x: dates,
+          y: heights,
+          type: "scatter",
+          mode: "lines+markers",
+          name: "Child Height",
+          line: { color: "#3b82f6", width: 3 },
+          marker: { size: 10, color: "#3b82f6" },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 115),
+          type: "scatter",
+          mode: "lines",
+          name: "95th Percentile",
+          line: { color: "#10b981", dash: "dash", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 107),
+          type: "scatter",
+          mode: "lines",
+          name: "50th Percentile",
+          line: { color: "#f59e0b", dash: "dot", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 100),
+          type: "scatter",
+          mode: "lines",
+          name: "5th Percentile",
+          line: { color: "#dc2626", dash: "dash", width: 2 },
+        },
+      ],
+      {
+        title: {
+          text: "Height Growth Over Time",
+          font: { size: 18, color: "#1e293b" },
+        },
+        xaxis: {
+          title: {
+            text: "Measurement Date",
+            font: { size: 13, color: "#475569" },
+          },
+          tickfont: { size: 11 },
+        },
+        yaxis: {
+          title: { text: "Height (cm)", font: { size: 13, color: "#475569" } },
+          tickfont: { size: 11 },
+        },
+        hovermode: "closest",
+        showlegend: true,
+        plot_bgcolor: "#f9fafb",
+        paper_bgcolor: "#ffffff",
+      },
+      { responsive: true },
+    );
 
-    Plotly.react('weightChart', [
-      { x: dates, y: weights, type: 'scatter', mode: 'lines+markers', name: 'Child Weight', line: { color: '#8b5cf6', width: 3 }, marker: { size: 10, color: '#8b5cf6' } },
-      { x: dates, y: dates.map(() => 20), type: 'scatter', mode: 'lines', name: '95th Percentile', line: { color: '#10b981', dash: 'dash', width: 2 } },
-      { x: dates, y: dates.map(() => 17), type: 'scatter', mode: 'lines', name: '50th Percentile', line: { color: '#f59e0b', dash: 'dot', width: 2 } },
-      { x: dates, y: dates.map(() => 14), type: 'scatter', mode: 'lines', name: '5th Percentile', line: { color: '#dc2626', dash: 'dash', width: 2 } }
-    ], {
-      title: { text: 'Weight Growth Over Time', font: { size: 18, color: '#1e293b' } },
-      xaxis: { title: { text: 'Measurement Date', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      yaxis: { title: { text: 'Weight (kg)', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff'
-    }, { responsive: true });
+    Plotly.react(
+      "weightChart",
+      [
+        {
+          x: dates,
+          y: weights,
+          type: "scatter",
+          mode: "lines+markers",
+          name: "Child Weight",
+          line: { color: "#8b5cf6", width: 3 },
+          marker: { size: 10, color: "#8b5cf6" },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 20),
+          type: "scatter",
+          mode: "lines",
+          name: "95th Percentile",
+          line: { color: "#10b981", dash: "dash", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 17),
+          type: "scatter",
+          mode: "lines",
+          name: "50th Percentile",
+          line: { color: "#f59e0b", dash: "dot", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 14),
+          type: "scatter",
+          mode: "lines",
+          name: "5th Percentile",
+          line: { color: "#dc2626", dash: "dash", width: 2 },
+        },
+      ],
+      {
+        title: {
+          text: "Weight Growth Over Time",
+          font: { size: 18, color: "#1e293b" },
+        },
+        xaxis: {
+          title: {
+            text: "Measurement Date",
+            font: { size: 13, color: "#475569" },
+          },
+          tickfont: { size: 11 },
+        },
+        yaxis: {
+          title: { text: "Weight (kg)", font: { size: 13, color: "#475569" } },
+          tickfont: { size: 11 },
+        },
+        hovermode: "closest",
+        showlegend: true,
+        plot_bgcolor: "#f9fafb",
+        paper_bgcolor: "#ffffff",
+      },
+      { responsive: true },
+    );
 
-    Plotly.react('bmiChart', [
-      { x: dates, y: bmis, type: 'scatter', mode: 'lines+markers', name: 'BMI', line: { color: '#ec4899', width: 3 }, marker: { size: 12, color: bmiColors, line: { color: '#fff', width: 2 } } },
-      { x: dates, y: dates.map(() => 18), type: 'scatter', mode: 'lines', name: 'Obese (>18)', line: { color: '#dc2626', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(220,38,38,0.1)' },
-      { x: dates, y: dates.map(() => 17), type: 'scatter', mode: 'lines', name: 'Overweight (17-18)', line: { color: '#f59e0b', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(245,158,11,0.1)' },
-      { x: dates, y: dates.map(() => 15), type: 'scatter', mode: 'lines', name: 'Normal (15-17)', line: { color: '#10b981', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(16,185,129,0.1)' },
-      { x: dates, y: dates.map(() => 14), type: 'scatter', mode: 'lines', name: 'Underweight (<15)', line: { color: '#f59e0b', dash: 'dash', width: 2 }, fill: 'tonexty', fillcolor: 'rgba(245,158,11,0.1)' }
-    ], {
-      title: { text: 'BMI Trend with Risk Zones', font: { size: 18, color: '#1e293b' } },
-      xaxis: { title: { text: 'Measurement Date', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      yaxis: { title: { text: 'BMI (kg/m²)', font: { size: 13, color: '#475569' } }, tickfont: { size: 11 } },
-      hovermode: 'closest', showlegend: true, plot_bgcolor: '#f9fafb', paper_bgcolor: '#ffffff'
-    }, { responsive: true });
-
+    Plotly.react(
+      "bmiChart",
+      [
+        {
+          x: dates,
+          y: bmis,
+          type: "scatter",
+          mode: "lines+markers",
+          name: "BMI",
+          line: { color: "#ec4899", width: 3 },
+          marker: {
+            size: 12,
+            color: bmiColors,
+            line: { color: "#fff", width: 2 },
+          },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 18),
+          type: "scatter",
+          mode: "lines",
+          name: "Obese (>18)",
+          line: { color: "#dc2626", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(220,38,38,0.1)",
+        },
+        {
+          x: dates,
+          y: dates.map(() => 17),
+          type: "scatter",
+          mode: "lines",
+          name: "Overweight (17-18)",
+          line: { color: "#f59e0b", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(245,158,11,0.1)",
+        },
+        {
+          x: dates,
+          y: dates.map(() => 15),
+          type: "scatter",
+          mode: "lines",
+          name: "Normal (15-17)",
+          line: { color: "#10b981", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(16,185,129,0.1)",
+        },
+        {
+          x: dates,
+          y: dates.map(() => 14),
+          type: "scatter",
+          mode: "lines",
+          name: "Underweight (<15)",
+          line: { color: "#f59e0b", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(245,158,11,0.1)",
+        },
+      ],
+      {
+        title: {
+          text: "BMI Trend with Risk Zones",
+          font: { size: 18, color: "#1e293b" },
+        },
+        xaxis: {
+          title: {
+            text: "Measurement Date",
+            font: { size: 13, color: "#475569" },
+          },
+          tickfont: { size: 11 },
+        },
+        yaxis: {
+          title: { text: "BMI (kg/m²)", font: { size: 13, color: "#475569" } },
+          tickfont: { size: 11 },
+        },
+        hovermode: "closest",
+        showlegend: true,
+        plot_bgcolor: "#f9fafb",
+        paper_bgcolor: "#ffffff",
+      },
+      { responsive: true },
+    );
   }, [childData]);
-
 
   if (loading) {
     return (
@@ -115,18 +280,33 @@ function Analytics() {
     );
   }
 
-  const latestMeasurement = childData?.measurements?.length ? childData.measurements[childData.measurements.length - 1] : null;
-  const latestBMI = latestMeasurement ? calculateBMI(latestMeasurement.weight, latestMeasurement.height) : 0;
-  const riskLevel = latestMeasurement ? getBMIRiskLevel(parseFloat(latestBMI), childData.age) : null;
+  const latestMeasurement = childData?.measurements?.length
+    ? childData.measurements[childData.measurements.length - 1]
+    : null;
+  const latestBMI = latestMeasurement
+    ? calculateBMI(latestMeasurement.weight, latestMeasurement.height)
+    : 0;
+  const riskLevel = latestMeasurement
+    ? getBMIRiskLevel(parseFloat(latestBMI), childData.age)
+    : null;
 
   return (
     <div className={styles.analyticsContainer}>
       <div className="container-fluid">
         <div className={styles.headerCard}>
           <div className={styles.animatedBackground}>
-            <div className={styles.floatingCircle} style={{ top: '10%', left: '15%' }}></div>
-            <div className={styles.floatingCircle} style={{ top: '60%', right: '10%' }}></div>
-            <div className={styles.floatingCircle} style={{ bottom: '15%', left: '40%' }}></div>
+            <div
+              className={styles.floatingCircle}
+              style={{ top: "10%", left: "15%" }}
+            ></div>
+            <div
+              className={styles.floatingCircle}
+              style={{ top: "60%", right: "10%" }}
+            ></div>
+            <div
+              className={styles.floatingCircle}
+              style={{ bottom: "15%", left: "40%" }}
+            ></div>
           </div>
           <div className={styles.headerContent}>
             <div className="row align-items-center">
@@ -135,7 +315,9 @@ function Analytics() {
                   <span className={styles.headerIcon}>✨</span>
                 </div>
                 <h1 className={styles.mainTitle}>Analytics Dashboard</h1>
-                <p className={styles.subtitle}>Track your little one's growth</p>
+                <p className={styles.subtitle}>
+                  Track your little one's growth
+                </p>
                 <div className={styles.childDetails}>
                   <span className={styles.detailBadge}>
                     <i className="bi bi-person-fill me-2"></i>
@@ -167,7 +349,9 @@ function Analytics() {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <p className={styles.statLabel}>Current Height</p>
-                    <p className={styles.statValue}>{latestMeasurement?.height}</p>
+                    <p className={styles.statValue}>
+                      {latestMeasurement?.height}
+                    </p>
                     <p className={styles.statUnit}>cm</p>
                   </div>
                   <div className={styles.iconContainer}>
@@ -184,7 +368,9 @@ function Analytics() {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <p className={styles.statLabel}>Current Weight</p>
-                    <p className={styles.statValue}>{latestMeasurement?.weight}</p>
+                    <p className={styles.statValue}>
+                      {latestMeasurement?.weight}
+                    </p>
                     <p className={styles.statUnit}>kg</p>
                   </div>
                   <div className={styles.iconContainer}>
@@ -216,7 +402,10 @@ function Analytics() {
             <div className={`card ${styles.statCard} ${styles.statusCard}`}>
               <div className="card-body">
                 <p className={styles.statLabel}>Health Status</p>
-                <p className={styles.riskLevel} style={{ color: riskLevel?.color }}>
+                <p
+                  className={styles.riskLevel}
+                  style={{ color: riskLevel?.color }}
+                >
                   {riskLevel?.level}
                 </p>
                 <div className={styles.progressBar}>
@@ -224,7 +413,7 @@ function Analytics() {
                     className={styles.progressFill}
                     style={{
                       backgroundColor: riskLevel?.color,
-                      width: riskLevel?.level === "Normal" ? "80%" : "40%"
+                      width: riskLevel?.level === "Normal" ? "80%" : "40%",
                     }}
                   ></div>
                 </div>
@@ -257,7 +446,7 @@ function Analytics() {
 
         <div className={`card ${styles.vaccineCard}`}>
           <div className="card-body">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="mb-5 text-center">
               <h2 className={styles.sectionTitle}>Vaccination Records</h2>
             </div>
 
@@ -277,14 +466,23 @@ function Analytics() {
                       <td className={styles.vaccineName}>{record.vaccine}</td>
                       <td>{record.date}</td>
                       <td>
-                        <span className={`badge ${record.status === 'Completed'
-                          ? styles.badgeCompleted
-                          : styles.badgePending
-                          }`}>
+                        <span
+                          className={`badge ${
+                            record.status === "Completed"
+                              ? styles.badgeCompleted
+                              : styles.badgePending
+                          }`}
+                        >
                           {record.status}
                         </span>
                       </td>
-                      <td className={record.nextDue === '-' ? styles.noDueDate : styles.dueDate}>
+                      <td
+                        className={
+                          record.nextDue === "-"
+                            ? styles.noDueDate
+                            : styles.dueDate
+                        }
+                      >
                         {record.nextDue}
                       </td>
                     </tr>
