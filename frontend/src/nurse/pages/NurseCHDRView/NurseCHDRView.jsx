@@ -76,6 +76,7 @@ export default function NurseCHDRView({ selectedChild }) {
     const dates = sorted.map((g) => formatDate(g.date || g.record_date));
 
     const heights = sorted.map((g) => g.height);
+    const weights = sorted.map((g) => g.weight);
 
     Plotly.react(
       "nurseHeightChart",
@@ -130,6 +131,67 @@ export default function NurseCHDRView({ selectedChild }) {
           title: { text: "Height (cm)", font: { size: 13, color: "#475569" } },
           tickfont: { size: 11 },
         },
+        plot_bgcolor: "#f9fafb",
+        paper_bgcolor: "#ffffff",
+      },
+      { responsive: true },
+    );
+
+    Plotly.react(
+      "nurseWeightChart",
+      [
+        {
+          x: dates,
+          y: weights,
+          type: "scatter",
+          mode: "lines+markers",
+          name: "Weight",
+          line: { color: "#8b5cf6", width: 3 },
+          marker: { size: 10, color: "#8b5cf6" },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 20),
+          type: "scatter",
+          mode: "lines",
+          name: "95th Percentile",
+          line: { color: "#10b981", dash: "dash", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 17),
+          type: "scatter",
+          mode: "lines",
+          name: "50th Percentile",
+          line: { color: "#f59e0b", dash: "dot", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 14),
+          type: "scatter",
+          mode: "lines",
+          name: "5th Percentile",
+          line: { color: "#dc2626", dash: "dash", width: 2 },
+        },
+      ],
+      {
+        title: {
+          text: "Weight Growth Over Time",
+          font: { size: 18, color: "#1e293b" },
+        },
+        xaxis: {
+          title: {
+            text: "Measurement Date",
+            font: { size: 13, color: "#475569" },
+          },
+          tickfont: { size: 11 },
+        },
+        yaxis: {
+          title: { text: "Weight (kg)", font: { size: 13, color: "#475569" } },
+          tickfont: { size: 11 },
+        },
+        hovermode: "closest",
+        showlegend: true,
         plot_bgcolor: "#f9fafb",
         paper_bgcolor: "#ffffff",
       },
@@ -353,9 +415,14 @@ export default function NurseCHDRView({ selectedChild }) {
         </div>
       </div>
 
-      {/*Weight Chart*/}
+      {/*hight Chart*/}
       <div className="nurse-card nurse-card--full">
         <div id="nurseHeightChart" className="nurse-chart"></div>
+      </div>
+
+      {/*Weight Chart*/}
+      <div className="nurse-card nurse-card--full">
+        <div id="nurseWeightChart" className="nurse-chart"></div>
       </div>
 
       {/*full vaccination history table*/}
