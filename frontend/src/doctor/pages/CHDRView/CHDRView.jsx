@@ -1,4 +1,6 @@
 import "./DoctorCHDRView.css";
+import { useEffect } from "react";
+import Plotly from "plotly.js-dist";
 
 function calculateAge(dobString) {
   const dob = new Date(dobString);
@@ -59,6 +61,81 @@ export default function CHDRView({ selectedChild }) {
   const activeConditions = selectedChild.activeConditions || [];
   const vaccines = (selectedChild.vaccinations || []).slice(-5);
   const healthNotes = (selectedChild.healthNotes || []).slice(-5);
+
+  useEffect(() => {
+    const growthData =
+      selectedChild?.growthHistory || selectedChild?.growth_records || [];
+
+    if (!growthData.length) return;
+
+    const sorted = [...growthData].sort(
+      (a, b) =>
+        new Date(a.date || a.record_date) - new Date(b.date || b.record_date),
+    );
+
+    const dates = sorted.map((g) => formatDate(g.date || g.record_date));
+
+    const heights = sorted.map((g) => g.height);
+
+    Plotly.react(
+      "doctorHeightChart",
+      [
+        {
+          x: dates,
+          y: heights,
+          type: "scatter",
+          mode: "lines+markers",
+          name: "Height",
+          line: { color: "#3b82f6", width: 3 },
+          marker: { size: 8 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 115),
+          type: "scatter",
+          mode: "lines",
+          name: "95th Percentile",
+          line: { color: "#10b981", dash: "dash", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 107),
+          type: "scatter",
+          mode: "lines",
+          name: "50th Percentile",
+          line: { color: "#f59e0b", dash: "dot", width: 2 },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 100),
+          type: "scatter",
+          mode: "lines",
+          name: "5th Percentile",
+          line: { color: "#dc2626", dash: "dash", width: 2 },
+        },
+      ],
+      {
+        title: {
+          text: "Height Growth Over Time",
+          font: { size: 18, color: "#1e293b" },
+        },
+        xaxis: {
+          title: {
+            text: "Measurement Date",
+            font: { size: 13, color: "#475569" },
+          },
+          tickfont: { size: 11 },
+        },
+        yaxis: {
+          title: { text: "Height (cm)", font: { size: 13, color: "#475569" } },
+          tickfont: { size: 11 },
+        },
+        plot_bgcolor: "#f9fafb",
+        paper_bgcolor: "#ffffff",
+      },
+      { responsive: true },
+    );
+  }, [selectedChild]);
 
   return (
     <div className="chdr-page">
@@ -263,6 +340,11 @@ export default function CHDRView({ selectedChild }) {
             </ul>
           )}
         </div>
+      </div>
+
+      {/*Weight Chart*/}
+      <div className="nurse-card nurse-card--full">
+        <div id="doctorHeightChart" className="nurse-chart"></div>
       </div>
 
       {/*full vaccination history table*/}
