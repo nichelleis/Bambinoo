@@ -62,6 +62,20 @@ export default function CHDRView({ selectedChild }) {
   const vaccines = (selectedChild.vaccinations || []).slice(-5);
   const healthNotes = (selectedChild.healthNotes || []).slice(-5);
 
+  const calculateBMI = (weight, height) => {
+    if (!weight || !height) return null;
+    const heightInMeters = height / 100;
+    return (weight / (heightInMeters * heightInMeters)).toFixed(2);
+  };
+
+  const getBMIRiskLevel = (bmi) => {
+    if (bmi < 14) return { level: "Severe Underweight", color: "#dc2626" };
+    if (bmi < 15) return { level: "Underweight", color: "#f59e0b" };
+    if (bmi < 17) return { level: "Normal", color: "#10b981" };
+    if (bmi < 18) return { level: "Overweight", color: "#f59e0b" };
+    return { level: "Obese", color: "#dc2626" };
+  };
+
   useEffect(() => {
     const growthData =
       selectedChild?.growthHistory || selectedChild?.growth_records || [];
@@ -77,6 +91,12 @@ export default function CHDRView({ selectedChild }) {
 
     const heights = sorted.map((g) => g.height);
     const weights = sorted.map((g) => g.weight);
+
+    const bmis = sorted.map((g) => calculateBMI(g.weight, g.height));
+
+    const bmiColors = bmis.map((bmi) =>
+      bmi ? getBMIRiskLevel(parseFloat(bmi)).color : "#94a3b8",
+    );
 
     Plotly.react(
       "doctorHeightChart",
@@ -187,6 +207,91 @@ export default function CHDRView({ selectedChild }) {
         },
         yaxis: {
           title: { text: "Weight (kg)", font: { size: 13, color: "#475569" } },
+          tickfont: { size: 11 },
+        },
+        hovermode: "closest",
+        showlegend: true,
+        plot_bgcolor: "#f9fafb",
+        paper_bgcolor: "#ffffff",
+      },
+      { responsive: true },
+    );
+
+    Plotly.react(
+      "BMIChart",
+      [
+        {
+          x: dates,
+          y: bmis,
+          type: "scatter",
+          mode: "lines+markers",
+          name: "BMI",
+          line: { color: "#ec4899", width: 3 },
+          marker: {
+            size: 12,
+            color: bmiColors,
+            line: { color: "#fff", width: 2 },
+          },
+        },
+        {
+          x: dates,
+          y: dates.map(() => 18),
+          type: "scatter",
+          mode: "lines",
+          name: "Obese (>18)",
+          line: { color: "#dc2626", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(220,38,38,0.1)",
+        },
+        {
+          x: dates,
+          y: dates.map(() => 17),
+          type: "scatter",
+          mode: "lines",
+          name: "Overweight (17-18)",
+          line: { color: "#f59e0b", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(245,158,11,0.1)",
+        },
+        {
+          x: dates,
+          y: dates.map(() => 15),
+          type: "scatter",
+          mode: "lines",
+          name: "Normal (15-17)",
+          line: { color: "#10b981", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(16,185,129,0.1)",
+        },
+        {
+          x: dates,
+          y: dates.map(() => 14),
+          type: "scatter",
+          mode: "lines",
+          name: "Underweight (<15)",
+          line: { color: "#f59e0b", dash: "dash", width: 2 },
+          fill: "tonexty",
+          fillcolor: "rgba(245,158,11,0.1)",
+        },
+      ],
+      {
+        title: {
+          text: "<b>BMI Trend with Risk Zones<b>",
+          font: {
+            size: 18,
+            color: "#1e293b",
+            family: "Nunito, sans-serif",
+          },
+        },
+        xaxis: {
+          title: {
+            text: "Measurement Date",
+            font: { size: 13, color: "#475569" },
+          },
+          tickfont: { size: 11 },
+        },
+        yaxis: {
+          title: { text: "BMI (kg/m²)", font: { size: 13, color: "#475569" } },
           tickfont: { size: 11 },
         },
         hovermode: "closest",
@@ -411,6 +516,11 @@ export default function CHDRView({ selectedChild }) {
       {/*Weight Chart*/}
       <div className="nurse-card nurse-card--full">
         <div id="doctorWeightChart" className="nurse-chart"></div>
+      </div>
+
+      {/*BMI Chart*/}
+      <div className="nurse-card nurse-card--full">
+        <div id="BMIChart" className="nurse-chart"></div>
       </div>
 
       {/*full vaccination history table*/}
