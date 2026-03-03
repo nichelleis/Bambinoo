@@ -48,7 +48,7 @@ const RecentActivity = () => {
     <div className="activity-card">
       <div className="activity-header">
         <h4>Recent Activity</h4>
-        <span className="activity-count">{activities.length} records</span>
+        <span className="nurse-activity-count">{activities.length} records</span>
       </div>
 
       {loading && (

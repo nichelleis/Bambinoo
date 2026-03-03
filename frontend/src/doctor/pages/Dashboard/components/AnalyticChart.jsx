@@ -103,7 +103,7 @@ const AnalyticChart = () => {
         <div>
           <h3>
             {isChildSelected
-              ? `Weight Trend — ${selectedChild.name}`
+              ? `Growth Trend — ${selectedChild.name}`
               : "Child Growth Trends"}
           </h3>
           <p className="nac-subtitle">
@@ -114,13 +114,14 @@ const AnalyticChart = () => {
         {isChildSelected ? (
           <span
             style={{
-              background: "rgba(59,130,246,0.15)",
+              background: "rgba(33, 103, 217, 0.15)",
               border: "1px solid rgba(59,130,246,0.35)",
               borderRadius: "20px",
               padding: "3px 10px",
-              fontSize: "0.68rem",
-              color: "#93c5fd",
+              fontSize: "0.7rem",
+              color: "#1f5491",
               whiteSpace: "nowrap",
+              fontWeight: "600",
             }}
           >
             📊 {selectedChild.name}
@@ -128,13 +129,14 @@ const AnalyticChart = () => {
         ) : (
           <span
             style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(59, 131, 246, 0.09)",
+              border: "1px solid rgba(59,130,246,0.35)",
               borderRadius: "20px",
               padding: "3px 10px",
-              fontSize: "0.68rem",
-              color: "rgba(241,245,249,0.4)",
+              fontSize: "0.7rem",
               whiteSpace: "nowrap",
+              color: "#2161aa",
+              fontWeight: "600",
             }}
           >
             No child selected

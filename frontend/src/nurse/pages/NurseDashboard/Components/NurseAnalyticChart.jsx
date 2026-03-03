@@ -88,7 +88,7 @@ const NurseAnalyticChart = () => {
         <div className="nac-header-left">
           <h3 className="nac-title">
             {isChildSelected
-              ? `Weight Trend — ${selectedChild.name}`
+              ? `Growth Trend — ${selectedChild.name}`
               : "Child Growth Trends"}
           </h3>
           <p className="nac-subtitle">
