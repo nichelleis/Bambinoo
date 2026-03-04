@@ -2266,6 +2266,77 @@ def delete_user(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": str(e)}), 500
+    
+    
+@app.route('/api/admin/dashboard-stats', methods=['GET'])
+@jwt_required()
+def get_dashboard_stats():
+    try:
+        user_id = get_jwt_identity()
+        current_user = db.session.get(User, int(user_id))
+        
+        if not current_user or current_user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        total_users = User.query.count()
+        total_doctors = User.query.filter(User.role.ilike('%doctor%')).count()
+        users_with_phones = User.query.filter(User.phone.isnot(None), User.phone != '').count()
+        
+        try:
+            total_children = Child.query.count()
+        except Exception:
+            total_children = 0 
+
+        all_users = User.query.all()
+        role_counts = {}
+        action_required = []
+        
+        for u in all_users:
+            role = u.role or 'Unknown'
+            role_counts[role] = role_counts.get(role, 0) + 1
+            
+            missing_fields = []
+            if not u.phone or str(u.phone).strip() == '':
+                missing_fields.append('Phone Number')
+            
+            is_doctor = u.role and 'doctor' in u.role.lower()
+            if is_doctor and (not u.MOH_ID or str(u.MOH_ID).strip() == ''):
+                missing_fields.append('MOH ID')
+            
+            if missing_fields:
+                action_required.append({
+                    "id": u.id,
+                    "username": u.username,
+                    "role": u.role or "N/A",
+                    "missing": ", ".join(missing_fields)
+                })
+                
+        chart_data = [{"name": k.upper(), "value": v} for k, v in role_counts.items()]
+
+        recent_users_query = User.query.order_by(User.id.desc()).limit(5).all()
+        recent_users = [
+            {
+                "id": u.id, 
+                "username": u.username, 
+                "role": u.role or "N/A", 
+                "email": u.email
+            } for u in recent_users_query
+        ]
+
+        return jsonify({
+            "totalUsers": total_users,
+            "activeDoctors": total_doctors,
+            "totalChildren": total_children,
+            "usersWithPhones": users_with_phones,
+            "chartData": chart_data,
+            "recentUsers": recent_users,
+            "actionRequired": action_required[:5]
+        }), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+    
+
 
 # SocketIO and Main Block 
 
