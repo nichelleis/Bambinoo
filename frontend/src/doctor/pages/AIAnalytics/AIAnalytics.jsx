@@ -1,5 +1,6 @@
 import "./DoctorAi.css";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Plotly from "plotly.js-dist";
 import GrowthPredictionChart from "../../../components/GrowthPredictionChart";
 
 
@@ -7,207 +8,86 @@ export default function AIAnalytics({ selectedChild }) {
   const [activeTab, setActiveTab] = useState("insights");
 
 
-  const clinicalData = {
-    aiConfidence: 87,
-    lastAnalyzed: "15 minutes ago",
-    dataPoints: 247,
-    
-    criticalAlerts: [
-      {
-        id: 1,
-        severity: "high",
-        title: "Potential Asthma Exacerbation Risk",
-        probability: 78,
-        timeframe: "Next 48-72 hours",
-        reasoning: [
-          "Recent increase in rescue inhaler usage (3x in past week)",
-          "Weather forecast shows high pollen count",
-          "Patient history shows seasonal pattern",
-          "Sleep disturbance reported by parent"
-        ],
-        recommendation: "Consider adjusting controller medication dosage. Schedule telehealth check-in within 24 hours.",
-        evidenceBased: "Based on 15,000+ similar pediatric cases"
-      },
-      {
-        id: 2,
-        severity: "medium",
-        title: "Growth Trajectory Deviation",
-        probability: 65,
-        timeframe: "Current assessment",
-        reasoning: [
-          "Weight gain slower than expected (5th percentile drop)",
-          "No corresponding height velocity change",
-          "Appetite decrease noted in parent logs",
-          "No acute illness reported"
-        ],
-        recommendation: "Review nutritional intake. Consider dietary consultation if pattern continues for 2 more weeks.",
-        evidenceBased: "WHO growth chart analysis + ML pattern recognition"
-      }
-    ],
+  const [clinicalData, setClinicalData] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
 
-    diagnosticSupport: [
-      {
-        symptomCluster: "Skin Inflammation Pattern",
-        likelyDiagnoses: [
-          { condition: "Atopic Dermatitis (Eczema)", probability: 89, confidence: "High" },
-          { condition: "Contact Dermatitis", probability: 45, confidence: "Medium" },
-          { condition: "Psoriasis (Pediatric)", probability: 12, confidence: "Low" }
-        ],
-        differentialFactors: [
-          "Distribution pattern: flexural areas (elbows, knees) - consistent with atopic dermatitis",
-          "Family history of allergies present",
-          "Age of onset: 2 years - typical for eczema",
-          "Response to emollients: positive"
-        ],
-        suggestedTests: [
-          "IgE levels (if not recently tested)",
-          "Patch testing if contact dermatitis suspected"
-        ]
-      }
-    ],
+  useEffect(() => {
+    if (!selectedChild) return;
+    const aiTabs = ["insights", "diagnostics", "patterns", "compliance"];
+    if (!aiTabs.includes(activeTab)) return;
+    if (clinicalData && clinicalData._childId === selectedChild.id) return;
 
-    medicationAnalysis: {
-      currentMedications: [
-        {
-          name: "Cetirizine 5ml",
-          adherence: 85,
-          effectiveness: "Good",
-          sideEffects: "None reported",
-          aiInsight: "Optimal dosing. Adherence pattern shows weekend gaps - consider parent reminder system.",
-          durationAnalysis: "Long-term use (8 months) - Review need for continuation vs seasonal use"
+    const fetchInsights = async () => {
+      setAiLoading(true);
+      setAiError(null);
+      try {
+        const numericId = parseInt(String(selectedChild.id).replace("CH", ""));
+        const token = localStorage.getItem("token");
+        const res = await fetch(`http://127.0.0.1:5000/doctor/ai-insights/${numericId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setAiError({
+            type:   data.error_type  || "unknown",
+            title:  data.error_title || "AI Analysis Failed",
+            detail: data.error_detail || data.error || "An unexpected error occurred.",
+            fix:    data.error_fix   || "Check the backend console for more details.",
+          });
+          return;
         }
-      ],
-      interactions: [],
-      alternatives: [
-        {
-          suggestion: "Consider switching to leukotriene inhibitor if control inadequate",
-          reasoning: "Better long-term outcomes in 62% of similar cases",
-          costBenefit: "Higher cost but improved compliance due to once-daily dosing"
-        }
-      ]
-    },
-
-    patternRecognition: [
-      {
-        pattern: "Symptom Spike Correlation",
-        finding: "Eczema flare-ups correlate 83% with dairy consumption",
-        visualData: "Peaks observed 24-48 hours post consumption",
-        clinicalAction: "Consider elimination diet trial or food allergy testing",
-        confidence: 83
-      },
-      {
-        pattern: "Seasonal Trend",
-        finding: "Respiratory symptoms increase 340% during spring months",
-        visualData: "March-May historical data shows consistent pattern",
-        clinicalAction: "Prophylactic antihistamine starting February may reduce severity",
-        confidence: 91
-      },
-      {
-        pattern: "Nocturnal Symptom Pattern",
-        finding: "Sleep disruption correlates with symptom severity",
-        visualData: "Sleep quality score drops from 8/10 to 4/10 during flare-ups",
-        clinicalAction: "Address nighttime symptom management - consider evening medication timing",
-        confidence: 76
+        setClinicalData({
+          _childId: selectedChild.id,
+          aiConfidence: data.aiConfidence,
+          lastAnalyzed: data.lastAnalyzed,
+          dataPoints: data.dataPoints,
+          criticalAlerts:    data.insights?.criticalAlerts    ?? [],
+          redFlags:          data.insights?.redFlags          ?? [],
+          aiRecommendations: data.insights?.aiRecommendations ?? [],
+          diagnosticSupport: data.diagnostics?.diagnosticSupport ?? [],
+          medicationAnalysis: data.diagnostics?.medicationAnalysis ?? { currentMedications: [], interactions: [], alternatives: [] },
+          patternRecognition: data.patterns?.patternRecognition ?? [],
+          populationComparison: data.patterns?.populationComparison ?? { similarCases: 0, outcomeData: [], successfulProtocols: [] },
+          complianceInsights: {
+            overallAdherence: data.compliance?.overallAdherence ?? 0,
+            missedDoses:      data.compliance?.missedDoses ?? 0,
+            patterns:         data.compliance?.patterns ?? [],
+            parentEngagement: data.compliance?.parentEngagement ?? {}
+          },
+          literatureInsights: data.literatureInsights ?? [],
+        });
+      } catch (err) {
+        setAiError({
+          type:   "network_error",
+          title:  "Cannot Reach Backend",
+          detail: "The request to the backend server failed. The server may be offline.",
+          fix:    "Make sure the Flask backend is running on port 5000 and try again.",
+        });
+      } finally {
+        setAiLoading(false);
       }
-    ],
+    };
 
-    complianceInsights: {
-      overallAdherence: 78,
-      missedDoses: 22,
-      patterns: [
-        { issue: "Weekend Gaps", frequency: "40% of missed doses occur Sat-Sun", suggestion: "Weekend reminder protocol" },
-        { issue: "Evening Doses", frequency: "35% of missed doses are PM medications", suggestion: "Bedtime routine integration" }
-      ],
-      parentEngagement: {
-        appUsage: "Daily",
-        logCompleteness: 85,
-        responseTime: "Usually within 4 hours",
-        concernLevel: "Appropriate - proactive but not anxious"
-      }
-    },
+    fetchInsights();
+  }, [selectedChild, activeTab]);
 
-    populationComparison: {
-      similarCases: 1247,
-      outcomeData: [
-        {
-          metric: "Symptom Control",
-          thisPatient: 72,
-          cohortAverage: 68,
-          status: "Above average"
-        },
-        {
-          metric: "Treatment Response",
-          thisPatient: 81,
-          cohortAverage: 75,
-          status: "Above average"
-        },
-        {
-          metric: "Quality of Life Score",
-          thisPatient: 7.8,
-          cohortAverage: 7.2,
-          status: "Above average"
-        }
-      ],
-      successfulProtocols: [
-        "Step-down therapy achieved in 67% of similar cases after 6 months",
-        "Combining skin barrier therapy with antihistamines shows 23% better outcomes"
-      ]
-    },
+  useEffect(() => {
+    setClinicalData(null);
+    setAiError(null);
+  }, [selectedChild?.id]);
 
-    aiRecommendations: [
-      {
-        type: "Clinical Action",
-        priority: "High",
-        title: "Schedule In-Person Examination",
-        rationale: "AI flags require clinical confirmation. Respiratory rate pattern needs assessment.",
-        timing: "Within 5-7 days",
-        automated: false
-      },
-      {
-        type: "Preventive",
-        priority: "Medium",
-        title: "Update Asthma Action Plan",
-        rationale: "Current plan is 8 months old. Recent pattern changes warrant revision.",
-        timing: "Next scheduled visit",
-        automated: true
-      },
-      {
-        type: "Educational",
-        priority: "Medium",
-        title: "Parent Education: Trigger Management",
-        rationale: "AI identifies knowledge gaps in environmental control measures",
-        timing: "Send resources via portal",
-        automated: true
-      },
-      {
-        type: "Referral",
-        priority: "Low",
-        title: "Allergist Consultation (Optional)",
-        rationale: "Complex multi-system involvement may benefit from specialist input",
-        timing: "Consider if no improvement in 8 weeks",
-        automated: false
-      }
-    ],
-
-    redFlags: [
-      {
-        flag: "Increasing Inhaler Dependency",
-        status: "Monitor",
-        details: "Rescue inhaler use increased from 1x/week to 3x/week",
-        action: "If continues for 2 more weeks, step up controller therapy"
-      }
-    ],
-
-    literatureInsights: [
-      {
-        topic: "Pediatric Eczema Management",
-        finding: "Recent RCT shows wet wrap therapy reduces flare severity by 45%",
-        relevance: "High - applicable to this patient",
-        citation: "J Pediatr Dermatol. 2025;15(2):234-241",
-        action: "Consider recommending to parents"
-      }
-    ]
+  const ERROR_META = {
+    invalid_api_key:  { icon: "ri-key-2-line",        color: "#E55B4D", bg: "#FFF0EF" },
+    quota_exceeded:   { icon: "ri-time-line",          color: "#E07B00", bg: "#FFF8EC" },
+    permission_denied:{ icon: "ri-shield-cross-line",  color: "#7C3AED", bg: "#F5F0FF" },
+    network_error:    { icon: "ri-wifi-off-line",      color: "#2563EB", bg: "#EFF6FF" },
+    unknown:          { icon: "ri-error-warning-line", color: "#6B7280", bg: "#F9FAFB" },
   };
+
+  const AI_TABS = ["insights", "diagnostics", "patterns", "compliance"];
+
+  const _cd = clinicalData;
 
   if (!selectedChild) {
     return (
@@ -239,14 +119,14 @@ export default function AIAnalytics({ selectedChild }) {
         <div className="ai-meta">
           <div className="meta-badge">
             <i className="ri-database-2-line"></i>
-            <span>{clinicalData.dataPoints} data points analyzed</span>
+            <span>{_cd ? _cd.dataPoints : "—"} data points analyzed</span>
           </div>
           <div className="meta-badge">
             <i className="ri-refresh-line"></i>
-            <span>{clinicalData.lastAnalyzed}</span>
+            <span>{_cd ? _cd.lastAnalyzed : "—"}</span>
           </div>
           <div className="confidence-badge">
-            AI Confidence: {clinicalData.aiConfidence}%
+            AI Confidence: {_cd ? `${_cd.aiConfidence}%` : "—"}
           </div>
         </div>
       </div>
@@ -281,7 +161,7 @@ export default function AIAnalytics({ selectedChild }) {
           <i className="ri-checkbox-circle-line"></i>
           Compliance Tracking
         </button>
-        <button
+        <button 
           className={activeTab === "growth-prediction" ? "tab active" : "tab"}
           onClick={() => setActiveTab("growth-prediction")}
         >
@@ -290,7 +170,63 @@ export default function AIAnalytics({ selectedChild }) {
         </button>
       </div>
 
-      {activeTab === "insights" && (
+      {AI_TABS.includes(activeTab) && aiLoading && (
+        <div className="ai-loading-state">
+          <div className="ai-spinner" />
+          <h3>Analysing patient data with AI…</h3>
+          <p>Gemini is reviewing <strong>{selectedChild.name}</strong>'s complete health records.</p>
+          <p className="ai-loading-sub">This may take 10–20 seconds on first load.</p>
+        </div>
+      )}
+
+      {AI_TABS.includes(activeTab) && !aiLoading && aiError && (() => {
+        const meta = ERROR_META[aiError.type] || ERROR_META.unknown;
+        return (
+          <div className="ai-error-state">
+            <div className="ai-error-card" style={{ borderTop: `4px solid ${meta.color}` }}>
+              <div className="ai-error-icon-wrap" style={{ background: meta.bg }}>
+                <i className={meta.icon} style={{ color: meta.color }} />
+              </div>
+              <h3 className="ai-error-title">{aiError.title}</h3>
+              <p className="ai-error-detail">{aiError.detail}</p>
+              <div className="ai-error-fix">
+                <i className="ri-tools-line" />
+                <span><strong>How to fix:</strong> {aiError.fix}</span>
+              </div>
+              {aiError.type === "invalid_api_key" && (
+                <div className="ai-error-steps">
+                  <p className="ai-error-steps-title">Quick steps:</p>
+                  <ol>
+                    <li>Go to <strong>aistudio.google.com</strong> → Get API Key</li>
+                    <li>Open <code>backend/.env</code></li>
+                    <li>Set <code>GEMINI_API_KEY=your_key_here</code></li>
+                    <li>Restart the Flask backend</li>
+                  </ol>
+                </div>
+              )}
+              {aiError.type === "quota_exceeded" && (
+                <div className="ai-error-steps">
+                  <p className="ai-error-steps-title">Quick steps:</p>
+                  <ol>
+                    <li>Wait 1–2 minutes for the rate limit to reset</li>
+                    <li>Or check your quota at <strong>aistudio.google.com</strong></li>
+                    <li>Click Retry when ready</li>
+                  </ol>
+                </div>
+              )}
+              <button
+                className="retry-btn"
+                style={{ background: meta.color }}
+                onClick={() => { setClinicalData(null); setAiError(null); }}
+              >
+                <i className="ri-refresh-line" /> Try Again
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      {activeTab === "insights" && _cd && (
         <>
           <div className="alerts-section">
             <h3 className="section-title">
@@ -298,7 +234,7 @@ export default function AIAnalytics({ selectedChild }) {
               Critical Alerts Requiring Attention
             </h3>
             
-            {clinicalData.criticalAlerts.map((alert) => (
+            {_cd.criticalAlerts.map((alert) => (
               <div key={alert.id} className={`alert-card severity-${alert.severity}`}>
                 <div className="alert-header">
                   <div className="alert-title-row">
@@ -368,7 +304,7 @@ export default function AIAnalytics({ selectedChild }) {
               Red Flags & Monitoring Points
             </h3>
             
-            {clinicalData.redFlags.map((flag, idx) => (
+            {_cd.redFlags.map((flag, idx) => (
               <div key={idx} className="red-flag-item">
                 <div className="flag-icon">⚠️</div>
                 <div className="flag-content">
@@ -390,7 +326,7 @@ export default function AIAnalytics({ selectedChild }) {
               AI-Generated Action Items
             </h3>
             
-            {clinicalData.aiRecommendations.map((rec, idx) => (
+            {_cd.aiRecommendations.map((rec, idx) => (
               <div key={idx} className={`recommendation-card priority-${rec.priority.toLowerCase()}`}>
                 <div className="rec-header">
                   <span className={`rec-type ${rec.type.toLowerCase()}`}>
@@ -423,14 +359,14 @@ export default function AIAnalytics({ selectedChild }) {
       )}
 
   
-      {activeTab === "diagnostics" && (
+      {activeTab === "diagnostics" && _cd && (
         <div className="diagnostics-section">
           <h3 className="section-title">
             <i className="ri-stethoscope-line"></i>
             AI-Assisted Differential Diagnosis
           </h3>
 
-          {clinicalData.diagnosticSupport.map((diag, idx) => (
+          {_cd.diagnosticSupport.map((diag, idx) => (
             <div key={idx} className="diagnostic-card">
               <h4 className="diag-title">{diag.symptomCluster}</h4>
               
@@ -487,7 +423,7 @@ export default function AIAnalytics({ selectedChild }) {
               Medication Effectiveness Analysis
             </h3>
 
-            {clinicalData.medicationAnalysis.currentMedications.map((med, idx) => (
+            {_cd.medicationAnalysis.currentMedications.map((med, idx) => (
               <div key={idx} className="med-analysis-card">
                 <div className="med-header">
                   <h4>{med.name}</h4>
@@ -521,10 +457,10 @@ export default function AIAnalytics({ selectedChild }) {
               </div>
             ))}
 
-            {clinicalData.medicationAnalysis.alternatives.length > 0 && (
+            {_cd.medicationAnalysis.alternatives.length > 0 && (
               <div className="alternatives-section">
                 <strong>Alternative Treatment Considerations:</strong>
-                {clinicalData.medicationAnalysis.alternatives.map((alt, idx) => (
+                {_cd.medicationAnalysis.alternatives.map((alt, idx) => (
                   <div key={idx} className="alternative-card">
                     <p><strong>Suggestion:</strong> {alt.suggestion}</p>
                     <p><strong>AI Reasoning:</strong> {alt.reasoning}</p>
@@ -538,14 +474,14 @@ export default function AIAnalytics({ selectedChild }) {
       )}
 
 
-      {activeTab === "patterns" && (
+      {activeTab === "patterns" && _cd && (
         <div className="patterns-section">
           <h3 className="section-title">
             <i className="ri-line-chart-line"></i>
             AI Pattern Recognition & Correlations
           </h3>
 
-          {clinicalData.patternRecognition.map((pattern, idx) => (
+          {_cd.patternRecognition.map((pattern, idx) => (
             <div key={idx} className="pattern-card">
               <div className="pattern-header">
                 <h4>{pattern.pattern}</h4>
@@ -578,11 +514,11 @@ export default function AIAnalytics({ selectedChild }) {
             <h3 className="section-title">
               <i className="ri-group-line"></i>
               Population-Based Insights
-              <span className="cohort-size">Based on {clinicalData.populationComparison.similarCases} similar cases</span>
+              <span className="cohort-size">Based on {_cd.populationComparison.similarCases} similar cases</span>
             </h3>
 
             <div className="comparison-grid">
-              {clinicalData.populationComparison.outcomeData.map((outcome, idx) => (
+              {_cd.populationComparison.outcomeData.map((outcome, idx) => (
                 <div key={idx} className="comparison-card">
                   <h5>{outcome.metric}</h5>
                   <div className="comparison-bars">
@@ -617,7 +553,7 @@ export default function AIAnalytics({ selectedChild }) {
             <div className="success-protocols">
               <strong>Evidence-Based Insights from Similar Cases:</strong>
               <ul>
-                {clinicalData.populationComparison.successfulProtocols.map((protocol, idx) => (
+                {_cd.populationComparison.successfulProtocols.map((protocol, idx) => (
                   <li key={idx}>
                     <i className="ri-check-line"></i>
                     {protocol}
@@ -630,7 +566,7 @@ export default function AIAnalytics({ selectedChild }) {
       )}
 
     
-      {activeTab === "compliance" && (
+      {activeTab === "compliance" && _cd && (
         <div className="compliance-section">
           <h3 className="section-title">
             <i className="ri-checkbox-circle-line"></i>
@@ -649,13 +585,13 @@ export default function AIAnalytics({ selectedChild }) {
                     fill="none" 
                     stroke="#10b981" 
                     strokeWidth="8"
-                    strokeDasharray={`${clinicalData.complianceInsights.overallAdherence * 2.827} 283`}
+                    strokeDasharray={`${_cd.complianceInsights.overallAdherence * 2.827} 283`}
                     strokeLinecap="round"
                     transform="rotate(-90 50 50)"
                   />
                 </svg>
                 <div className="score-text">
-                  <span className="score-number">{clinicalData.complianceInsights.overallAdherence}%</span>
+                  <span className="score-number">{_cd.complianceInsights.overallAdherence}%</span>
                   <span className="score-label">Overall Adherence</span>
                 </div>
               </div>
@@ -663,18 +599,18 @@ export default function AIAnalytics({ selectedChild }) {
               <div className="compliance-stats">
                 <div className="stat">
                   <i className="ri-check-double-line"></i>
-                  <span>{100 - clinicalData.complianceInsights.missedDoses} doses completed</span>
+                  <span>{100 - _cd.complianceInsights.missedDoses} doses completed</span>
                 </div>
                 <div className="stat missed">
                   <i className="ri-close-circle-line"></i>
-                  <span>{clinicalData.complianceInsights.missedDoses} doses missed</span>
+                  <span>{_cd.complianceInsights.missedDoses} doses missed</span>
                 </div>
               </div>
             </div>
 
             <div className="compliance-patterns">
               <h4>AI-Identified Compliance Patterns</h4>
-              {clinicalData.complianceInsights.patterns.map((pattern, idx) => (
+              {_cd.complianceInsights.patterns.map((pattern, idx) => (
                 <div key={idx} className="compliance-pattern-item">
                   <div className="pattern-issue">
                     <i className="ri-alert-line"></i>
@@ -699,25 +635,26 @@ export default function AIAnalytics({ selectedChild }) {
             <div className="engagement-grid">
               <div className="engagement-item">
                 <span className="eng-label">App Usage</span>
-                <span className="eng-value good">{clinicalData.complianceInsights.parentEngagement.appUsage}</span>
+                <span className="eng-value good">{_cd.complianceInsights.parentEngagement.appUsage}</span>
               </div>
               <div className="engagement-item">
                 <span className="eng-label">Log Completeness</span>
-                <span className="eng-value good">{clinicalData.complianceInsights.parentEngagement.logCompleteness}%</span>
+                <span className="eng-value good">{_cd.complianceInsights.parentEngagement.logCompleteness}%</span>
               </div>
               <div className="engagement-item">
                 <span className="eng-label">Response Time</span>
-                <span className="eng-value good">{clinicalData.complianceInsights.parentEngagement.responseTime}</span>
+                <span className="eng-value good">{_cd.complianceInsights.parentEngagement.responseTime}</span>
               </div>
             </div>
 
             <div className="engagement-assessment">
               <strong>AI Assessment:</strong>
-              <p>{clinicalData.complianceInsights.parentEngagement.concernLevel}</p>
+              <p>{_cd.complianceInsights.parentEngagement.concernLevel}</p>
             </div>
           </div>
         </div>
       )}
+
 
       {activeTab === "growth-prediction" && (
         <div className="growth-pred-section">
@@ -725,14 +662,9 @@ export default function AIAnalytics({ selectedChild }) {
         </div>
       )}
 
+      {_cd && <div className="literature-section">
 
-      <div className="literature-section">
-        <h3 className="section-title">
-          <i className="ri-book-open-line"></i>
-          Relevant Recent Literature
-        </h3>
-
-        {clinicalData.literatureInsights.map((lit, idx) => (
+        {_cd.literatureInsights.map((lit, idx) => (
           <div key={idx} className="literature-card">
             <div className="lit-header">
               <h4>{lit.topic}</h4>
@@ -755,9 +687,8 @@ export default function AIAnalytics({ selectedChild }) {
             </div>
           </div>
         ))}
-      </div>
+      </div>}
 
-    
       <div className="ai-disclaimer">
         <i className="ri-information-line"></i>
         <p>

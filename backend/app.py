@@ -2476,6 +2476,167 @@ def predict_growth():
         return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
 
 
+@app.route('/doctor/ai-insights/<int:child_id>', methods=['GET'])
+@jwt_required()
+def doctor_ai_insights(child_id):
+    
+    import json as _json
+
+    try:
+        child = Child.query.get(child_id)
+        if not child:
+            return jsonify({"error": "Child not found"}), 404
+
+        today = date.today()
+        age_months = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
+        if today.day < child.date_of_birth.day:
+            age_months -= 1
+
+        growth_records = (GrowthRecord.query.filter_by(child_id=child_id)
+                          .order_by(GrowthRecord.record_date.asc()).all())
+        vaccinations   = Vaccination.query.filter_by(child_id=child_id).all()
+        health_notes   = (HealthNote.query.filter_by(child_id=child_id)
+                          .order_by(HealthNote.record_date.desc()).limit(20).all())
+        milestones     = Milestone.query.filter_by(child_id=child_id).all()
+        allergies         = [a.name for a in child.allergies]
+        active_conditions = [c.name for c in child.active_conditions]
+
+        growth_summary = []
+        for r in growth_records[-8:]:
+            rd = r.record_date.date() if hasattr(r.record_date, 'date') else r.record_date
+            rec_age = (rd.year - child.date_of_birth.year) * 12 + (rd.month - child.date_of_birth.month)
+            growth_summary.append(
+                f"Age {rec_age}mo: weight={r.weight}kg, height={r.height}cm"
+                + (f", head={r.head_circumference}cm" if r.head_circumference else "")
+                + (f", notes='{r.notes}'" if r.notes else "")
+            )
+
+        vacc_given   = [v.vaccine_name for v in vaccinations if v.status == 'administered']
+        vacc_pending = [v.vaccine_name for v in vaccinations if v.status != 'administered']
+
+        notes_summary = []
+        for h in health_notes[:10]:
+            entry = f"[{h.record_date.date() if hasattr(h.record_date,'date') else h.record_date}] {h.record_type}"
+            if h.title:           entry += f" — {h.title}"
+            if h.description:     entry += f": {h.description[:200]}"
+            if h.temperature:     entry += f" (temp: {h.temperature}°C)"
+            if h.severity:        entry += f" severity={h.severity}"
+            if h.medication_name: entry += f", medication={h.medication_name} {h.medication_dosage or ''}"
+            notes_summary.append(entry)
+
+        milestone_achieved = [m.category for m in milestones if m.achieved_date]
+        milestone_pending  = [m.category for m in milestones if not m.achieved_date]
+
+        prompt = f"""
+You are an expert pediatric AI clinical decision support system for Sri Lankan doctors.
+Analyse the following REAL patient data and return ONLY a valid JSON object — no markdown, no explanation.
+
+PATIENT DATA:
+- Name: {child.name}
+- Age: {age_months} months
+- Gender: {child.gender}
+- Date of Birth: {child.date_of_birth}
+- Allergies: {', '.join(allergies) if allergies else 'None known'}
+- Active Conditions: {', '.join(active_conditions) if active_conditions else 'None recorded'}
+
+GROWTH HISTORY (chronological):
+{chr(10).join(growth_summary) if growth_summary else 'No growth records available'}
+
+VACCINATION STATUS:
+- Given: {', '.join(vacc_given) if vacc_given else 'None recorded'}
+- Pending/Overdue: {', '.join(vacc_pending) if vacc_pending else 'None'}
+
+HEALTH NOTES & VISITS (most recent first):
+{chr(10).join(notes_summary) if notes_summary else 'No health notes recorded'}
+
+DEVELOPMENTAL MILESTONES:
+- Achieved: {', '.join(set(milestone_achieved)) if milestone_achieved else 'None recorded'}
+- Pending:  {', '.join(set(milestone_pending))  if milestone_pending  else 'None'}
+
+Return EXACTLY this JSON structure (base all fields on the real data above):
+
+{{
+  "aiConfidence": <integer 0-100>,
+  "dataPoints": <integer count of data points analysed>,
+  "lastAnalyzed": "Just now",
+  "insights": {{
+    "criticalAlerts": [{{ "id":1, "severity":"<high|medium|low>", "title":"...", "probability":<int>,
+      "timeframe":"...", "reasoning":["..."], "recommendation":"...", "evidenceBased":"..." }}],
+    "redFlags": [{{ "flag":"...", "status":"<Monitor|Action Required|Resolved>", "details":"...", "action":"..." }}],
+    "aiRecommendations": [{{ "type":"<Clinical Action|Preventive|Educational|Referral>",
+      "priority":"<High|Medium|Low>", "title":"...", "rationale":"...", "timing":"...", "automated":<bool> }}]
+  }},
+  "diagnostics": {{
+    "diagnosticSupport": [{{ "symptomCluster":"...", "likelyDiagnoses":[{{"condition":"...","probability":<int>,"confidence":"..."}}],
+      "differentialFactors":["..."], "suggestedTests":["..."] }}],
+    "medicationAnalysis": {{
+      "currentMedications": [{{"name":"...","adherence":<int>,"effectiveness":"...","sideEffects":"...","aiInsight":"...","durationAnalysis":"..."}}],
+      "interactions":[], "alternatives":[]
+    }}
+  }},
+  "patterns": {{
+    "patternRecognition": [{{"pattern":"...","finding":"...","visualData":"...","clinicalAction":"...","confidence":<int>}}],
+    "populationComparison": {{
+      "similarCases":<int>,
+      "outcomeData":[{{"metric":"...","thisPatient":<number>,"cohortAverage":<number>,"status":"..."}}],
+      "successfulProtocols":["..."]
+    }}
+  }},
+  "compliance": {{
+    "overallAdherence":<int 0-100>,
+    "missedDoses":<int>,
+    "patterns":[{{"issue":"...","frequency":"...","suggestion":"..."}}],
+    "parentEngagement":{{"appUsage":"...","logCompleteness":<int>,"responseTime":"...","concernLevel":"..."}}
+  }},
+  "literatureInsights": [{{"topic":"...","finding":"...","relevance":"...","citation":"...","action":"..."}}]
+}}
+"""
+        model    = genai.GenerativeModel(MODEL_NAME)
+        response = model.generate_content(prompt)
+        raw      = clean_ai_response(response.text).strip()
+
+        try:
+            data = _json.loads(raw)
+        except _json.JSONDecodeError:
+            import re
+            match = re.search(r'\{.*\}', raw, re.DOTALL)
+            if match:
+                data = _json.loads(match.group())
+            else:
+                return jsonify({"error": "AI returned invalid JSON", "raw": raw[:500]}), 500
+
+        return jsonify(data), 200
+
+    except Exception as e:
+        print(f"[DoctorAIInsights] Error: {e}")
+        err = str(e).lower()
+        if "api_key" in err or ("invalid" in err and "key" in err):
+            return jsonify({"error": str(e), "error_type": "invalid_api_key",
+                "error_title": "Gemini API Key Invalid",
+                "error_detail": "The GEMINI_API_KEY in your .env file is missing or incorrect.",
+                "error_fix": "Open backend/.env and set GEMINI_API_KEY=your_key_here, then restart the backend."}), 500
+        elif "quota" in err or "rate" in err or "limit" in err or "429" in err:
+            return jsonify({"error": str(e), "error_type": "quota_exceeded",
+                "error_title": "API Quota Exceeded",
+                "error_detail": "Your Gemini API quota or rate limit has been reached.",
+                "error_fix": "Wait a few minutes and try again, or check your quota at aistudio.google.com."}), 429
+        elif "permission" in err or "403" in err or "forbidden" in err:
+            return jsonify({"error": str(e), "error_type": "permission_denied",
+                "error_title": "API Permission Denied",
+                "error_detail": "Your API key does not have access to the Gemini model.",
+                "error_fix": "Ensure the Gemini API is enabled in your Google Cloud project."}), 403
+        elif "connect" in err or "network" in err or "timeout" in err:
+            return jsonify({"error": str(e), "error_type": "network_error",
+                "error_title": "Network Error",
+                "error_detail": "Could not reach the Gemini API. Check your internet connection.",
+                "error_fix": "Ensure the backend server has internet access and try again."}), 503
+        else:
+            return jsonify({"error": str(e), "error_type": "unknown",
+                "error_title": "AI Analysis Failed",
+                "error_detail": str(e),
+                "error_fix": "Check the backend console for more details."}), 500
+
+
 # SocketIO and Main Block 
 
 @socketio.on("connect")
