@@ -1,5 +1,6 @@
 import "./DoctorAi.css";
 import React, { useState } from "react";
+import GrowthPredictionChart from "../../../components/GrowthPredictionChart";
 
 
 export default function AIAnalytics({ selectedChild }) {
@@ -279,6 +280,13 @@ export default function AIAnalytics({ selectedChild }) {
         >
           <i className="ri-checkbox-circle-line"></i>
           Compliance Tracking
+        </button>
+        <button
+          className={activeTab === "growth-prediction" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("growth-prediction")}
+        >
+          <i className="ri-line-chart-fill"></i>
+          Growth Prediction
         </button>
       </div>
 
@@ -708,6 +716,12 @@ export default function AIAnalytics({ selectedChild }) {
               <p>{clinicalData.complianceInsights.parentEngagement.concernLevel}</p>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === "growth-prediction" && (
+        <div className="growth-pred-section">
+          <GrowthPredictionChart selectedChild={selectedChild} />
         </div>
       )}
 

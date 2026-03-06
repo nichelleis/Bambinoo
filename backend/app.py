@@ -2336,6 +2336,144 @@ def get_dashboard_stats():
     except Exception as e:
         return jsonify({"message": str(e)}), 500
     
+    
+_WHO_STANDARDS = {
+    'boy': {
+        'months':  [0,    3,    6,    9,    12,   15,   18,   21,   24],
+        'height':  [49.9, 61.4, 67.6, 72.0, 75.7, 79.1, 82.3, 85.1, 87.8],
+        'weight':  [3.3,  6.4,  7.9,  8.9,  9.6,  10.2, 10.9, 11.5, 12.2]
+    },
+    'girl': {
+        'months':  [0,    3,    6,    9,    12,   15,   18,   21,   24],
+        'height':  [49.1, 59.8, 65.7, 70.1, 74.0, 77.5, 80.7, 83.7, 86.4],
+        'weight':  [3.2,  5.8,  7.3,  8.2,  8.9,  9.6,  10.2, 10.9, 11.5]
+    }
+}
+
+
+@app.route('/who-standards/<gender>', methods=['GET'])
+@jwt_required()
+def who_standards(gender):
+    """Return WHO 50th percentile height/weight reference data."""
+    key = 'boy' if gender.lower() in ('male', 'm', 'boy') else 'girl'
+    return jsonify(_WHO_STANDARDS[key])
+
+
+@app.route('/predict-growth/<int:child_id>', methods=['GET'])
+@jwt_required()
+def predict_growth_for_child(child_id):
+    """Predict growth for a specific child by ID. Used by Doctor and Nurse."""
+    try:
+        import numpy as np
+        child = Child.query.get(child_id)
+        if not child:
+            return jsonify({"error": "Child not found"}), 404
+
+        records = (GrowthRecord.query.filter_by(child_id=child.id)
+                   .order_by(GrowthRecord.record_date.asc()).all())
+        if not records:
+            return jsonify({"error": "No growth records found. Please add measurements first."}), 400
+
+        dob = child.date_of_birth
+        visits = []
+        for r in records:
+            rd = r.record_date.date() if hasattr(r.record_date, 'date') else r.record_date
+            age_months = (rd.year - dob.year) * 12 + (rd.month - dob.month)
+            if r.height and r.weight:
+                visits.append({"age_months": age_months, "height": r.height, "weight": r.weight})
+
+        if not visits:
+            return jsonify({"error": "No valid height/weight records found."}), 400
+
+        gender = "male" if child.gender.upper() in ('M', 'MALE', 'BOY') else "female"
+        gender_str = 'boy' if gender == 'male' else 'girl'
+        CHECKPOINTS = [0, 3, 6, 9, 12, 15, 18, 21, 24]
+        last_age = visits[-1]['age_months']
+        future = [m for m in CHECKPOINTS if m > last_age]
+        who = _WHO_STANDARDS[gender_str]
+
+        try:
+            import sys
+            if os.path.join(BASE_DIR, '..') not in sys.path:
+                sys.path.insert(0, os.path.join(BASE_DIR, '..'))
+            from ml.src.prediction_engine import GrowthPredictor
+            result = GrowthPredictor().predict(visits=visits, gender=gender)
+        except Exception as ml_err:
+            print(f"[ML] Fallback for child {child_id}: {ml_err}")
+            last_h = visits[-1]['height']
+            last_w = visits[-1]['weight']
+            h_ratio = last_h / np.interp(last_age, who['months'], who['height'])
+            w_ratio = last_w / np.interp(last_age, who['months'], who['weight'])
+            predictions = [{"age_months": m,
+                "height": round(float(np.interp(m, who['months'], who['height']) * h_ratio), 1),
+                "weight": round(float(np.interp(m, who['months'], who['weight']) * w_ratio), 2)}
+                for m in future]
+            result = {"actuals": visits, "predictions": predictions,
+                      "who_median": who, "gender": gender_str, "model_used": "who_fallback"}
+
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"[PredictGrowthChild] Error: {e}")
+        return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
+
+
+@app.route('/predict-growth', methods=['POST'])
+@jwt_required()
+def predict_growth():
+    """Predict growth for the logged-in parent's child."""
+    try:
+        import numpy as np
+        parent_id = get_jwt_identity()
+        child = Child.query.filter_by(parent_id=parent_id).first()
+        if not child:
+            return jsonify({"error": "Child not found"}), 404
+
+        records = (GrowthRecord.query.filter_by(child_id=child.id)
+                   .order_by(GrowthRecord.record_date.asc()).all())
+        if not records:
+            return jsonify({"error": "No growth records found. Please add measurements first."}), 400
+
+        dob = child.date_of_birth
+        visits = []
+        for r in records:
+            rd = r.record_date.date() if hasattr(r.record_date, 'date') else r.record_date
+            age_months = (rd.year - dob.year) * 12 + (rd.month - dob.month)
+            if r.height and r.weight:
+                visits.append({"age_months": age_months, "height": r.height, "weight": r.weight})
+
+        if not visits:
+            return jsonify({"error": "No valid height/weight records found."}), 400
+
+        gender = "male" if child.gender.upper() in ('M', 'MALE', 'BOY') else "female"
+        gender_str = 'boy' if gender == 'male' else 'girl'
+        CHECKPOINTS = [0, 3, 6, 9, 12, 15, 18, 21, 24]
+        last_age = visits[-1]['age_months']
+        future = [m for m in CHECKPOINTS if m > last_age]
+        who = _WHO_STANDARDS[gender_str]
+
+        try:
+            import sys
+            if os.path.join(BASE_DIR, '..') not in sys.path:
+                sys.path.insert(0, os.path.join(BASE_DIR, '..'))
+            from ml.src.prediction_engine import GrowthPredictor
+            result = GrowthPredictor().predict(visits=visits, gender=gender)
+        except Exception as ml_err:
+            print(f"[ML] Model not available ({ml_err}), using WHO fallback.")
+            last_h = visits[-1]['height']
+            last_w = visits[-1]['weight']
+            h_ratio = last_h / np.interp(last_age, who['months'], who['height'])
+            w_ratio = last_w / np.interp(last_age, who['months'], who['weight'])
+            predictions = [{"age_months": m,
+                "height": round(float(np.interp(m, who['months'], who['height']) * h_ratio), 1),
+                "weight": round(float(np.interp(m, who['months'], who['weight']) * w_ratio), 2)}
+                for m in future]
+            result = {"actuals": visits, "predictions": predictions,
+                      "who_median": who, "gender": gender_str, "model_used": "who_fallback"}
+
+        return jsonify(result), 200
+    except Exception as e:
+        print(f"[PredictGrowth] Error: {e}")
+        return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
 
 
 # SocketIO and Main Block 
