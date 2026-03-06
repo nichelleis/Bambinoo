@@ -1,0 +1,7 @@
+,0
+initial_records,486267
+final_records,104608
+records_removed,381659
+unique_children,24174
+avg_measurements_per_child,4.327293786712997
+cleaning_date,2026-03-03 14:33:25.457732

@@ -1,0 +1,53 @@
+================================================================================
+CHILD GROWTH PREDICTION MODEL - EVALUATION REPORT
+================================================================================
+
+Model: CNN_LSTM
+Test Samples: 37,828
+
+OVERALL PERFORMANCE
+--------------------------------------------------------------------------------
+MSE: 25.9644
+RMSE: 5.0955
+MAE: 2.9742
+R² Score: 0.5253
+
+
+HEIGHT METRICS
+--------------------------------------------------------------------------------
+mse: 43.5994
+rmse: 6.6030
+mae: 4.4068
+r2: 0.7316
+mean_error: 0.1144
+std_error: 6.6020
+median_absolute_error: 2.7831
+p90_error: 10.4641
+p95_error: 14.2685
+
+WEIGHT METRICS
+--------------------------------------------------------------------------------
+mse: 8.3298
+rmse: 2.8861
+mae: 1.5417
+r2: 0.3189
+mean_error: -0.0594
+std_error: 2.8855
+median_absolute_error: 1.1696
+p90_error: 3.1334
+p95_error: 3.9556
+
+================================================================================
+INTERPRETATION
+================================================================================
+
+HEIGHT Predictions:
+- Average error: ±4.41 units
+- 90% of predictions within: ±10.46 units
+- 95% of predictions within: ±14.27 units
+
+WEIGHT Predictions:
+- Average error: ±1.54 units
+- 90% of predictions within: ±3.13 units
+- 95% of predictions within: ±3.96 units
+
