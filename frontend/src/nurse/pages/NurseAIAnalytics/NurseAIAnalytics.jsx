@@ -1,5 +1,6 @@
 import "./NurseAIAnalytics";
 import React, { useState } from "react";
+import GrowthPredictionChart from "../../../components/GrowthPredictionChart";
 
 
 export default function AIAnalytics({ selectedChild }) {
@@ -279,6 +280,13 @@ export default function AIAnalytics({ selectedChild }) {
         >
           <i className="ri-checkbox-circle-line"></i>
           Compliance Tracking
+        </button>
+        <button
+          className={activeTab === "growth" ? "tab active" : "tab"}
+          onClick={() => setActiveTab("growth")}
+        >
+          <i className="ri-line-chart-line"></i>
+          Growth Prediction
         </button>
       </div>
 
@@ -708,6 +716,16 @@ export default function AIAnalytics({ selectedChild }) {
               <p>{clinicalData.complianceInsights.parentEngagement.concernLevel}</p>
             </div>
           </div>
+        </div>
+      )}
+
+      {activeTab === "growth" && (
+        <div className="gpc-tab-section">
+          <h3 className="section-title">
+            <i className="ri-line-chart-line"></i>
+            ML Growth Prediction
+          </h3>
+          <GrowthPredictionChart selectedChild={selectedChild} />
         </div>
       )}
 
