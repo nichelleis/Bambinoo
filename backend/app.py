@@ -1757,6 +1757,50 @@ def add_growth_record(child_id):
         db.session.rollback()
         print(f'[AddGrowth] Error: {e}')
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/health-alerts', methods=['GET'])
+@jwt_required()
+def get_health_alerts():
+    parent_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=parent_id).first()
+    if not child:
+        return jsonify([]), 200
+
+    alerts = (HealthAlert.query
+              .filter_by(child_id=child.id)
+              .order_by(HealthAlert.created_at.desc())
+              .all())
+    return jsonify([{
+        'id': a.id, 'alert_type': a.alert_type, 'severity': a.severity,
+        'title': a.title, 'message': a.message, 'value': a.value,
+        'threshold': a.threshold, 'age_months': a.age_months,
+        'is_read': a.is_read, 'created_at': a.created_at.isoformat()
+    } for a in alerts]), 200
+
+
+@app.route('/health-alerts/<int:alert_id>/read', methods=['POST'])
+@jwt_required()
+def mark_alert_read(alert_id):
+    parent_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=parent_id).first()
+    alert = HealthAlert.query.get(alert_id)
+    if not alert or (child and alert.child_id != child.id):
+        return jsonify({'error': 'Not found'}), 404
+    alert.is_read = True
+    db.session.commit()
+    return jsonify({'success': True}), 200
+
+
+@app.route('/health-alerts/read-all', methods=['POST'])
+@jwt_required()
+def mark_all_alerts_read():
+    parent_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=parent_id).first()
+    if child:
+        HealthAlert.query.filter_by(child_id=child.id, is_read=False).update({'is_read': True})
+        db.session.commit()
+    return jsonify({'success': True}), 200
     
 
 @app.route("/children/<int:child_id>/vaccinations", methods=["POST"])
