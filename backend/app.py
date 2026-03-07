@@ -1475,7 +1475,121 @@ class DoctorAvailability(db.Model):
 _DAYS_ORDER = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
 
 
+_WHO_W_SD = {
+    'boy': {
+        'months': list(range(25)),
+        'sd2neg': [2.5,3.4,4.3,5.0,5.6,6.0,6.4,6.7,7.0,7.2,7.5,7.7,7.8,8.0,8.2,8.4,8.6,8.7,8.9,9.1,9.2,9.4,9.5,9.7,9.8],
+        'sd3neg': [2.1,2.9,3.8,4.4,4.9,5.3,5.7,5.9,6.2,6.4,6.6,6.8,6.9,7.1,7.2,7.4,7.5,7.7,7.8,8.0,8.1,8.2,8.4,8.5,8.6],
+        'sd2pos': [4.4,5.8,7.1,8.0,8.7,9.3,9.8,10.3,10.7,11.0,11.4,11.7,12.0,12.3,12.6,12.8,13.1,13.4,13.7,13.9,14.2,14.5,14.7,15.0,15.3],
+    },
+    'girl': {
+        'months': list(range(25)),
+        'sd2neg': [2.4,3.2,4.0,4.5,5.0,5.4,5.7,6.0,6.3,6.5,6.7,6.9,7.1,7.2,7.4,7.6,7.8,8.0,8.2,8.4,8.6,8.8,9.0,9.2,9.4],
+        'sd3neg': [2.0,2.7,3.4,3.9,4.3,4.7,5.0,5.3,5.5,5.7,5.9,6.0,6.2,6.4,6.5,6.7,6.9,7.0,7.2,7.4,7.5,7.7,7.9,8.0,8.2],
+        'sd2pos': [4.2,5.5,6.6,7.5,8.2,8.8,9.3,9.8,10.2,10.5,10.9,11.2,11.5,11.8,12.1,12.4,12.6,12.9,13.2,13.5,13.8,14.1,14.4,14.7,15.0],
+    }
+}
 
+_WHO_H_SD = {
+    'boy': {
+        'months': list(range(25)),
+        'sd2neg': [46.1,50.8,54.4,57.3,59.7,61.7,63.3,64.8,66.2,67.5,68.7,69.9,71.0,72.1,73.1,74.1,75.0,75.9,76.9,77.7,78.6,79.4,80.2,81.0,81.7],
+        'sd3neg': [44.2,48.9,52.4,55.3,57.6,59.6,61.2,62.7,64.0,65.2,66.4,67.6,68.6,69.6,70.6,71.6,72.5,73.3,74.2,75.0,75.8,76.5,77.2,77.9,78.7],
+    },
+    'girl': {
+        'months': list(range(25)),
+        'sd2neg': [45.4,49.8,53.0,55.6,57.8,59.6,61.2,62.7,64.0,65.2,66.4,67.5,68.6,69.6,70.6,71.5,72.4,73.3,74.2,75.0,75.9,76.7,77.5,78.3,79.1],
+        'sd3neg': [43.6,47.8,51.0,53.5,55.6,57.4,58.9,60.3,61.5,62.7,63.8,64.9,65.8,66.8,67.7,68.6,69.4,70.2,71.0,71.8,72.6,73.3,74.0,74.8,75.4],
+    }
+}
+
+
+class HealthAlert(db.Model):
+    __tablename__ = 'health_alert'
+    id         = db.Column(db.Integer, primary_key=True)
+    child_id   = db.Column(db.Integer, db.ForeignKey('child.id'), nullable=False)
+    alert_type = db.Column(db.String(50),  nullable=False)
+    severity   = db.Column(db.String(20),  nullable=False)
+    title      = db.Column(db.String(200), nullable=False)
+    message    = db.Column(db.Text,        nullable=False)
+    value      = db.Column(db.Float)  
+    threshold  = db.Column(db.Float)   
+    age_months = db.Column(db.Integer)
+    is_read    = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+def _interp(x, xs, ys):
+    if x <= xs[0]:  return ys[0]
+    if x >= xs[-1]: return ys[-1]
+    for i in range(len(xs) - 1):
+        if xs[i] <= x <= xs[i+1]:
+            t = (x - xs[i]) / (xs[i+1] - xs[i])
+            return ys[i] + t * (ys[i+1] - ys[i])
+    return ys[-1]
+
+
+def _check_growth_alerts(child, record_date, weight, height, age_months):
+
+    alerts = []
+    gk  = 'boy' if child.gender.upper() in ('M', 'MALE', 'BOY') else 'girl'
+    wsd = _WHO_W_SD[gk]
+    hsd = _WHO_H_SD[gk]
+
+    if weight:
+        sd3w  = _interp(age_months, wsd['months'], wsd['sd3neg'])
+        sd2w  = _interp(age_months, wsd['months'], wsd['sd2neg'])
+        sd2pw = _interp(age_months, wsd['months'], wsd['sd2pos'])
+
+        if weight < sd3w:
+            alerts.append(HealthAlert(child_id=child.id, alert_type='weight_severe',
+                severity='critical', title='⚠️ Severely Underweight',
+                message=f"{child.name} weighs {weight} kg at {age_months} months, below WHO -3SD ({sd3w:.1f} kg). Immediate nutritional assessment and medical review is recommended.",
+                value=weight, threshold=sd3w, age_months=age_months))
+        elif weight < sd2w:
+            alerts.append(HealthAlert(child_id=child.id, alert_type='weight_moderate',
+                severity='warning', title='⚠️ Moderately Underweight',
+                message=f"{child.name} weighs {weight} kg at {age_months} months, below WHO -2SD ({sd2w:.1f} kg). Dietary review and close monitoring advised.",
+                value=weight, threshold=sd2w, age_months=age_months))
+        elif weight > sd2pw:
+            alerts.append(HealthAlert(child_id=child.id, alert_type='overweight',
+                severity='warning', title='⚠️ Overweight / Obese',
+                message=f"{child.name} weighs {weight} kg at {age_months} months, above WHO +2SD ({sd2pw:.1f} kg). Dietary and lifestyle review recommended.",
+                value=weight, threshold=sd2pw, age_months=age_months))
+
+    if height:
+        sd3h = _interp(age_months, hsd['months'], hsd['sd3neg'])
+        sd2h = _interp(age_months, hsd['months'], hsd['sd2neg'])
+
+        if height < sd3h:
+            alerts.append(HealthAlert(child_id=child.id, alert_type='height_severe',
+                severity='critical', title='⚠️ Severely Stunted',
+                message=f"{child.name}'s height {height} cm at {age_months} months is below WHO -3SD ({sd3h:.1f} cm). Urgent medical evaluation recommended.",
+                value=height, threshold=sd3h, age_months=age_months))
+        elif height < sd2h:
+            alerts.append(HealthAlert(child_id=child.id, alert_type='height_moderate',
+                severity='warning', title='⚠️ Stunted Growth',
+                message=f"{child.name}'s height {height} cm at {age_months} months is below WHO -2SD ({sd2h:.1f} cm). Growth monitoring and nutritional support advised.",
+                value=height, threshold=sd2h, age_months=age_months))
+
+    prev = (GrowthRecord.query.filter_by(child_id=child.id)
+            .filter(GrowthRecord.record_date < record_date)
+            .order_by(GrowthRecord.record_date.desc()).first())
+    if prev and prev.weight and weight:
+        loss_pct = (prev.weight - weight) / prev.weight * 100
+        gain_pct = (weight - prev.weight) / prev.weight * 100
+        if loss_pct > 5:
+            alerts.append(HealthAlert(child_id=child.id, alert_type='rapid_loss',
+                severity='critical', title='⚠️ Rapid Weight Loss',
+                message=f"{child.name} lost {loss_pct:.1f}% weight ({prev.weight} kg → {weight} kg) since last measurement. Medical review recommended.",
+                value=weight, threshold=prev.weight, age_months=age_months))
+        elif gain_pct > 20:
+            alerts.append(HealthAlert(child_id=child.id, alert_type='rapid_gain',
+                severity='warning', title='⚠️ Unusually Rapid Weight Gain',
+                message=f"{child.name} gained {gain_pct:.1f}% weight ({prev.weight} kg → {weight} kg) since last measurement. Review dietary intake.",
+                value=weight, threshold=prev.weight, age_months=age_months))
+
+    return alerts
 
 
 @app.route("/", methods=["GET"])
@@ -1583,67 +1697,112 @@ def get_children():
         })
 
     return jsonify(response)
-@app.route("/children/<int:child_id>/growth", methods=["POST"])
-@cross_origin()
+
+
+@app.route('/children/<int:child_id>/growth', methods=['POST'])
 def add_growth_record(child_id):
     try:
-        data = request.get_json()
-
-        if not data:
-            return jsonify({"error": "No data received"}), 400
-
         child = Child.query.get(child_id)
         if not child:
-            return jsonify({"error": "Child not found"}), 404
+            return jsonify({'error': 'Child not found'}), 404
 
-        try:
-            record_date = datetime.strptime(data["date"], "%Y-%m-%d")
-        except (ValueError, KeyError):
-            return jsonify({"error": "Invalid or missing date"}), 400
+        data        = request.get_json()
+        weight      = float(data['weight']) if data.get('weight') else None
+        height      = float(data['height']) if data.get('height') else None
+        head        = float(data['head'])   if data.get('head')   else None
+        notes       = data.get('notes', '')
+        date_str    = data.get('date')
+        record_date = datetime.strptime(date_str, '%Y-%m-%d') if date_str else datetime.utcnow()
 
-        # Safe conversion — avoids crash on empty strings
-        def to_float(val):
-            try:
-                return float(val) if val not in (None, "", " ") else None
-            except (ValueError, TypeError):
-                return None
+        dob = child.date_of_birth
+        rd  = record_date.date() if hasattr(record_date, 'date') else record_date
+        age_months = (rd.year - dob.year) * 12 + (rd.month - dob.month)
 
-        weight = to_float(data.get("weight"))
-        height = to_float(data.get("height"))
-        head   = to_float(data.get("head"))
+        bmi = round(weight / ((height / 100) ** 2), 1) if weight and height else None
 
-        if not weight or not height:
-            return jsonify({"error": "Weight and height are required"}), 400
-
-        age_at_record = (record_date.date() - child.date_of_birth).days
-
-        height_m = height / 100
-        bmi = round(weight / (height_m ** 2), 2) if height_m > 0 else None
-
-        new_record = GrowthRecord(
-            child_id=child_id,
-            record_date=record_date,
-            weight=weight,
-            height=height,
-            head_circumference=head,
-            bmi=bmi,
-            age_at_record=age_at_record,
-            notes=data.get("notes", "")
+        record = GrowthRecord(
+            child_id=child_id, record_date=record_date,
+            weight=weight, height=height, head_circumference=head,
+            bmi=bmi, age_at_record=age_months, notes=notes
         )
+        db.session.add(record)
 
-        db.session.add(new_record)
+        new_alerts = _check_growth_alerts(child, record_date, weight, height, age_months)
+        for a in new_alerts:
+            db.session.add(a)
+
         db.session.commit()
 
+        if new_alerts:
+            parent = User.query.get(child.parent_id)
+            if parent:
+                for a in new_alerts:
+                    socketio.emit('health_alert', {
+                        'id': a.id, 'alert_type': a.alert_type,
+                        'severity': a.severity, 'title': a.title,
+                        'message': a.message, 'value': a.value,
+                        'threshold': a.threshold, 'age_months': a.age_months,
+                        'is_read': False, 'created_at': a.created_at.isoformat()
+                    }, room=f'user_{parent.id}')
+
         return jsonify({
-            "message": "Growth record saved successfully",
-            "id": new_record.id,
-            "bmi": bmi
+            'success': True, 'record_id': record.id,
+            'bmi': bmi, 'age_months': age_months,
+            'alerts': [{'id': a.id, 'severity': a.severity, 'title': a.title,
+                        'message': a.message, 'alert_type': a.alert_type}
+                       for a in new_alerts]
         }), 201
 
     except Exception as e:
         db.session.rollback()
-        print(f"Growth record error: {e}")   # <-- This will show in your Flask terminal
-        return jsonify({"error": str(e)}), 500
+        print(f'[AddGrowth] Error: {e}')
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/health-alerts', methods=['GET'])
+@jwt_required()
+def get_health_alerts():
+    parent_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=parent_id).first()
+    if not child:
+        return jsonify([]), 200
+
+    alerts = (HealthAlert.query
+              .filter_by(child_id=child.id)
+              .order_by(HealthAlert.created_at.desc())
+              .all())
+    return jsonify([{
+        'id': a.id, 'alert_type': a.alert_type, 'severity': a.severity,
+        'title': a.title, 'message': a.message, 'value': a.value,
+        'threshold': a.threshold, 'age_months': a.age_months,
+        'is_read': a.is_read, 'created_at': a.created_at.isoformat()
+    } for a in alerts]), 200
+
+
+@app.route('/health-alerts/<int:alert_id>/read', methods=['POST'])
+@jwt_required()
+def mark_alert_read(alert_id):
+    parent_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=parent_id).first()
+    alert = HealthAlert.query.get(alert_id)
+    if not alert or (child and alert.child_id != child.id):
+        return jsonify({'error': 'Not found'}), 404
+    alert.is_read = True
+    db.session.commit()
+    return jsonify({'success': True}), 200
+
+
+@app.route('/health-alerts/read-all', methods=['POST'])
+@jwt_required()
+def mark_all_alerts_read():
+    parent_id = get_jwt_identity()
+    child = Child.query.filter_by(parent_id=parent_id).first()
+    if child:
+        HealthAlert.query.filter_by(child_id=child.id, is_read=False).update({'is_read': True})
+        db.session.commit()
+    return jsonify({'success': True}), 200
+    
+
 @app.route("/children/<int:child_id>/vaccinations", methods=["POST"])
 @cross_origin()
 def add_vaccination(child_id):
