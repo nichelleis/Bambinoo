@@ -1697,67 +1697,68 @@ def get_children():
         })
 
     return jsonify(response)
-@app.route("/children/<int:child_id>/growth", methods=["POST"])
-@cross_origin()
+
+
+@app.route('/children/<int:child_id>/growth', methods=['POST'])
 def add_growth_record(child_id):
     try:
-        data = request.get_json()
-
-        if not data:
-            return jsonify({"error": "No data received"}), 400
-
         child = Child.query.get(child_id)
         if not child:
-            return jsonify({"error": "Child not found"}), 404
+            return jsonify({'error': 'Child not found'}), 404
 
-        try:
-            record_date = datetime.strptime(data["date"], "%Y-%m-%d")
-        except (ValueError, KeyError):
-            return jsonify({"error": "Invalid or missing date"}), 400
+        data        = request.get_json()
+        weight      = float(data['weight']) if data.get('weight') else None
+        height      = float(data['height']) if data.get('height') else None
+        head        = float(data['head'])   if data.get('head')   else None
+        notes       = data.get('notes', '')
+        date_str    = data.get('date')
+        record_date = datetime.strptime(date_str, '%Y-%m-%d') if date_str else datetime.utcnow()
 
-        # Safe conversion — avoids crash on empty strings
-        def to_float(val):
-            try:
-                return float(val) if val not in (None, "", " ") else None
-            except (ValueError, TypeError):
-                return None
+        dob = child.date_of_birth
+        rd  = record_date.date() if hasattr(record_date, 'date') else record_date
+        age_months = (rd.year - dob.year) * 12 + (rd.month - dob.month)
 
-        weight = to_float(data.get("weight"))
-        height = to_float(data.get("height"))
-        head   = to_float(data.get("head"))
+        bmi = round(weight / ((height / 100) ** 2), 1) if weight and height else None
 
-        if not weight or not height:
-            return jsonify({"error": "Weight and height are required"}), 400
-
-        age_at_record = (record_date.date() - child.date_of_birth).days
-
-        height_m = height / 100
-        bmi = round(weight / (height_m ** 2), 2) if height_m > 0 else None
-
-        new_record = GrowthRecord(
-            child_id=child_id,
-            record_date=record_date,
-            weight=weight,
-            height=height,
-            head_circumference=head,
-            bmi=bmi,
-            age_at_record=age_at_record,
-            notes=data.get("notes", "")
+        record = GrowthRecord(
+            child_id=child_id, record_date=record_date,
+            weight=weight, height=height, head_circumference=head,
+            bmi=bmi, age_at_record=age_months, notes=notes
         )
+        db.session.add(record)
 
-        db.session.add(new_record)
+        new_alerts = _check_growth_alerts(child, record_date, weight, height, age_months)
+        for a in new_alerts:
+            db.session.add(a)
+
         db.session.commit()
 
+        if new_alerts:
+            parent = User.query.get(child.parent_id)
+            if parent:
+                for a in new_alerts:
+                    socketio.emit('health_alert', {
+                        'id': a.id, 'alert_type': a.alert_type,
+                        'severity': a.severity, 'title': a.title,
+                        'message': a.message, 'value': a.value,
+                        'threshold': a.threshold, 'age_months': a.age_months,
+                        'is_read': False, 'created_at': a.created_at.isoformat()
+                    }, room=f'user_{parent.id}')
+
         return jsonify({
-            "message": "Growth record saved successfully",
-            "id": new_record.id,
-            "bmi": bmi
+            'success': True, 'record_id': record.id,
+            'bmi': bmi, 'age_months': age_months,
+            'alerts': [{'id': a.id, 'severity': a.severity, 'title': a.title,
+                        'message': a.message, 'alert_type': a.alert_type}
+                       for a in new_alerts]
         }), 201
 
     except Exception as e:
         db.session.rollback()
-        print(f"Growth record error: {e}")   # <-- This will show in your Flask terminal
-        return jsonify({"error": str(e)}), 500
+        print(f'[AddGrowth] Error: {e}')
+        return jsonify({'error': str(e)}), 500
+    
+
 @app.route("/children/<int:child_id>/vaccinations", methods=["POST"])
 @cross_origin()
 def add_vaccination(child_id):
