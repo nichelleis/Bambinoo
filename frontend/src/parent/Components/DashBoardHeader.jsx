@@ -1,6 +1,7 @@
 import style from "../../assets/styleSheets/ParentDashboard.module.css";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 
 function calculateAge(dobString) {
   const dob = new Date(dobString);
@@ -54,6 +55,9 @@ function DashboardHeader() {
   const [childName, setChildName] = useState("");
   const [childAge, setChildAge] = useState("");
   const [childGender, setChildGender] = useState("");
+  const [alerts, setAlerts]           = useState([]);
+  const [showAlerts, setShowAlerts]   = useState(false);
+  const [alertsLoaded, setAlertsLoaded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -84,6 +88,61 @@ function DashboardHeader() {
       })
       .catch((err) => console.error(err));
   }, []);
+
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  fetch("http://localhost:5000/health-alerts", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => {
+      setAlerts(Array.isArray(data) ? data : []);
+      setAlertsLoaded(true);
+    })
+    .catch(err => console.error("Alert fetch failed:", err));
+
+  const socket = io("http://localhost:5000", { auth: { token } });
+  socket.on("health_alert", (newAlert) => {
+    setAlerts(prev => [newAlert, ...prev]);
+  });
+
+  return () => socket.disconnect();
+}, []);
+
+useEffect(() => {
+    if (!showAlerts) return;
+    const handleClickOutside = (e) => {
+      if (!e.target.closest("[data-alert-drawer]")) {
+        setShowAlerts(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showAlerts]);
+
+  const markRead = async (id) => {
+    const token = localStorage.getItem("token");
+    await fetch(`http://localhost:5000/health-alerts/${id}/read`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setAlerts((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, is_read: true } : a))
+    );
+  };
+
+  const markAllRead = async () => {
+    const token = localStorage.getItem("token");
+    await fetch("http://localhost:5000/health-alerts/read-all", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setAlerts((prev) => prev.map((a) => ({ ...a, is_read: true })));
+  };
+
+  const unreadCount = alerts.filter((a) => !a.is_read).length;
 
   return (
     <header
