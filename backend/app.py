@@ -215,6 +215,17 @@ class Message(db.Model):
     is_read = db.Column(db.Boolean, default=False)
 
 
+class Event(db.Model):
+    __tablename__ = 'event'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    event_type = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    location = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 with app.app_context():
     db.create_all()
 
@@ -251,6 +262,23 @@ def login():
         return jsonify({
             "error": str(e)
         }), 500
+
+
+# Admin Profile route
+@app.route('/admin-profile', methods=['GET'])
+def admin_profile():
+    try:
+        admin = User.query.filter_by(role='admin').first()
+        if not admin:
+            return jsonify({"error": "Admin not found"}), 404
+        return jsonify({
+            "username": admin.username,
+            "email": admin.email,
+            "role": admin.role
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
     
 # JWT Verification route
 @app.route('/verify-token', methods=['GET'])
@@ -1126,6 +1154,7 @@ MODEL_NAME = 'models/gemini-flash-latest'
 def clean_ai_response(text):
     return text.replace("```html", "").replace("```", "")
 
+
 # 1. MEAL PLAN API 
 # React calls this to generate a meal plan
 @app.route('/generate-plan', methods=['POST'])
@@ -1152,6 +1181,12 @@ def generate_plan():
         if not latest_growth or not latest_growth.weight:
             return jsonify({"success": False, "error": "No weight data found for this child"}), 404
         
+        # --- ADDED: Fetch Allergies ---
+        allergies = Allergy.query.filter_by(child_id=child.id).all()
+        allergy_list = [a.name for a in allergies]
+        allergy_display = ", ".join(allergy_list) if allergy_list else "None"
+        # ------------------------------
+
         # Calculate age in months
         today = date.today()
         child_age = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
@@ -1168,17 +1203,24 @@ def generate_plan():
         PATIENT DATA:
         - Age: {child_age} months
         - Weight: {weight} kg
+        - KNOWN ALLERGIES: {allergy_display}
         
+        CRITICAL SAFETY REQUIREMENT:
+        - Check the KNOWN ALLERGIES list carefully.
+        - You MUST NOT include any foods containing {allergy_display} in the meal plan.
+        - If the child is allergic to Dairy, replace milk/ghee with Coconut Milk or oil.
+        - If the child is allergic to Eggs or Seafood, ensure proteins are sourced from Dhal, Chickpeas, or alternative legumes.
+
         STEP 1: ANALYSIS
         - Calculate if the weight is low, normal, or high for this age.
-        - If Low Weight: Focus on "Calorie Boosting" (adding Coconut Milk, Ghee, Oil).
+        - If Low Weight: Focus on "Calorie Boosting" (adding Coconut Milk, Ghee, Oil - if not allergic).
         - If Normal/High: Focus on "Balanced Nutrition" (Vegetables, Fiber).
         
         STEP 2: CREATE A DYNAMIC MEAL PLAN
         - Do NOT use a generic template. Customize the food based on the analysis above.
         - STARCH: Rotate between Red Rice, Sweet Potato (Bathala), or String Hoppers based on age.
-        - PROTEIN: Use Dhal, Sprats (Haalmasso), or Egg based on age safety.
-        - FRUIT: Select ONE specific vitamin-rich local fruit (Papaya, Mango, Avocado, or Banana) - do NOT always choose Banana.
+        - PROTEIN: Use Dhal, Sprats (Haalmasso), or Egg based on age safety AND allergy constraints.
+        - FRUIT: Select ONE specific vitamin-rich local fruit (Papaya, Mango, Avocado, or Banana).
         - VEGETABLE: Select ONE specific local vegetable (Pumpkin, Spinach, Carrots).
         
         STEP 3: FORMATTING (CRITICAL)
@@ -1187,8 +1229,9 @@ def generate_plan():
         
         STRUCTURE:
         <div class="summary-card">
-            <h3>Patient Analysis</h3>
-            <p><strong>Status:</strong> (Insert specific analysis: e.g., "Weight is slightly low. We added healthy fats.")</p>
+            <h3>Patient Analysis & Safety</h3>
+            <p><strong>Status:</strong> (Insert specific analysis: e.g., "Weight is slightly low.")</p>
+            <p><strong>Allergies Noted:</strong> {allergy_display} (Confirmed excluded from plan)</p>
             <p><strong>Calorie Goal:</strong> (Estimate daily calories) | <strong>Texture:</strong> (e.g. Puree / Mashed / Finger Food)</p>
         </div>
 
@@ -1197,14 +1240,14 @@ def generate_plan():
                 <tr>
                     <th style="width: 20%;">Time</th>
                     <th style="width: 30%;">Menu Item</th>
-                    <th>Portion & Instructions</th>
+                    <th>Portion & Allergy-Safe Instructions</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><strong>Breakfast</strong><br><span class="time">8:00 AM</span></td>
                     <td>(Insert appropriate Starch dish)</td>
-                    <td>(Specific portion size in tbsp/cups based on {weight}kg)</td>
+                    <td>(Specific portion size in tbsp/cups based on {weight}kg. Confirm it is allergy-safe.)</td>
                 </tr>
                 <tr>
                     <td><strong>Lunch</strong><br><span class="time">12:00 PM</span></td>
@@ -1229,6 +1272,7 @@ def generate_plan():
             <ul>
                 <li>(Tip specifically for {child_age} month old)</li>
                 <li>(Tip specifically about the weight of {weight} kg)</li>
+                <li>(Safety tip regarding {allergy_display} management in Sri Lankan cooking)</li>
             </ul>
         </div>
         """
@@ -1243,6 +1287,18 @@ def generate_plan():
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+        
+        # Specific AI call and clean up
+        model = genai.GenerativeModel(MODEL_NAME)
+        response = model.generate_content(prompt)
+        html_content = clean_ai_response(response.text)
+        
+        # Send the clean HTML back to React as JSON
+        return jsonify({"success": True, "html": html_content})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 
 # 2. RESOURCE API 
@@ -2794,6 +2850,73 @@ Return EXACTLY this JSON structure (base all fields on the real data above):
                 "error_title": "AI Analysis Failed",
                 "error_detail": str(e),
                 "error_fix": "Check the backend console for more details."}), 500
+
+
+# Admin Event Routes
+
+@app.route('/api/admin/events', methods=['GET'])
+def get_events():
+    try:
+        today = date.today()
+        one_month_ago = today - relativedelta(months=1)
+        events = Event.query.filter(Event.date >= one_month_ago).order_by(Event.date.asc()).all()
+
+        results = []
+        for e in events:
+            if e.date > today:
+                status = "Upcoming"
+            elif e.date == today:
+                status = "Ongoing"
+            else:
+                status = "Finished"
+
+            results.append({
+                "id": e.id,
+                "title": e.title,
+                "type": e.event_type,
+                "date": e.date.strftime('%Y-%m-%d'),
+                "location": e.location,
+                "description": e.description,
+                "status": status
+            })
+        return jsonify(results), 200
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
+
+
+@app.route('/api/admin/events', methods=['POST'])
+def create_event():
+    try:
+        data = request.get_json()
+        event_date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+
+        new_event = Event(
+            title=data['title'],
+            event_type=data['type'],
+            date=event_date,
+            location=data['location'],
+            description=data.get('description', '')
+        )
+        db.session.add(new_event)
+        db.session.commit()
+        return jsonify({"message": "Event created!"}), 201
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"error": str(ex)}), 500
+
+
+@app.route('/api/admin/events/<int:event_id>', methods=['DELETE'])
+def delete_event(event_id):
+    try:
+        event = Event.query.get(event_id)
+        if not event:
+            return jsonify({"error": "Event not found"}), 404
+        db.session.delete(event)
+        db.session.commit()
+        return jsonify({"message": "Event deleted!"}), 200
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"error": str(ex)}), 500
 
 
 # SocketIO and Main Block 

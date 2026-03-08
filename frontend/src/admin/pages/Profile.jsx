@@ -5,55 +5,58 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        // We fetch the latest data from the backend to ensure email shows up
-        const response = await fetch("http://127.0.0.1:5000/verify-token", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
+  const fetchAdmin = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/admin-profile");
+      const data = await response.json();
 
-        if (response.ok && data.user) {
-          setUser(data.user);
-          // Update localStorage so it's correct next time
-          localStorage.setItem("user", JSON.stringify(data.user));
-        }
-      } catch (err) {
-        console.error("Profile fetch failed:", err);
-      } finally {
-        setLoading(false);
+      if (response.ok && data.username) {
+        setUser(data);
+      } else {
+        console.error("Admin not found:", data);
       }
-    };
+    } catch (err) {
+      console.error("Admin fetch failed:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProfile();
-  }, []);
+  fetchAdmin();
+}, []);
 
   if (loading) return <div className="admin-content">Loading...</div>;
   if (!user) return <div className="admin-content">User not found.</div>;
 
   return (
     <div className="admin-content">
-      <div className="dashboard-header">
-        <h1 className="admin-title">Account Settings</h1>
-      </div>
+      <h1 className="admin-title">Account Settings</h1>
 
-      <div className="stat-card" style={{ maxWidth: "600px", margin: "20px 0", textAlign: "center" }}>
-        <div style={{ 
-          width: "80px", height: "80px", background: "linear-gradient(135deg, #6366f1, #a855f7)", 
-          borderRadius: "50%", margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "2rem", color: "white", fontWeight: "bold"
-        }}>
-          {user.username?.charAt(0).toUpperCase()}
+      <div className="stat-card profile-container">
+        <div className="profile-left">
+          <div className="profile-initial">
+            {user.username?.charAt(0).toUpperCase()}
+          </div>
         </div>
-        
-        <h2 style={{ color: "#0f172a", marginBottom: "8px" }}>{user.username}</h2>
-        <p style={{ color: "#64748b", fontSize: "1rem", marginBottom: "4px" }}>
-          <strong>Email:</strong> {user.email || "No email set"}
-        </p>
-        <p style={{ color: "#64748b", fontSize: "1rem" }}>
-          <strong>Role:</strong> <span className="role-badge admin">{user.role}</span>
-        </p>
+
+        <div className="profile-right">
+          <div className="profile-row">
+            <label>Username</label>
+            <div>{user.username}</div>
+          </div>
+
+          <div className="profile-row">
+            <label>Email</label>
+            <div>{user.email || "Not provided"}</div>
+          </div>
+
+          <div className="profile-row">
+            <label>Role</label>
+            <div className="profile-role">{user.role}</div>
+          </div>
+
+          
+        </div>
       </div>
     </div>
   );
