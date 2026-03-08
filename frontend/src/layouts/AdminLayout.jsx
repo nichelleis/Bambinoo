@@ -3,6 +3,7 @@ import "../admin/components/AdminLayout.css";
 import { Routes, Route, NavLink } from "react-router-dom"; 
 import AdminDashboard from "../admin/pages/AdminDashboard"; 
 import ManageUsers from "../admin/pages/ManageUsers";
+import UserManagement from "../admin/pages/UserManagement";
 import Reports from "../admin/pages/Reports"; 
 import Profile from "../admin/pages/Profile";
 
@@ -22,6 +23,7 @@ export default function AdminLayout() {
           {/* end prop ensures the Dashboard isn't always highlighted */}
           <NavLink to="/admin" end className="admin-link">Dashboard</NavLink>
           <NavLink to="/admin/users" className="admin-link">Manage Users</NavLink>
+          <NavLink to="/admin/user-management" className="admin-link">User Management</NavLink>
           <NavLink to="/admin/reports" className="admin-link">Reports</NavLink>
           <NavLink to="/admin/profile" className="admin-link">Profile</NavLink>
         </nav>
@@ -34,6 +36,7 @@ export default function AdminLayout() {
         <Routes>
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<ManageUsers />} />
+          <Route path="user-management" element={<UserManagement />} />
           <Route path="reports" element={<Reports />} />
           <Route path="profile" element={<Profile />} />
         </Routes>
