@@ -1,36 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --sage-900: #1a3a2a;
-  --sage-800: #234d38;
-  --sage-700: #2e6347;
-  --sage-600: #3a7a58;
-  --sage-500: #4a9168;
-  --sage-400: #72b08a;
-  --sage-300: #a2ccb4;
-  --sage-200: #c6e0d0;
-  --sage-100: #e0f0e8;
-  --sage-50:  #f3faf6;
+  --green-900: #052e16;
+  --green-800: #0a4523;
+  --green-700: #116331;
+  --green-600: #16803a;
+  --green-500: #22a44f;
+  --green-400: #4abe72;
+  --green-300: #86d9a0;
+  --green-200: #bbf0cb;
+  --green-100: #dcfce7;
+  --green-50:  #f0fdf4;
+
+  --teal-400: #2dd4bf;
+  --teal-200: #99f6e4;
+  --teal-100: #ccfbf1;
+  --teal-50:  #f0fdfa;
 
   --surface-0:   #ffffff;
-  --surface-1:   #f8faf9;
-  --border:      #d4e6db;
-  --border-soft: #e4efe8;
+  --surface-1:   #f6fdf8;
+  --border:      #c6e8d0;
+  --border-soft: #daf0e2;
 
-  --text-primary:   #111c16;
-  --text-secondary: #3a5545;
-  --text-tertiary:  #5e8070;
-  --text-muted:     #96b5a5;
+  --text-primary:   #052e16;
+  --text-secondary: #1a4a2a;
+  --text-tertiary:  #3d7550;
+  --text-muted:     #86b894;
 
-  --red-600:  #b91c1c;
-  --red-50:   #fef2f2;
-  --red-200:  #fecaca;
+  --red-600:   #b91c1c;
+  --red-50:    #fef2f2;
+  --red-200:   #fecaca;
+  --amber-700: #b45309;
+  --amber-50:  #fffbeb;
+  --amber-200: #fde68a;
 
   --danger: #b91c1c;
 
-  --shadow-xs: 0 1px 3px rgba(10,25,18,.05);
-  --shadow-sm: 0 1px 6px rgba(10,25,18,.07);
-  --shadow-md: 0 4px 16px rgba(10,25,18,.09);
+  --shadow-xs: 0 1px 3px rgba(5,46,22,.05);
+  --shadow-sm: 0 1px 6px rgba(5,46,22,.07);
+  --shadow-md: 0 4px 16px rgba(5,46,22,.09);
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -50,14 +58,14 @@
   font-family: var(--font-body);
 }
 
-
 .immunization-empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 480px;
-  background: var(--surface-1);
-  border-radius: var(--radius-xl);
+  min-height: 100vh;
+  width: 100%;
+  background: #edf5f0;
+  padding: 32px;
 }
 
 .immunization-empty-card {
@@ -76,7 +84,7 @@
 
 .immunization-empty-card i {
   font-size: 48px;
-  color: var(--sage-400);
+  color: var(--green-400);
   line-height: 1;
 }
 
@@ -84,7 +92,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 650;
-  color: var(--sage-900);
+  color: var(--green-900);
 }
 
 .immunization-empty-card p {
@@ -93,7 +101,6 @@
   color: var(--text-secondary);
   line-height: 1.65;
 }
-
 
 .immunizations-page {
   padding: 28px 32px 48px;
@@ -105,13 +112,17 @@
   animation: fadeUp 0.3s ease;
 }
 
+.immunizations-page:has(.immunization-empty) {
+  padding: 0;
+  gap: 0;
+}
 
 .immunization-header {
   background: var(--surface-0);
   border-radius: var(--radius-xl);
   padding: 22px 28px;
   border: 1px solid var(--border-soft);
-  border-top: 3px solid var(--sage-500);
+  border-top: 3px solid var(--green-400);
   box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
@@ -133,22 +144,9 @@
 }
 
 .immunization-header p strong {
-  color: var(--sage-700);
+  color: var(--green-700);
   font-weight: 600;
 }
-
-.immunization-header-badge {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--sage-700);
-  background: var(--sage-50);
-  border: 1px solid var(--sage-200);
-  border-radius: 999px;
-  padding: 5px 14px;
-}
-
 
 .immunization-layout {
   display: grid;
@@ -156,13 +154,6 @@
   gap: 20px;
   align-items: start;
 }
-
-.immunization-layout > * {
-  animation: fadeUp 0.38s ease both;
-}
-.immunization-layout > *:nth-child(1) { animation-delay: 0.06s; }
-.immunization-layout > *:nth-child(2) { animation-delay: 0.12s; }
-
 
 .immunization-form,
 .immunization-history {
@@ -173,8 +164,12 @@
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  animation: fadeUp 0.38s ease both;
 }
+
+.immunization-form:nth-child(1) { animation-delay: 0.06s; }
+.immunization-history:nth-child(2) { animation-delay: 0.12s; }
 
 .immunization-form h3,
 .immunization-history h3 {
@@ -186,37 +181,25 @@
   border-bottom: 1.5px solid var(--border-soft);
 }
 
-.empty-text {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  padding: 24px 0;
-  font-style: italic;
-  margin: 0;
-}
-
-
-.ni-field,
-.immunization-form > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.form-row > div {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .immunization-form label,
-.form-row label {
+.form-row label,
+.immunization-form > div > label {
+  display: block;
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.ni-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ni-field label {
   font-size: 0.73rem;
   font-weight: 700;
   color: var(--text-tertiary);
@@ -226,11 +209,11 @@
 
 .ni-required {
   color: var(--danger);
-  font-weight: 700;
 }
 
 .immunization-form input,
-.immunization-form textarea {
+.immunization-form textarea,
+.form-row input {
   width: 100%;
   padding: 10px 13px;
   font-size: 0.875rem;
@@ -250,12 +233,14 @@
 }
 
 .immunization-form input:focus,
-.immunization-form textarea:focus {
-  border-color: var(--sage-500);
-  box-shadow: 0 0 0 3px rgba(74,145,104,.10);
+.immunization-form textarea:focus,
+.form-row input:focus {
+  border-color: var(--green-400);
+  box-shadow: 0 0 0 3px rgba(34,164,79,.09);
 }
 
-input[type="date"] {
+.immunization-form input[type="date"],
+.form-row input[type="date"] {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   color: var(--text-secondary);
@@ -267,6 +252,11 @@ input[type="date"] {
   line-height: 1.55;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
 
 .form-error {
   margin: 0;
@@ -282,19 +272,18 @@ input[type="date"] {
 .form-success {
   margin: 0;
   padding: 10px 14px;
-  background: var(--sage-50);
-  border: 1px solid var(--sage-200);
+  background: var(--green-50);
+  border: 1px solid var(--green-200);
   border-radius: var(--radius-sm);
   font-size: 0.83rem;
-  color: var(--sage-800);
+  color: var(--green-700);
   font-weight: 500;
 }
-
 
 .primary-btn {
   width: 100%;
   padding: 12px 24px;
-  background: var(--sage-600);
+  background: var(--green-600);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 700;
@@ -308,12 +297,12 @@ input[type="date"] {
 }
 
 .primary-btn:hover:not(:disabled) {
-  background: var(--sage-700);
+  background: var(--green-700);
   transform: translateY(-1px);
 }
 
 .primary-btn:active:not(:disabled) {
-  background: var(--sage-800);
+  background: var(--green-800);
   transform: translateY(0);
 }
 
@@ -323,11 +312,19 @@ input[type="date"] {
   transform: none;
 }
 
+.empty-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 24px 0;
+  font-style: italic;
+  margin: 0;
+}
 
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .history-card {
@@ -335,16 +332,17 @@ input[type="date"] {
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  padding: 13px 15px;
+  padding: 14px 16px;
   background: var(--surface-1);
   border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--green-300);
   border-radius: var(--radius-md);
-  transition: background 0.14s, box-shadow 0.14s;
+  transition: background 0.13s, border-left-color 0.13s;
 }
 
 .history-card:hover {
-  background: var(--sage-50);
-  box-shadow: var(--shadow-xs);
+  background: var(--green-50);
+  border-left-color: var(--green-500);
 }
 
 .history-left {
@@ -352,14 +350,12 @@ input[type="date"] {
   flex-direction: column;
   gap: 4px;
   flex: 1;
-  min-width: 0;
 }
 
 .history-left strong {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.3;
 }
 
 .history-left p {
@@ -367,49 +363,43 @@ input[type="date"] {
   font-size: 0.8rem;
   color: var(--text-secondary);
   display: flex;
-  align-items: center;
-  gap: 5px;
-  line-height: 1.4;
+  gap: 6px;
 }
 
 .label {
-  font-size: 0.71rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 0.69rem;
+  letter-spacing: 0.06em;
   flex-shrink: 0;
 }
 
 .notes-text {
-  font-size: 0.79rem;
-  color: var(--text-muted);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
   font-style: italic;
-  margin-top: 2px;
+  margin: 2px 0 0;
 }
 
 .dose-badge {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  white-space: nowrap;
   flex-shrink: 0;
-  background: var(--sage-100);
-  color: var(--sage-800);
-  border: 1px solid var(--sage-200);
-  letter-spacing: 0.03em;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--green-700);
+  background: var(--green-100);
+  border: 1px solid var(--green-200);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  align-self: flex-start;
 }
-
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 
 @media (max-width: 1024px) {
   .immunization-layout {

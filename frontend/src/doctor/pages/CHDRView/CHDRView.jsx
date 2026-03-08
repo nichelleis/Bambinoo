@@ -34,15 +34,17 @@ function getSeverityClass(severity) {
 export default function CHDRView({ selectedChild }) {
   if (!selectedChild) {
     return (
-      <div className="chdr-empty">
-        <div className="chdrempty-card">
-          <i className="ri-file-list-3-line" />
-          <h2>No Patient Selected</h2>
-          <p>
-            Please search and select a patient to view their
-            <br />
-            Child Health Development Record (CHDR).
-          </p>
+      <div className="chdr-page">
+        <div className="chdr-empty">
+          <div className="chdrempty-card">
+            <i className="ri-file-list-3-line" />
+            <h2>No Patient Selected</h2>
+            <p>
+              Please search and select a patient to view their
+              <br />
+              Child Health Development Record (CHDR).
+            </p>
+          </div>
         </div>
       </div>
     );
