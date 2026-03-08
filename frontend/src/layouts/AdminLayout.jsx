@@ -23,7 +23,7 @@ export default function AdminLayout() {
           {/* end prop ensures the Dashboard isn't always highlighted */}
           <NavLink to="/admin" end className="admin-link">Dashboard</NavLink>
           <NavLink to="/admin/users" className="admin-link">Manage Users</NavLink>
-          <NavLink to="/admin/user-management" className="admin-link">User Management</NavLink>
+          <NavLink to="/admin/user-management" className="admin-link">Event Management</NavLink>
           <NavLink to="/admin/reports" className="admin-link">Reports</NavLink>
           <NavLink to="/admin/profile" className="admin-link">Profile</NavLink>
         </nav>
