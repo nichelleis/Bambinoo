@@ -1154,6 +1154,7 @@ MODEL_NAME = 'models/gemini-flash-latest'
 def clean_ai_response(text):
     return text.replace("```html", "").replace("```", "")
 
+
 # 1. MEAL PLAN API 
 # React calls this to generate a meal plan
 @app.route('/generate-plan', methods=['POST'])
@@ -1180,6 +1181,12 @@ def generate_plan():
         if not latest_growth or not latest_growth.weight:
             return jsonify({"success": False, "error": "No weight data found for this child"}), 404
         
+        # --- ADDED: Fetch Allergies ---
+        allergies = Allergy.query.filter_by(child_id=child.id).all()
+        allergy_list = [a.name for a in allergies]
+        allergy_display = ", ".join(allergy_list) if allergy_list else "None"
+        # ------------------------------
+
         # Calculate age in months
         today = date.today()
         child_age = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
@@ -1196,17 +1203,24 @@ def generate_plan():
         PATIENT DATA:
         - Age: {child_age} months
         - Weight: {weight} kg
+        - KNOWN ALLERGIES: {allergy_display}
         
+        CRITICAL SAFETY REQUIREMENT:
+        - Check the KNOWN ALLERGIES list carefully.
+        - You MUST NOT include any foods containing {allergy_display} in the meal plan.
+        - If the child is allergic to Dairy, replace milk/ghee with Coconut Milk or oil.
+        - If the child is allergic to Eggs or Seafood, ensure proteins are sourced from Dhal, Chickpeas, or alternative legumes.
+
         STEP 1: ANALYSIS
         - Calculate if the weight is low, normal, or high for this age.
-        - If Low Weight: Focus on "Calorie Boosting" (adding Coconut Milk, Ghee, Oil).
+        - If Low Weight: Focus on "Calorie Boosting" (adding Coconut Milk, Ghee, Oil - if not allergic).
         - If Normal/High: Focus on "Balanced Nutrition" (Vegetables, Fiber).
         
         STEP 2: CREATE A DYNAMIC MEAL PLAN
         - Do NOT use a generic template. Customize the food based on the analysis above.
         - STARCH: Rotate between Red Rice, Sweet Potato (Bathala), or String Hoppers based on age.
-        - PROTEIN: Use Dhal, Sprats (Haalmasso), or Egg based on age safety.
-        - FRUIT: Select ONE specific vitamin-rich local fruit (Papaya, Mango, Avocado, or Banana) - do NOT always choose Banana.
+        - PROTEIN: Use Dhal, Sprats (Haalmasso), or Egg based on age safety AND allergy constraints.
+        - FRUIT: Select ONE specific vitamin-rich local fruit (Papaya, Mango, Avocado, or Banana).
         - VEGETABLE: Select ONE specific local vegetable (Pumpkin, Spinach, Carrots).
         
         STEP 3: FORMATTING (CRITICAL)
@@ -1215,8 +1229,9 @@ def generate_plan():
         
         STRUCTURE:
         <div class="summary-card">
-            <h3>Patient Analysis</h3>
-            <p><strong>Status:</strong> (Insert specific analysis: e.g., "Weight is slightly low. We added healthy fats.")</p>
+            <h3>Patient Analysis & Safety</h3>
+            <p><strong>Status:</strong> (Insert specific analysis: e.g., "Weight is slightly low.")</p>
+            <p><strong>Allergies Noted:</strong> {allergy_display} (Confirmed excluded from plan)</p>
             <p><strong>Calorie Goal:</strong> (Estimate daily calories) | <strong>Texture:</strong> (e.g. Puree / Mashed / Finger Food)</p>
         </div>
 
@@ -1225,14 +1240,14 @@ def generate_plan():
                 <tr>
                     <th style="width: 20%;">Time</th>
                     <th style="width: 30%;">Menu Item</th>
-                    <th>Portion & Instructions</th>
+                    <th>Portion & Allergy-Safe Instructions</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><strong>Breakfast</strong><br><span class="time">8:00 AM</span></td>
                     <td>(Insert appropriate Starch dish)</td>
-                    <td>(Specific portion size in tbsp/cups based on {weight}kg)</td>
+                    <td>(Specific portion size in tbsp/cups based on {weight}kg. Confirm it is allergy-safe.)</td>
                 </tr>
                 <tr>
                     <td><strong>Lunch</strong><br><span class="time">12:00 PM</span></td>
@@ -1257,6 +1272,7 @@ def generate_plan():
             <ul>
                 <li>(Tip specifically for {child_age} month old)</li>
                 <li>(Tip specifically about the weight of {weight} kg)</li>
+                <li>(Safety tip regarding {allergy_display} management in Sri Lankan cooking)</li>
             </ul>
         </div>
         """
@@ -1271,6 +1287,18 @@ def generate_plan():
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+        
+        # Specific AI call and clean up
+        model = genai.GenerativeModel(MODEL_NAME)
+        response = model.generate_content(prompt)
+        html_content = clean_ai_response(response.text)
+        
+        # Send the clean HTML back to React as JSON
+        return jsonify({"success": True, "html": html_content})
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 
 # 2. RESOURCE API 
