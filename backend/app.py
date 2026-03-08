@@ -215,6 +215,17 @@ class Message(db.Model):
     is_read = db.Column(db.Boolean, default=False)
 
 
+class Event(db.Model):
+    __tablename__ = 'event'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    event_type = db.Column(db.String(50), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    location = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 with app.app_context():
     db.create_all()
 
@@ -251,6 +262,23 @@ def login():
         return jsonify({
             "error": str(e)
         }), 500
+
+
+# Admin Profile route
+@app.route('/admin-profile', methods=['GET'])
+def admin_profile():
+    try:
+        admin = User.query.filter_by(role='admin').first()
+        if not admin:
+            return jsonify({"error": "Admin not found"}), 404
+        return jsonify({
+            "username": admin.username,
+            "email": admin.email,
+            "role": admin.role
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
     
 # JWT Verification route
 @app.route('/verify-token', methods=['GET'])
@@ -2794,6 +2822,73 @@ Return EXACTLY this JSON structure (base all fields on the real data above):
                 "error_title": "AI Analysis Failed",
                 "error_detail": str(e),
                 "error_fix": "Check the backend console for more details."}), 500
+
+
+# Admin Event Routes
+
+@app.route('/api/admin/events', methods=['GET'])
+def get_events():
+    try:
+        today = date.today()
+        one_month_ago = today - relativedelta(months=1)
+        events = Event.query.filter(Event.date >= one_month_ago).order_by(Event.date.asc()).all()
+
+        results = []
+        for e in events:
+            if e.date > today:
+                status = "Upcoming"
+            elif e.date == today:
+                status = "Ongoing"
+            else:
+                status = "Finished"
+
+            results.append({
+                "id": e.id,
+                "title": e.title,
+                "type": e.event_type,
+                "date": e.date.strftime('%Y-%m-%d'),
+                "location": e.location,
+                "description": e.description,
+                "status": status
+            })
+        return jsonify(results), 200
+    except Exception as ex:
+        return jsonify({"error": str(ex)}), 500
+
+
+@app.route('/api/admin/events', methods=['POST'])
+def create_event():
+    try:
+        data = request.get_json()
+        event_date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+
+        new_event = Event(
+            title=data['title'],
+            event_type=data['type'],
+            date=event_date,
+            location=data['location'],
+            description=data.get('description', '')
+        )
+        db.session.add(new_event)
+        db.session.commit()
+        return jsonify({"message": "Event created!"}), 201
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"error": str(ex)}), 500
+
+
+@app.route('/api/admin/events/<int:event_id>', methods=['DELETE'])
+def delete_event(event_id):
+    try:
+        event = Event.query.get(event_id)
+        if not event:
+            return jsonify({"error": "Event not found"}), 404
+        db.session.delete(event)
+        db.session.commit()
+        return jsonify({"message": "Event deleted!"}), 200
+    except Exception as ex:
+        db.session.rollback()
+        return jsonify({"error": str(ex)}), 500
 
 
 # SocketIO and Main Block 
