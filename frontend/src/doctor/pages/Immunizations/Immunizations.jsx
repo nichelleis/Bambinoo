@@ -100,7 +100,7 @@ const Immunizations = ({ selectedChild }) => {
   if (!selectedChild) {
     return (
       <div className="immunization-empty">
-        <div className="empty-card">
+        <div className="immunization-empty-card">
           <i className="ri-syringe-line" />
           <h2>No Patient Selected</h2>
           <p>
