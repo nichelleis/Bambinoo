@@ -614,6 +614,44 @@ def delete_appointment(appointment_id):
         return jsonify({'error': 'Failed to delete appointment'}), 500
 
 
+@app.route('/add-health-note', methods=['POST'])
+@jwt_required()
+def add_health_note():
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+
+        child = Child.query.filter_by(parent_id=user_id).first()
+        if not child:
+            return jsonify({"message": "Child record not found"}), 404
+
+        record_date = datetime.fromisoformat(data.get('noticedAt'))
+
+        new_note = HealthNote(
+            child_id=child.id,
+            record_type=data.get('type'),
+            record_date=record_date,
+            symptom_type=data.get('symptomType'),
+            severity=data.get('severity'),
+            medication_name=data.get('medicationName'),
+            medication_dosage=data.get('dosage'),
+            reason=data.get('reason'),
+            temperature=float(data.get('temperature')) if data.get('temperature') else None,
+            title=data.get('subject'),
+            description=data.get('description') or data.get('details'),
+            notes=f"Entry created via {data.get('type')} form."
+        )
+
+        db.session.add(new_note)
+        db.session.commit()
+
+        return jsonify({"message": "Successfully recorded health data"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print("Backend Error:", str(e))
+        return jsonify({"message": "Internal server error", "error": str(e)}), 500
+
 
 @app.route('/milestone-status')
 @jwt_required()
@@ -2496,6 +2534,8 @@ def get_dashboard_stats():
         total_users = User.query.count()
         total_doctors = User.query.filter(User.role.ilike('%doctor%')).count()
         users_with_phones = User.query.filter(User.phone.isnot(None), User.phone != '').count()
+
+        total_events = Event.query.count()
         
         try:
             total_children = Child.query.count()
@@ -2542,7 +2582,7 @@ def get_dashboard_stats():
             "totalUsers": total_users,
             "activeDoctors": total_doctors,
             "totalChildren": total_children,
-            "usersWithPhones": users_with_phones,
+            "totalEvents": total_events,
             "chartData": chart_data,
             "recentUsers": recent_users,
             "actionRequired": action_required[:5]

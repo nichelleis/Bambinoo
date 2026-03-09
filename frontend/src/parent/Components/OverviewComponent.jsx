@@ -58,7 +58,7 @@ function Overview() {
     new Date(d.date).toLocaleDateString("en-US", {
       month: "short",
       year: "numeric",
-    })
+    }),
   );
   const weights = trendData.map((d) => d.weight ?? 0);
 
@@ -84,7 +84,7 @@ function Overview() {
       <div className="row card-body text-center mb-1">
         <div className="col-4">
           <div
-            className="stat-card p-4 rounded"
+            className="overview-stat-card p-4 rounded"
             style={{ background: "rgba(107, 99, 255, 0.2)" }}
           >
             <div className="fs-2 fw-bold text-primary">{weightCurrent} kg</div>
@@ -97,7 +97,7 @@ function Overview() {
 
         <div className="col-4">
           <div
-            className="stat-card p-4 rounded"
+            className="overview-stat-card p-4 rounded"
             style={{ background: "rgba(255, 107, 156, 0.2)" }}
           >
             <div className="fs-2 fw-bold text-secondary">{headCurrent} cm</div>
@@ -110,7 +110,7 @@ function Overview() {
 
         <div className="col-4">
           <div
-            className="stat-card p-4 rounded"
+            className="overview-stat-card p-4 rounded"
             style={{ background: "rgba(254, 192, 99, 0.2)" }}
           >
             <div className="fs-2 fw-bold text-warning">{headCurrent} cm</div>

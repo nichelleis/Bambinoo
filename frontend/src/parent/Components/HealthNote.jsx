@@ -2,23 +2,82 @@ import style from "../../assets/styleSheets/ParentDashboard.module.css";
 import { useState, useEffect } from "react";
 
 function HealthNote() {
-  const getNow = () => {
-    const now = new Date();
-    return now.toISOString().slice(0, 16);
+  const getNow = () => new Date().toISOString().slice(0, 16);
+
+  const initialFormState = {
+    noticedAt: getNow(),
+    symptomType: "",
+    severity: "mild",
+    description: "",
+    medicationName: "",
+    dosage: "",
+    reason: "",
+    temperature: "",
+    subject: "",
+    details: "",
   };
+
   const [showModal, setShowModal] = useState(false);
   const [activeForm, setActiveForm] = useState(null);
-  const [noticedAt, setNoticedAt] = useState(getNow());
+  const [formData, setFormData] = useState(initialFormState);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      ...initialFormState,
+      noticedAt: getNow(),
+    });
+  };
 
   const openModal = (form) => {
     setActiveForm(form);
-    setNoticedAt(getNow());
+    resetForm();
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setActiveForm(null);
+    resetForm();
+  };
+
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login first");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/add-health-note", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type: activeForm,
+          ...formData,
+        }),
+      });
+
+      if (response.ok) {
+        alert(
+          `${activeForm.charAt(0).toUpperCase() + activeForm.slice(1)} recorded!`,
+        );
+        closeModal();
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message || "Failed to save record"}`);
+      }
+    } catch (error) {
+      console.error("Connection error:", error);
+      alert("Could not connect to the server.");
+    }
   };
 
   useEffect(() => {
@@ -56,7 +115,6 @@ function HealthNote() {
           <i className="bi bi-thermometer-half"></i>
           <span>Temperature</span>
         </div>
-
         <div
           className={`${style.quadrant} ${style.meds}`}
           onClick={() => openModal("medication")}
@@ -64,7 +122,6 @@ function HealthNote() {
           <i className="bi bi-capsule"></i>
           <span>Medication</span>
         </div>
-
         <div
           className={`${style.quadrant} ${style.symptoms}`}
           onClick={() => openModal("symptoms")}
@@ -72,7 +129,6 @@ function HealthNote() {
           <i className="bi bi-activity"></i>
           <span className={style.symptomsSpan}>Symptoms</span>
         </div>
-
         <div
           className={`${style.quadrant} ${style.notes}`}
           onClick={() => openModal("note")}
@@ -90,27 +146,43 @@ function HealthNote() {
                 <h4>Record Symptoms</h4>
                 <hr />
                 <label>Symptom Type</label>
-                <input type="text" placeholder="e.g./- Rash, Cough, Fever" />
+                <input
+                  type="text"
+                  name="symptomType"
+                  value={formData.symptomType}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Rash, Cough"
+                />
                 <label>Severity</label>
-                <select name="severity" id="severity">
+                <select
+                  name="severity"
+                  value={formData.severity}
+                  onChange={handleInputChange}
+                >
                   <option value="mild">Mild</option>
                   <option value="moderate">Moderate</option>
                   <option value="severe">Severe</option>
                 </select>
                 <label>Description</label>
                 <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
                   rows="4"
-                  placeholder="Describe the symptoms in detail..."
-                ></textarea>
+                  placeholder="Details..."
+                />
                 <label>Date & Time Noticed</label>
                 <input
                   type="datetime-local"
-                  value={noticedAt}
-                  onChange={(e) => setNoticedAt(e.target.value)}
+                  name="noticedAt"
+                  value={formData.noticedAt}
+                  onChange={handleInputChange}
                 />
-
-                <button className={style.btnPrimaryCustom}>
-                  <i className="bi bi-save p-2"></i>Save Weight
+                <button
+                  className={style.btnPrimaryCustom}
+                  onClick={handleSubmit}
+                >
+                  <i className="bi bi-save p-2"></i>Save Symptom
                 </button>
               </div>
             )}
@@ -120,22 +192,40 @@ function HealthNote() {
                 <h4>Record Medication</h4>
                 <hr />
                 <label>Medication Name</label>
-                <input type="text" placeholder="e.g./- Paracetamol" />
-
+                <input
+                  type="text"
+                  name="medicationName"
+                  value={formData.medicationName}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Paracetamol"
+                />
                 <label>Dosage</label>
-                <input type="text" placeholder="e.g./- 5ml twice daily" />
-
+                <input
+                  type="text"
+                  name="dosage"
+                  value={formData.dosage}
+                  onChange={handleInputChange}
+                  placeholder="e.g. 5ml"
+                />
                 <label>Reason</label>
-                <input type="text" placeholder="e.g./- Fever" />
-
+                <input
+                  type="text"
+                  name="reason"
+                  value={formData.reason}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Fever"
+                />
                 <label>Date & Time Given</label>
                 <input
                   type="datetime-local"
-                  value={noticedAt}
-                  onChange={(e) => setNoticedAt(e.target.value)}
+                  name="noticedAt"
+                  value={formData.noticedAt}
+                  onChange={handleInputChange}
                 />
-
-                <button className={style.btnPrimaryCustom}>
+                <button
+                  className={style.btnPrimaryCustom}
+                  onClick={handleSubmit}
+                >
                   <i className="bi bi-save p-2"></i>Save Medication
                 </button>
               </div>
@@ -146,22 +236,33 @@ function HealthNote() {
                 <h4>Record Temperature</h4>
                 <hr />
                 <label>Temperature (°C)</label>
-                <input type="number" step="0.1" placeholder="e.g./- 37.5" />
-
+                <input
+                  type="number"
+                  step="0.1"
+                  name="temperature"
+                  value={formData.temperature}
+                  onChange={handleInputChange}
+                  placeholder="37.5"
+                />
                 <label>Date & Time Recorded</label>
                 <input
                   type="datetime-local"
-                  value={noticedAt}
-                  onChange={(e) => setNoticedAt(e.target.value)}
+                  name="noticedAt"
+                  value={formData.noticedAt}
+                  onChange={handleInputChange}
                 />
-
                 <label>Notes (Optional)</label>
                 <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
                   rows="2"
-                  placeholder="Any symptoms or observations..."
-                ></textarea>
-
-                <button className={style.btnPrimaryCustom}>
+                  placeholder="Observations..."
+                />
+                <button
+                  className={style.btnPrimaryCustom}
+                  onClick={handleSubmit}
+                >
                   <i className="bi bi-save p-2"></i>Save Temperature
                 </button>
               </div>
@@ -171,31 +272,38 @@ function HealthNote() {
               <div className={style.recordForm}>
                 <h4>Add Health Note</h4>
                 <hr />
-
                 <label>Subject</label>
                 <input
                   type="text"
-                  placeholder="e.g./- Sleep pattern, Behavior change"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Sleep pattern"
                 />
-
                 <label>Details</label>
                 <textarea
+                  name="details"
+                  value={formData.details}
+                  onChange={handleInputChange}
                   rows="4"
-                  placeholder="Write your observations or notes here..."
-                ></textarea>
-
+                  placeholder="Write observations here..."
+                />
                 <label>Date & Time</label>
                 <input
                   type="datetime-local"
-                  value={noticedAt}
-                  onChange={(e) => setNoticedAt(e.target.value)}
+                  name="noticedAt"
+                  value={formData.noticedAt}
+                  onChange={handleInputChange}
                 />
-
-                <button className={style.btnPrimaryCustom}>
+                <button
+                  className={style.btnPrimaryCustom}
+                  onClick={handleSubmit}
+                >
                   <i className="bi bi-save p-2"></i>Save Note
                 </button>
               </div>
             )}
+
             <button
               className={`${style.recordCloseBtn} btn btn-secondary`}
               onClick={closeModal}

@@ -28,7 +28,6 @@ function SideNav() {
       path: "/parent/message-doctor",
       icon: "bi-chat-dots-fill",
     },
-    { name: "More", path: "/parent/more", icon: "bi-three-dots" },
   ];
   return (
     <nav className={style.mainMenu}>
