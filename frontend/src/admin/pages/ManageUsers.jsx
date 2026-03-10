@@ -8,14 +8,13 @@ export default function ManageUsers() {
   const [roleFilter, setRoleFilter] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    phone: '',
-    moh_id: '',
-    role: 'Doctor',
-    password: ''
+    username: '', email: '', phone: '', moh_id: '', role: 'doctor', password: '',
+    registration_number: '', child_name: '', child_dob: '', nationality: '', child_number: '',
+    language: '', mother_name: '', mother_dob: '', mother_email: '', mother_phone: '',
+    birth_location: '', birth_hospital: '', delivery_type: '', surgery: '', birth_weight: '',
+    birth_length: '', head_circumference: '', personnel_type: '', personnel_name: '',
+    living_address: '', registration_date: '', status: 'pending'
   });
 
   const fetchUsers = async () => {
@@ -44,9 +43,9 @@ export default function ManageUsers() {
   }, []);
 
   const exportToCSV = () => {
-    const headers = "ID,Username,Email,Phone,MOH_ID,Role\n";
+    const headers = "MOH_ID,Username,Email,Phone,Role\n";
     const rows = filteredUsers.map(u => 
-      `${u.id},${u.username},${u.email},${u.phone || 'N/A'},${u.moh_id || u.MOH_ID || 'N/A'},${u.role}`
+      `${u.moh_id || u.MOH_ID || 'N/A'},${u.username},${u.email},${u.phone || 'N/A'},${u.role}`
     ).join("\n");
     const blob = new Blob([headers + rows], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -76,7 +75,6 @@ export default function ManageUsers() {
       if (response.ok) {
         setShowModal(false);
         setEditingUser(null);
-        setFormData({ username: '', email: '', phone: '', moh_id: '', role: 'Doctor', password: '' });
         fetchUsers();
       } else {
         const errorData = await response.json();
@@ -112,10 +110,17 @@ export default function ManageUsers() {
   };
 
   const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.username.toLowerCase().includes(searchTerm.toLowerCase());
+    const mohIdString = String(user.moh_id || user.MOH_ID || "").toLowerCase();
+    const matchesSearch = mohIdString.includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "All" || user.role?.toLowerCase() === roleFilter.toLowerCase();
     return matchesSearch && matchesRole;
   });
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const isParent = editingUser ? editingUser.role?.toLowerCase() === 'parent' : formData.role?.toLowerCase() === 'parent';
 
   return (
     <div className="admin-content" style={{ padding: '20px' }}>
@@ -128,7 +133,11 @@ export default function ManageUsers() {
           <button style={exportBtnStyle} onClick={exportToCSV}>
             <span style={{ fontSize: '16px' }}>📥</span> Export CSV
           </button>
-          <button style={createBtnStyle} onClick={() => { setEditingUser(null); setFormData({ username: '', email: '', phone: '', moh_id: '', role: 'Doctor', password: '' }); setShowModal(true); }}>
+          <button style={createBtnStyle} onClick={() => { 
+            setEditingUser(null); 
+            setFormData({ username: '', email: '', phone: '', moh_id: '', role: 'doctor', password: '', registration_number: '', child_name: '', child_dob: '', nationality: '', child_number: '', language: '', mother_name: '', mother_dob: '', mother_email: '', mother_phone: '', birth_location: '', birth_hospital: '', delivery_type: '', surgery: '', birth_weight: '', birth_length: '', head_circumference: '', personnel_type: '', personnel_name: '', living_address: '', registration_date: '', status: 'pending' }); 
+            setShowModal(true); 
+          }}>
             + Create Staff Account
           </button>
         </div>
@@ -138,18 +147,18 @@ export default function ManageUsers() {
         <div style={{ position: 'relative', flex: 1 }}>
           <span style={searchIconStyle}>🔍</span>
           <input 
-            type="text" 
-            placeholder="Search by username..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            type="text" placeholder="Search by MOH ID..." 
+            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
             style={searchInputStyle}
           />
         </div>
+        
         <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} style={selectStyle}>
-          <option value="All">All Staff Roles</option>
-          <option value="Admin">Admin</option>
-          <option value="Doctor">Doctor</option>
-          <option value="Nurse">Nurse</option>
+          <option value="All">Filter by Role</option>
+          <option value="admin">Admin</option>
+          <option value="doctor">Doctor</option>
+          <option value="nurse">Nurse</option>
+          <option value="parent">Parent</option>
         </select>
       </div>
 
@@ -157,7 +166,7 @@ export default function ManageUsers() {
         <table style={tableStyle}>
           <thead>
             <tr style={tableHeaderRowStyle}>
-              <th style={headerStyle}>ID</th>
+              <th style={headerStyle}>MOH ID</th>
               <th style={headerStyle}>USERNAME</th>
               <th style={headerStyle}>EMAIL</th>
               <th style={headerStyle}>PHONE</th>
@@ -168,7 +177,7 @@ export default function ManageUsers() {
           <tbody>
             {filteredUsers.map((user) => (
               <tr key={user.id} style={tableRowStyle}>
-                <td style={cellStyle}>#{user.id}</td>
+                <td style={cellStyle}>{user.moh_id || user.MOH_ID || 'N/A'}</td>
                 <td style={{ ...cellStyle, fontWeight: '600' }}>{user.username}</td>
                 <td style={cellStyle}>{user.email}</td>
                 <td style={cellStyle}>{user.phone || 'N/A'}</td>
@@ -176,14 +185,7 @@ export default function ManageUsers() {
                 <td style={cellStyle}>
                   <button onClick={() => { 
                     setEditingUser(user); 
-                    setFormData({
-                      username: user.username,
-                      email: user.email,
-                      phone: user.phone || '',
-                      moh_id: user.moh_id || user.MOH_ID || '',
-                      role: user.role,
-                      password: ''
-                    }); 
+                    setFormData({ ...formData, username: user.username, email: user.email, phone: user.phone || '', moh_id: user.moh_id || user.MOH_ID || '', role: user.role?.toLowerCase() || 'doctor', password: '' }); 
                     setShowModal(true); 
                   }} style={actionBtnStyle}>Edit</button>
                   <button 
@@ -201,49 +203,105 @@ export default function ManageUsers() {
 
       {showModal && (
         <div style={modalOverlayStyle}>
-          <div style={modalContentStyle}>
-            <h2 style={{ marginBottom: '20px', fontSize: '24px' }}>{editingUser ? 'Edit Staff Account' : 'Register New Staff'}</h2>
+          <div style={{...modalContentStyle, width: isParent ? '800px' : '500px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h2 style={{ marginBottom: '20px', fontSize: '24px' }}>
+              {editingUser ? `Edit ${isParent ? 'Parent' : 'Staff'} Account` : 'Register New Account'}
+            </h2>
+            
             <form onSubmit={handleSaveUser}>
-              <div style={formGroupStyle}>
-                <label style={labelStyle}>Username</label>
-                <input required style={modalInputStyle} type="text" value={formData.username} onChange={(e) => setFormData({...formData, username: e.target.value})} />
-              </div>
-              <div style={formGroupStyle}>
-                <label style={labelStyle}>Email</label>
-                <input required style={modalInputStyle} type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-              </div>
               
-              <div style={{ display: 'flex', gap: '15px', width: '100%' }}>
-                <div style={formGroupStyle}>
-                  <label style={labelStyle}>Phone Number</label>
-                  <input style={modalInputStyle} type="text" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
-                </div>
-                <div style={formGroupStyle}>
-                  <label style={labelStyle}>MOH ID</label>
-                  <input style={modalInputStyle} type="text" value={formData.moh_id} onChange={(e) => setFormData({...formData, moh_id: e.target.value})} />
-                </div>
-              </div>
+              {!isParent && (
+                <>
+                  <div style={formGroupStyle}>
+                    <label style={labelStyle}>Username</label>
+                    <input required name="username" style={modalInputStyle} type="text" value={formData.username} onChange={handleInputChange} />
+                  </div>
+                  <div style={formGroupStyle}>
+                    <label style={labelStyle}>Email</label>
+                    <input required name="email" style={modalInputStyle} type="email" value={formData.email} onChange={handleInputChange} />
+                  </div>
+                  <div style={{ display: 'flex', gap: '15px', width: '100%' }}>
+                    <div style={formGroupStyle}>
+                      <label style={labelStyle}>Phone Number</label>
+                      <input name="phone" style={modalInputStyle} type="text" value={formData.phone} onChange={handleInputChange} />
+                    </div>
+                    <div style={formGroupStyle}>
+                      <label style={labelStyle}>MOH ID</label>
+                      <input name="moh_id" style={modalInputStyle} type="text" value={formData.moh_id} onChange={handleInputChange} />
+                    </div>
+                  </div>
+                  <div style={formGroupStyle}>
+                    <label style={labelStyle}>Password</label>
+                    <input required={!editingUser} placeholder={editingUser ? "Leave blank to keep current" : ""} name="password" style={modalInputStyle} type="password" value={formData.password} onChange={handleInputChange} />
+                  </div>
+                  {!editingUser && (
+                    <div style={formGroupStyle}>
+                      <label style={labelStyle}>Role</label>
+                      <select name="role" style={modalInputStyle} value={formData.role} onChange={handleInputChange}>
+                        <option value="doctor">Doctor</option>
+                        <option value="nurse">Nurse</option>
+                        <option value="admin">Admin</option>
+                        <option value="parent">Parent</option>
+                      </select>
+                    </div>
+                  )}
+                </>
+              )}
 
-              <div style={formGroupStyle}>
-                <label style={labelStyle}>Password</label>
-                <input 
-                    required={!editingUser} 
-                    placeholder={editingUser ? "Leave blank to keep current" : ""}
-                    style={modalInputStyle} 
-                    type="password" 
-                    value={formData.password} 
-                    onChange={(e) => setFormData({...formData, password: e.target.value})} 
-                />
-              </div>
-              
-              <div style={formGroupStyle}>
-                <label style={labelStyle}>Role</label>
-                <select style={modalInputStyle} value={formData.role} onChange={(e) => setFormData({...formData, role: e.target.value})}>
-                  <option value="Doctor">Doctor</option>
-                  <option value="Nurse">Nurse</option>
-                  <option value="Admin">Admin</option>
-                </select>
-              </div>
+              {isParent && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  
+                  <div style={sectionCardStyle}>
+                    <h3 style={sectionTitleStyle}>👶 Child Information</h3>
+                    <div style={gridStyle}>
+                      <div style={formGroupStyle}><label style={labelStyle}>Child Name</label><input required name="child_name" style={modalInputStyle} type="text" value={formData.child_name} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Child DOB</label><input required name="child_dob" style={modalInputStyle} type="date" value={formData.child_dob} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Nationality</label><input name="nationality" style={modalInputStyle} type="text" value={formData.nationality} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Child Number / ID</label><input name="child_number" style={modalInputStyle} type="text" value={formData.child_number} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Language</label><input name="language" style={modalInputStyle} type="text" value={formData.language} onChange={handleInputChange} /></div>
+                    </div>
+                  </div>
+
+                  <div style={sectionCardStyle}>
+                    <h3 style={sectionTitleStyle}>👩 Mother Information</h3>
+                    <div style={gridStyle}>
+                      <div style={formGroupStyle}><label style={labelStyle}>Mother Name (Username)</label><input required name="username" style={modalInputStyle} type="text" value={formData.username} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Mother DOB</label><input required name="mother_dob" style={modalInputStyle} type="date" value={formData.mother_dob} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Email</label><input required name="email" style={modalInputStyle} type="email" value={formData.email} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Phone</label><input required name="phone" style={modalInputStyle} type="text" value={formData.phone} onChange={handleInputChange} /></div>
+                    </div>
+                    <div style={{ ...formGroupStyle, marginTop: '10px' }}><label style={labelStyle}>Living Address</label><textarea name="living_address" style={{...modalInputStyle, resize: 'vertical'}} rows="2" value={formData.living_address} onChange={handleInputChange} /></div>
+                    <div style={{ ...formGroupStyle, marginTop: '10px' }}>
+                      <label style={labelStyle}>Password</label>
+                      <input required={!editingUser} placeholder={editingUser ? "Leave blank to keep current" : ""} name="password" style={modalInputStyle} type="password" value={formData.password} onChange={handleInputChange} />
+                    </div>
+                  </div>
+
+                  <div style={sectionCardStyle}>
+                    <h3 style={sectionTitleStyle}>🏥 Birth Details</h3>
+                    <div style={gridStyle}>
+                      <div style={formGroupStyle}><label style={labelStyle}>Birth Location</label><input name="birth_location" style={modalInputStyle} type="text" value={formData.birth_location} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Hospital</label><input name="birth_hospital" style={modalInputStyle} type="text" value={formData.birth_hospital} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Delivery Type</label><input name="delivery_type" style={modalInputStyle} type="text" value={formData.delivery_type} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Surgery</label><input name="surgery" style={modalInputStyle} type="text" value={formData.surgery} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Birth Weight (kg)</label><input name="birth_weight" style={modalInputStyle} type="number" step="0.01" value={formData.birth_weight} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Birth Length (cm)</label><input name="birth_length" style={modalInputStyle} type="number" step="0.01" value={formData.birth_length} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Head Circum. (cm)</label><input name="head_circumference" style={modalInputStyle} type="number" step="0.01" value={formData.head_circumference} onChange={handleInputChange} /></div>
+                    </div>
+                  </div>
+
+                  <div style={sectionCardStyle}>
+                    <h3 style={sectionTitleStyle}>📝 Registration Details</h3>
+                    <div style={gridStyle}>
+                      <div style={formGroupStyle}><label style={labelStyle}>Reg. Number</label><input required name="registration_number" style={modalInputStyle} type="text" value={formData.registration_number} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Reg. Date</label><input required name="registration_date" style={modalInputStyle} type="date" value={formData.registration_date} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Personnel Name</label><input name="personnel_name" style={modalInputStyle} type="text" value={formData.personnel_name} onChange={handleInputChange} /></div>
+                      <div style={formGroupStyle}><label style={labelStyle}>Personnel Type</label><input name="personnel_type" style={modalInputStyle} type="text" value={formData.personnel_type} onChange={handleInputChange} /></div>
+                    </div>
+                  </div>
+
+                </div>
+              )}
 
               <div style={modalFooterStyle}>
                 <button type="submit" style={saveBtnStyle}>Save</button>
@@ -276,8 +334,11 @@ const headerStyle = { padding: '16px', fontSize: '12px', color: '#64748b' };
 const cellStyle = { padding: '16px', fontSize: '14px', color: '#334155' };
 const actionBtnStyle = { border: 'none', background: 'transparent', color: '#3b82f6', cursor: 'pointer', marginRight: '15px' };
 const modalOverlayStyle = { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 };
-const modalContentStyle = { background: 'white', padding: '40px', borderRadius: '16px', width: '500px', boxSizing: 'border-box' };
-const formGroupStyle = { marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 0 };
+const modalContentStyle = { background: 'white', padding: '40px', borderRadius: '16px', boxSizing: 'border-box', margin: '20px 0' };
+const formGroupStyle = { display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, minWidth: 0 };
 const modalInputStyle = { width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', boxSizing: 'border-box' };
-const modalFooterStyle = { display: 'flex', gap: '15px', marginTop: '10px' };
+const modalFooterStyle = { display: 'flex', gap: '15px', marginTop: '30px', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '20px' };
 const labelStyle = { fontSize: '14px', fontWeight: '500', color: '#1e293b' };
+const sectionCardStyle = { background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' };
+const sectionTitleStyle = { margin: '0 0 15px 0', fontSize: '18px', color: '#334155', borderBottom: '2px solid #e2e8f0', paddingBottom: '10px' };
+const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' };
