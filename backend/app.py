@@ -2404,193 +2404,7 @@ def save_doctor_profile():
         print(f"PUT /doctor-profile error: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Admin Management Routes
 
-
-@app.route('/api/admin/users', methods=['GET'])
-@jwt_required()
-def get_admin_users():
-    try:
-        user_id = get_jwt_identity()
-        current_user = db.session.get(User, int(user_id))
-        
-        if not current_user or current_user.role.lower() != 'admin':
-            return jsonify({"message": "Unauthorized"}), 403
-
-        users = User.query.all()
-        return jsonify([
-            {
-                "id": u.id,
-                "username": u.username,
-                "email": u.email,
-                "phone": u.phone,
-                "MOH_ID": u.MOH_ID, 
-                "role": u.role
-            } for u in users
-        ]), 200
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
-
-@app.route('/api/admin/create-user', methods=['POST'])
-@jwt_required()
-def create_staff_user():
-    try:
-        user_id = get_jwt_identity()
-        admin = db.session.get(User, int(user_id))
-        if not admin or admin.role.lower() != 'admin':
-            return jsonify({"message": "Unauthorized"}), 403
-
-        data = request.get_json()
-        
-        if User.query.filter_by(email=data['email']).first():
-            return jsonify({"message": "Email already registered"}), 400
-
-        new_user = User(
-            username=data['username'],
-            email=data['email'],
-            phone=data.get('phone'),
-            MOH_ID=data.get('moh_id') or data.get('MOH_ID'),
-            role=data.get('role', 'doctor'),
-            password_hash=generate_password_hash(data['password'])
-        )
-        
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({"message": "Staff created successfully"}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 500
-
-@app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
-@jwt_required()
-def update_user(user_id):
-    try:
-        admin_id = get_jwt_identity()
-        admin = db.session.get(User, int(admin_id))
-        if not admin or admin.role.lower() != 'admin':
-            return jsonify({"message": "Unauthorized"}), 403
-
-        user = db.session.get(User, user_id)
-        if not user:
-            return jsonify({"message": "User not found"}), 404
-
-        data = request.get_json()
-
-        user.username = data.get('username', user.username)
-        user.email = data.get('email', user.email)
-        user.phone = data.get('phone', user.phone)
-        user.MOH_ID = data.get('moh_id', user.MOH_ID) or data.get('MOH_ID', user.MOH_ID)
-        user.role = data.get('role', user.role)
-
-        if data.get('password'):
-            user.password_hash = generate_password_hash(data['password'])
-
-        db.session.commit()
-        return jsonify({"message": "User updated successfully"}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 500
-
-from flask import jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-
-@app.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
-@jwt_required()
-def delete_user(user_id):
-    try:
-        current_admin_id = int(get_jwt_identity())
-        admin_user = db.session.get(User, current_admin_id)
-        
-        if not admin_user or admin_user.role.lower() != 'admin':
-            return jsonify({"message": "Unauthorized"}), 403
-
-        if user_id == current_admin_id:
-            return jsonify({"message": "Cannot delete your own account"}), 400
-
-        user_to_delete = db.session.get(User, user_id)
-        if not user_to_delete:
-            return jsonify({"message": "User not found"}), 404
-
-        db.session.delete(user_to_delete)
-        db.session.commit()
-        
-        return jsonify({"message": "User deleted successfully"}), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": str(e)}), 500
-    
-    
-@app.route('/api/admin/dashboard-stats', methods=['GET'])
-@jwt_required()
-def get_dashboard_stats():
-    try:
-        user_id = get_jwt_identity()
-        current_user = db.session.get(User, int(user_id))
-        
-        if not current_user or current_user.role.lower() != 'admin':
-            return jsonify({"message": "Unauthorized"}), 403
-
-        total_users = User.query.count()
-        total_doctors = User.query.filter(User.role.ilike('%doctor%')).count()
-        users_with_phones = User.query.filter(User.phone.isnot(None), User.phone != '').count()
-
-        total_events = Event.query.count()
-        
-        try:
-            total_children = Child.query.count()
-        except Exception:
-            total_children = 0 
-
-        all_users = User.query.all()
-        role_counts = {}
-        action_required = []
-        
-        for u in all_users:
-            role = u.role or 'Unknown'
-            role_counts[role] = role_counts.get(role, 0) + 1
-            
-            missing_fields = []
-            if not u.phone or str(u.phone).strip() == '':
-                missing_fields.append('Phone Number')
-            
-            is_doctor = u.role and 'doctor' in u.role.lower()
-            if is_doctor and (not u.MOH_ID or str(u.MOH_ID).strip() == ''):
-                missing_fields.append('MOH ID')
-            
-            if missing_fields:
-                action_required.append({
-                    "id": u.id,
-                    "username": u.username,
-                    "role": u.role or "N/A",
-                    "missing": ", ".join(missing_fields)
-                })
-                
-        chart_data = [{"name": k.upper(), "value": v} for k, v in role_counts.items()]
-
-        recent_users_query = User.query.order_by(User.id.desc()).limit(5).all()
-        recent_users = [
-            {
-                "id": u.id, 
-                "username": u.username, 
-                "role": u.role or "N/A", 
-                "email": u.email
-            } for u in recent_users_query
-        ]
-
-        return jsonify({
-            "totalUsers": total_users,
-            "activeDoctors": total_doctors,
-            "totalChildren": total_children,
-            "totalEvents": total_events,
-            "chartData": chart_data,
-            "recentUsers": recent_users,
-            "actionRequired": action_required[:5]
-        }), 200
-
-    except Exception as e:
-        return jsonify({"message": str(e)}), 500
-    
     
 _WHO_STANDARDS = {
     'boy': {
@@ -2604,7 +2418,6 @@ _WHO_STANDARDS = {
         'weight':  [3.2,  5.8,  7.3,  8.2,  8.9,  9.6,  10.2, 10.9, 11.5]
     }
 }
-
 
 @app.route('/who-standards/<gender>', methods=['GET'])
 @jwt_required()
@@ -2892,8 +2705,237 @@ Return EXACTLY this JSON structure (base all fields on the real data above):
                 "error_fix": "Check the backend console for more details."}), 500
 
 
-# Admin Event Routes
 
+# Admin Management Routes
+
+@app.route('/api/admin/users', methods=['GET'])
+@jwt_required()
+def get_admin_users():
+    try:
+        user_id = get_jwt_identity()
+        current_user = db.session.get(User, int(user_id))
+        
+        if not current_user or current_user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        users = User.query.all()
+        return jsonify([
+            {
+                "id": u.id,
+                "username": u.username,
+                "email": u.email,
+                "phone": u.phone,
+                "MOH_ID": u.MOH_ID, 
+                "role": u.role
+            } for u in users
+        ]), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+@app.route('/api/admin/create-user', methods=['POST'])
+@jwt_required()
+def create_staff_user():
+    try:
+        user_id = get_jwt_identity()
+        admin = db.session.get(User, int(user_id))
+        if not admin or admin.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        data = request.get_json()
+        
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({"message": "Email already registered"}), 400
+
+        new_user = User(
+            username=data['username'],
+            email=data['email'],
+            phone=data.get('phone'),
+            MOH_ID=data.get('moh_id') or data.get('MOH_ID'),
+            role=data.get('role', 'doctor'),
+            password_hash=generate_password_hash(data['password'])
+        )
+        
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "Staff created successfully"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 500
+
+@app.route('/api/admin/users/<int:user_id>', methods=['PUT'])
+@jwt_required()
+def update_user(user_id):
+    try:
+        admin_id = get_jwt_identity()
+        admin = db.session.get(User, int(admin_id))
+        if not admin or admin.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        user = db.session.get(User, user_id)
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+
+        data = request.get_json()
+
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        user.phone = data.get('phone', user.phone)
+        user.MOH_ID = data.get('moh_id', user.MOH_ID) or data.get('MOH_ID', user.MOH_ID)
+        user.role = data.get('role', user.role)
+
+        if data.get('password'):
+            user.password_hash = generate_password_hash(data['password'])
+
+        if user.role.lower() == 'parent':
+            reg = PendingRegistration.query.filter_by(mother_email=user.email).first()
+            if reg:
+                reg.child_name = data.get('child_name', reg.child_name)
+                reg.nationality = data.get('nationality', reg.nationality)
+                reg.child_number = data.get('child_number', reg.child_number)
+                reg.language = data.get('language', reg.language)
+                reg.mother_name = data.get('username', reg.mother_name)
+                reg.mother_phone = data.get('phone', reg.mother_phone)
+                reg.birth_location = data.get('birth_location', reg.birth_location)
+                reg.birth_hospital = data.get('birth_hospital', reg.birth_hospital)
+                reg.delivery_type = data.get('delivery_type', reg.delivery_type)
+                reg.surgery = data.get('surgery', reg.surgery)
+                
+                if data.get('birth_weight'): 
+                    reg.birth_weight = float(data['birth_weight'])
+                if data.get('birth_length'): 
+                    reg.birth_length = float(data['birth_length'])
+                if data.get('head_circumference'): 
+                    reg.head_circumference = float(data['head_circumference'])
+                
+                reg.personnel_type = data.get('personnel_type', reg.personnel_type)
+                reg.personnel_name = data.get('personnel_name', reg.personnel_name)
+                reg.living_address = data.get('living_address', reg.living_address)
+                reg.registration_number = data.get('registration_number', reg.registration_number)
+
+                if data.get('child_dob'):
+                    reg.child_dob = datetime.strptime(data['child_dob'], "%Y-%m-%d").date()
+                if data.get('mother_dob'):
+                    reg.mother_dob = datetime.strptime(data['mother_dob'], "%Y-%m-%d").date()
+                if data.get('registration_date'):
+                    reg.registration_date = datetime.strptime(data['registration_date'], "%Y-%m-%d").date()
+
+        db.session.commit()
+        return jsonify({"message": "User updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 500
+
+from flask import jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+@app.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+    try:
+        current_admin_id = int(get_jwt_identity())
+        admin_user = db.session.get(User, current_admin_id)
+        
+        if not admin_user or admin_user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        if user_id == current_admin_id:
+            return jsonify({"message": "Cannot delete your own account"}), 400
+
+        user_to_delete = db.session.get(User, user_id)
+        if not user_to_delete:
+            return jsonify({"message": "User not found"}), 404
+
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        
+        return jsonify({"message": "User deleted successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": str(e)}), 500
+    
+    
+@app.route('/api/admin/dashboard-stats', methods=['GET'])
+@jwt_required()
+def get_dashboard_stats():
+    try:
+        user_id = get_jwt_identity()
+        current_user = db.session.get(User, int(user_id))
+        
+        if not current_user or current_user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+        total_users = User.query.count()
+        total_doctors = User.query.filter(User.role.ilike('%doctor%')).count()
+        users_with_phones = User.query.filter(User.phone.isnot(None), User.phone != '').count()
+
+        total_events = Event.query.count()
+        
+        try:
+            total_children = Child.query.count()
+        except Exception:
+            total_children = 0 
+
+        all_users = User.query.all()
+        role_counts = {}
+        action_required = []
+        
+        for u in all_users:
+            role = u.role or 'Unknown'
+            role_counts[role] = role_counts.get(role, 0) + 1
+            
+            missing_fields = []
+            if not u.phone or str(u.phone).strip() == '':
+                missing_fields.append('Phone Number')
+            
+            is_doctor = u.role and 'doctor' in u.role.lower()
+            if is_doctor and (not u.MOH_ID or str(u.MOH_ID).strip() == ''):
+                missing_fields.append('MOH ID')
+            
+            if missing_fields:
+                action_required.append({
+                    "id": u.id,
+                    "username": u.username,
+                    "role": u.role or "N/A",
+                    "missing": ", ".join(missing_fields)
+                })
+                
+        chart_data = [{"name": k.upper(), "value": v} for k, v in role_counts.items()]
+
+        recent_users_query = User.query.order_by(User.id.desc()).limit(5).all()
+        recent_users = [
+            {
+                "id": u.id, 
+                "username": u.username, 
+                "role": u.role or "N/A", 
+                "email": u.email
+            } for u in recent_users_query
+        ]
+
+        reg_data = [
+            {"name": "Sep", "users": 12},
+            {"name": "Oct", "users": 19},
+            {"name": "Nov", "users": 14},
+            {"name": "Dec", "users": 8},
+            {"name": "Jan", "users": 23},
+            {"name": "Feb", "users": 31}
+        ]
+
+        return jsonify({
+            "adminName": current_user.username, 
+            "totalUsers": total_users,
+            "activeDoctors": total_doctors,
+            "totalChildren": total_children,
+            "totalEvents": total_events,
+            "chartData": chart_data,
+            "registrationData": reg_data,
+            "recentUsers": recent_users,
+            "actionRequired": action_required[:5]
+        }), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+    
 @app.route('/api/admin/events', methods=['GET'])
 def get_events():
     try:
@@ -2923,7 +2965,6 @@ def get_events():
     except Exception as ex:
         return jsonify({"error": str(ex)}), 500
 
-
 @app.route('/api/admin/events', methods=['POST'])
 def create_event():
     try:
@@ -2943,7 +2984,6 @@ def create_event():
     except Exception as ex:
         db.session.rollback()
         return jsonify({"error": str(ex)}), 500
-
 
 @app.route('/api/admin/events/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
