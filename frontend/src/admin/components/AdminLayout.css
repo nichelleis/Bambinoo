@@ -14,6 +14,9 @@
     display: flex;
     flex-direction: column;
     border-right: 1px solid #1e293b;
+    height: 100vh;
+    position: sticky;
+    top: 0;
 }
 
 .admin-title {
@@ -29,6 +32,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    overflow-y: auto;
 }
 
 .admin-link {
@@ -46,7 +50,6 @@
     color: #f8fafc;
 }
 
-/* NavLink Active State */
 .admin-link.active {
     background: #334155;
     color: #ffffff;
@@ -56,6 +59,7 @@
 
 .admin-logout {
     margin-top: auto;
+    margin-bottom: 10px;
     padding: 12px;
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
     color: #ffffff;
@@ -93,12 +97,6 @@
     border: 1px solid #f1f5f9;
     transition: all 0.3s ease;
 }
-/* 
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-} */
-
 
 .stat-card h3 {
     color: #64748b; 
@@ -121,6 +119,8 @@
     }
     .admin-sidebar {
         width: 100%;
+        height: auto;
+        position: relative;
         padding: 20px;
         border-right: none;
         border-bottom: 1px solid #1e293b;
@@ -129,70 +129,3 @@
         margin-bottom: 20px;
     }
 }
-
-
-
-.profile-container {
-    max-width: 520px;
-    width: 100%;
-    margin: 0 auto;           
-    display: flex;
-    gap: 32px;
-    align-items: flex-start;
-}
-
-.profile-container::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 4px;
-    width: 100%;
-    border-radius: 16px 16px 0 0;
-}
-
-.profile-initial {
-    width: 72px;
-    height: 72px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #6366f1, #38bdf8);
-    color: #ffffff;
-    font-size: 1.9rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
-}
-
-.profile-right {
-    flex: 1;
-}
-
-.profile-row {
-    margin-bottom: 24px;
-}
-
-.profile-row label {
-    display: block;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #64748b;
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-
-.profile-row div {
-    font-size: 16px;
-    font-weight: 600;
-    color: #0f172a;
-}
-
-
-
-.stat-card.profile-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(99, 102, 241, 0.08);
-}
-
