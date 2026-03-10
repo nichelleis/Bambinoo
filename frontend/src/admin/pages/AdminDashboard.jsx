@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
+    adminName: "",
     totalUsers: 0,
     activeDoctors: 0,
     totalChildren: 0,
@@ -18,6 +15,7 @@ export default function AdminDashboard() {
     chartData: [],
     recentUsers: [],
     actionRequired: [],
+    registrationData: [],
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -39,6 +37,7 @@ export default function AdminDashboard() {
         if (response.ok) {
           const data = await response.json();
           setStats({
+            adminName: data.adminName,
             totalUsers: data.totalUsers,
             activeDoctors: data.activeDoctors,
             totalChildren: data.totalChildren,
@@ -46,6 +45,7 @@ export default function AdminDashboard() {
             chartData: data.chartData,
             recentUsers: data.recentUsers,
             actionRequired: data.actionRequired,
+            registrationData: data.registrationData,
           });
         }
       } catch (error) {
@@ -58,29 +58,17 @@ export default function AdminDashboard() {
     fetchDashboardData();
   }, []);
 
-  const handleExport = () => {
-    const csvContent = `data:text/csv;charset=utf-8,Total Users,Active Doctors,Children Enrolled\n${stats.totalUsers},${stats.activeDoctors},${stats.totalChildren}`;
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "bambinoo_system_stats.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const COLORS = ["#8884d8", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
 
   return (
     <div className="admin-content" style={{ padding: "20px" }}>
       <div className="dashboard-header">
-        <h1 className="admin-title">Admin Dashboard</h1>
-        <p style={{ color: "#64748b", marginBottom: "30px" }}>
-          Welcome to the Bambinoo health tracking system overview.
+        <h1 className="admin-title">Overview</h1>
+        <p style={{ color: "#64748b", marginBottom: "30px", fontSize: "18px" }}>
+          Welcome back, <span style={{ fontWeight: "bold", color: "#0f172a" }}>{stats.adminName || 'Admin'}</span>
         </p>
       </div>
 
-      {/*Stats Grid */}
       <div
         className="stats-grid"
         style={{
@@ -122,11 +110,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Charts and Actions*/}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1.5fr 1fr",
+          gridTemplateColumns: "1fr 1fr",
           gap: "20px",
           marginBottom: "20px",
         }}
@@ -172,60 +159,51 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div className="stat-card" style={{ ...cardStyle, flex: 1 }}>
-            <h3
-              style={{
-                marginBottom: "15px",
-                color: "#64748b",
-                fontSize: "14px",
-                textTransform: "uppercase",
-              }}
-            >
-              Quick Actions
-            </h3>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "10px",
-              }}
-            >
-              <button
-                onClick={() => navigate("/admin/users")}
-                style={actionBtnStyle}
-              >
-                👥 Manage Staff
-              </button>
-              <button
-                onClick={() => navigate("/admin/reports")}
-                style={actionBtnStyle}
-              >
-                📊 View Reports
-              </button>
-              <button onClick={handleExport} style={actionBtnStyle}>
-                📥 Export Data
-              </button>
-              <button
-                onClick={() => navigate("/admin/profile")}
-                style={{
-                  ...actionBtnStyle,
-                  background: "#fef2f2",
-                  color: "#ef4444",
-                  border: "1px solid #fecaca",
-                }}
-              >
-                ⚙️ Profile
-              </button>
+        <div className="stat-card" style={{ ...cardStyle, minHeight: "350px", display: "flex", flexDirection: "column" }}>
+          <h3 style={{ marginBottom: "20px", color: "#64748b", fontSize: "14px", textTransform: "uppercase" }}>
+            User Registrations (Monthly)
+          </h3>
+          {loading ? (
+             <p>Loading Chart...</p>
+          ) : (
+            <div style={{ width: "100%", flexGrow: 1, minHeight: "250px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={stats.registrationData}
+                  margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1e293b', borderRadius: '8px', border: 'none', color: '#f8fafc' }}
+                    itemStyle={{ color: '#14b8a6', fontWeight: 'bold' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="users" 
+                    stroke="#14b8a6" 
+                    strokeWidth={2}
+                    fillOpacity={1} 
+                    fill="url(#colorUsers)" 
+                    activeDot={{ r: 6, fill: "#14b8a6", stroke: "#fff", strokeWidth: 2 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       <div
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}
       >
-        {/* Recent Users Panel*/}
         <div className="stat-card" style={cardStyle}>
           <h3
             style={{
@@ -313,7 +291,6 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* Compliance panel*/}
         <div
           className="stat-card"
           style={{ ...cardStyle, borderTop: "4px solid #f59e0b" }}
@@ -404,19 +381,4 @@ const numberStyle = {
   fontWeight: "bold",
   color: "#0f172a",
   margin: 0,
-};
-const actionBtnStyle = {
-  padding: "12px",
-  background: "#f8fafc",
-  border: "1px solid #e2e8f0",
-  borderRadius: "8px",
-  color: "#334155",
-  fontSize: "13px",
-  fontWeight: "500",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "6px",
-  transition: "all 0.2s",
 };
