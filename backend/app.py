@@ -16,6 +16,23 @@ from flask_socketio import SocketIO, join_room, leave_room, emit
 
 load_dotenv()
 
+_growth_predictor = None
+
+def _get_growth_predictor():
+    global _growth_predictor
+    if _growth_predictor is None:
+        try:
+            import sys
+            if os.path.join(BASE_DIR, '..') not in sys.path:
+                sys.path.insert(0, os.path.join(BASE_DIR, '..'))
+            from ml.src.prediction_engine import GrowthPredictor
+            _growth_predictor = GrowthPredictor()
+            print("[ML] GrowthPredictor loaded and cached \u2713")
+        except Exception as e:
+            print(f"[ML] Could not load GrowthPredictor: {e}")
+            _growth_predictor = None
+    return _growth_predictor
+
 
 app = Flask(__name__)
 CORS( app, resources={r"/*": {"origins": os.getenv("FRONTEND_URL")}}, supports_credentials=True)
@@ -2422,7 +2439,6 @@ _WHO_STANDARDS = {
 @app.route('/who-standards/<gender>', methods=['GET'])
 @jwt_required()
 def who_standards(gender):
-    """Return WHO 50th percentile height/weight reference data."""
     key = 'boy' if gender.lower() in ('male', 'm', 'boy') else 'girl'
     return jsonify(_WHO_STANDARDS[key])
 
@@ -2430,7 +2446,6 @@ def who_standards(gender):
 @app.route('/predict-growth/<int:child_id>', methods=['GET'])
 @jwt_required()
 def predict_growth_for_child(child_id):
-    """Predict growth for a specific child by ID. Used by Doctor and Nurse."""
     try:
         import numpy as np
         child = Child.query.get(child_id)
@@ -2461,11 +2476,10 @@ def predict_growth_for_child(child_id):
         who = _WHO_STANDARDS[gender_str]
 
         try:
-            import sys
-            if os.path.join(BASE_DIR, '..') not in sys.path:
-                sys.path.insert(0, os.path.join(BASE_DIR, '..'))
-            from ml.src.prediction_engine import GrowthPredictor
-            result = GrowthPredictor().predict(visits=visits, gender=gender)
+            predictor = _get_growth_predictor()
+            if predictor is None:
+                raise RuntimeError("ML model unavailable — see Flask startup logs")
+            result = predictor.predict(visits=visits, gender=gender)
         except Exception as ml_err:
             print(f"[ML] Fallback for child {child_id}: {ml_err}")
             last_h = visits[-1]['height']
@@ -2488,7 +2502,6 @@ def predict_growth_for_child(child_id):
 @app.route('/predict-growth', methods=['POST'])
 @jwt_required()
 def predict_growth():
-    """Predict growth for the logged-in parent's child."""
     try:
         import numpy as np
         parent_id = get_jwt_identity()
@@ -2520,11 +2533,10 @@ def predict_growth():
         who = _WHO_STANDARDS[gender_str]
 
         try:
-            import sys
-            if os.path.join(BASE_DIR, '..') not in sys.path:
-                sys.path.insert(0, os.path.join(BASE_DIR, '..'))
-            from ml.src.prediction_engine import GrowthPredictor
-            result = GrowthPredictor().predict(visits=visits, gender=gender)
+            predictor = _get_growth_predictor()
+            if predictor is None:
+                raise RuntimeError("ML model unavailable — see Flask startup logs")
+            result = predictor.predict(visits=visits, gender=gender)
         except Exception as ml_err:
             print(f"[ML] Model not available ({ml_err}), using WHO fallback.")
             last_h = visits[-1]['height']
@@ -3012,4 +3024,5 @@ def handle_connect(auth):
         print("Socket connection error:", e)
 
 if __name__ == '__main__':
+    _get_growth_predictor()
     socketio.run(app, debug=True, port=5000)

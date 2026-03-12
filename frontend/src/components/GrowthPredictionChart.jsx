@@ -44,47 +44,12 @@ const WHO_H = {
   },
 };
 
-const CHECKPOINTS = [0, 3, 6, 9, 12, 15, 18, 21, 24];
-
 const interp = (x, xs, ys) => {
   if (x <= xs[0]) return ys[0];
-  if (x >= xs[xs.length - 1]) return ys[ys.length - 1];
+  if (x >= xs[xs.length - 1]) return ys[xs.length - 1];
   const i = xs.findIndex(v => v > x) - 1;
   return ys[i] + ((x - xs[i]) / (xs[i + 1] - xs[i])) * (ys[i + 1] - ys[i]);
 };
-
-
-const buildPrediction = (childData) => {
-  if (!childData?.growthHistory?.length || !childData?.date_of_birth) return null;
-  const genderStr = childData.gender?.toLowerCase().startsWith("f") ? "girl" : "boy";
-  const dob = new Date(childData.date_of_birth);
-
-  const visits = childData.growthHistory
-    .filter(r => r.height && r.weight)
-    .map(r => {
-      const d = new Date(r.record_date);
-      const age_months = (d.getFullYear() - dob.getFullYear()) * 12 + (d.getMonth() - dob.getMonth());
-      return { age_months, height: r.height, weight: r.weight };
-    })
-    .sort((a, b) => a.age_months - b.age_months);
-
-  if (!visits.length) return null;
-
-  const last   = visits[visits.length - 1];
-  const whoW   = WHO_W[genderStr];
-  const whoH   = WHO_H[genderStr];
-  const wRatio = last.weight / interp(last.age_months, whoW.months, whoW.median);
-  const hRatio = last.height / interp(last.age_months, whoH.months, whoH.median);
-
-  const predictions = CHECKPOINTS.filter(m => m > last.age_months).map(m => ({
-    age_months: m,
-    weight: Math.round(interp(m, whoW.months, whoW.median) * wRatio * 100) / 100,
-    height: Math.round(interp(m, whoH.months, whoH.median) * hRatio * 10)  / 10,
-  }));
-
-  return { visits, predictions, genderStr };
-};
-
 
 const drawChart = (divRef, genderStr, visits, predictions, field, sdData, yLabel, yRange) => {
   if (!divRef.current) return;
@@ -94,7 +59,7 @@ const drawChart = (divRef, genderStr, visits, predictions, field, sdData, yLabel
 
   const bridge = predictions.length ? {
     x: [visits[visits.length - 1].age_months, ...predictions.map(p => p.age_months)],
-    y: [visits[visits.length - 1][field],     ...predictions.map(p => p[field])],
+    y: [visits[visits.length - 1][field],      ...predictions.map(p => p[field])],
   } : null;
 
   const traces = [
@@ -102,16 +67,13 @@ const drawChart = (divRef, genderStr, visits, predictions, field, sdData, yLabel
     { x:M, y:sdData.sd2neg, fill:"tonexty", fillcolor:"rgba(235,140,30,0.75)",  line:{color:"transparent",width:0}, name:"-3SD to -2SD Mod. Underweight", showlegend:true,  type:"scatter", mode:"lines", hoverinfo:"skip" },
     { x:M, y:sdData.sd1neg, fill:"tonexty", fillcolor:"rgba(245,245,210,0.90)", line:{color:"transparent",width:0}, name:"-2SD to -1SD Underweight Alert", showlegend:true,  type:"scatter", mode:"lines", hoverinfo:"skip" },
     { x:M, y:sdData.sd2pos, fill:"tonexty", fillcolor:"rgba(170,220,150,0.60)", line:{color:"transparent",width:0}, name:"-1SD to +2SD Normal",            showlegend:true,  type:"scatter", mode:"lines", hoverinfo:"skip" },
-    { x:M, y:top,           fill:"tonexty", fillcolor:"rgba(232,77,138,0.15)",  line:{color:"transparent",width:0}, name:">+2SD Overweight",              showlegend:true,  type:"scatter", mode:"lines", hoverinfo:"skip" },
-
+    { x:M, y:top,           fill:"tonexty", fillcolor:"rgba(232,77,138,0.15)",  line:{color:"transparent",width:0}, name:">+2SD Overweight",               showlegend:true,  type:"scatter", mode:"lines", hoverinfo:"skip" },
     { x:M, y:sdData.sd3neg, line:{color:"#b22222",width:1},            type:"scatter", mode:"lines", showlegend:false, hoverinfo:"skip" },
     { x:M, y:sdData.sd2neg, line:{color:"#cc6600",width:1},            type:"scatter", mode:"lines", showlegend:false, hoverinfo:"skip" },
     { x:M, y:sdData.sd1neg, line:{color:"#999900",width:1,dash:"dot"}, type:"scatter", mode:"lines", showlegend:false, hoverinfo:"skip" },
     { x:M, y:sdData.sd1pos, line:{color:"#999900",width:1,dash:"dot"}, type:"scatter", mode:"lines", showlegend:false, hoverinfo:"skip" },
     { x:M, y:sdData.sd2pos, line:{color:"#336633",width:1},            type:"scatter", mode:"lines", showlegend:false, hoverinfo:"skip" },
-
     { x:M, y:sdData.median, line:{color:"#10b981",width:2.5}, name:"WHO Median (50th %ile)", type:"scatter", mode:"lines", showlegend:true, hoverinfo:"skip" },
-
     {
       x: visits.map(v => v.age_months), y: visits.map(v => v[field]),
       type:"scatter", mode:"lines+markers", name:"Child's measurements",
@@ -119,10 +81,9 @@ const drawChart = (divRef, genderStr, visits, predictions, field, sdData, yLabel
       marker:{size:7, color:dotColor, symbol:"circle"},
       hovertemplate:`Age: %{x} mo<br>${yLabel}: %{y}<extra></extra>`,
     },
-
     ...(bridge ? [{
       x: bridge.x, y: bridge.y,
-      type:"scatter", mode:"lines+markers", name:"Predicted trajectory",
+      type:"scatter", mode:"lines+markers", name:"LSTM Predicted trajectory",
       line:{color:"#7c3aed", width:2.5, dash:"dash"},
       marker:{size:8, color:"#7c3aed", symbol:"diamond"},
       hovertemplate:`Age: %{x} mo<br>Predicted ${yLabel}: %{y}<extra></extra>`,
@@ -156,82 +117,101 @@ const drawChart = (divRef, genderStr, visits, predictions, field, sdData, yLabel
   Plotly.react(divRef.current, traces, layout, { responsive:true, displayModeBar:false });
 };
 
+
 export default function GrowthPredictionChart({ selectedChild }) {
   const weightRef = useRef(null);
   const heightRef = useRef(null);
 
-  const [fetchedChild, setFetchedChild] = useState(null);
-  const [fetchLoading, setFetchLoading] = useState(false);
-  const [fetchError,   setFetchError]   = useState(null);
+  const [predData, setPredData] = useState(null);
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState(null);
 
   const isParentMode = !selectedChild;
 
   useEffect(() => {
-    if (!isParentMode) return;
-    const load = async () => {
-      setFetchLoading(true);
-      setFetchError(null);
+    setPredData(null);
+    setError(null);
+
+    if (!isParentMode && !selectedChild) return;
+
+    const fetchPredictions = async () => {
+      setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const h = { Authorization: `Bearer ${token}` };
-        const [hRes, aRes] = await Promise.all([
-          fetch("http://127.0.0.1:5000/header",  { headers: h }),
-          fetch("http://127.0.0.1:5000/analize", { headers: h }),
-        ]);
-        const hData = await hRes.json();
-        const aData = await aRes.json();
-        if (!hData.date_of_birth) throw new Error("Child profile not found");
-        setFetchedChild({
-          name:          hData.name,
-          gender:        aData.gender || hData.gender,
-          date_of_birth: hData.date_of_birth,
-          growthHistory: (aData.measurements || []).map(m => ({
-            record_date: m.date + "-01",
-            height: m.height,
-            weight: m.weight,
-          })),
-        });
-      } catch (err) {
-        setFetchError(err.message || "Failed to load child data");
+        const token   = localStorage.getItem("token");
+        const headers = { Authorization: `Bearer ${token}` };
+        let res;
+
+        if (isParentMode) {
+          res = await fetch("http://127.0.0.1:5000/predict-growth", {
+            method: "POST",
+            headers,
+          });
+        } else {
+          const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
+          res = await fetch(`http://127.0.0.1:5000/predict-growth/${numericId}`, { headers });
+        }
+
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || "Prediction failed.");
+          return;
+        }
+        setPredData(data);
+      } catch {
+        setError("Cannot reach the server. Make sure Flask is running on port 5000.");
       } finally {
-        setFetchLoading(false);
+        setLoading(false);
       }
     };
-    load();
-  }, [isParentMode]);
 
-  const childData = isParentMode ? fetchedChild : selectedChild;
+    fetchPredictions();
+  }, [isParentMode, selectedChild?.id]);
 
   useEffect(() => {
-    if (!childData) return;
-    const pred = buildPrediction(childData);
-    if (!pred) return;
-    const { visits, predictions, genderStr } = pred;
-    drawChart(weightRef, genderStr, visits, predictions, "weight", WHO_W[genderStr], "Weight (kg)", [0, 16]);
-    drawChart(heightRef, genderStr, visits, predictions, "height", WHO_H[genderStr], "Height (cm)", [40, 100]);
-  }, [childData]);
+    if (!predData?.actuals?.length) return;
+    const g    = predData.gender || "boy";
+    const v    = predData.actuals;
+    const p    = predData.predictions || [];
+    drawChart(weightRef, g, v, p, "weight", WHO_W[g], "Weight (kg)", [0, 16]);
+    drawChart(heightRef, g, v, p, "height", WHO_H[g], "Height (cm)", [40, 100]);
+  }, [predData]);
 
-  if (fetchLoading) return (
-    <div className="gp-state-center">
-      <div className="gp-spinner" />
-      <p className="gp-state-text">Loading growth data…</p>
-    </div>
-  );
-  if (fetchError) return (
-    <div className="gp-state-center">
-      <i className="ri-error-warning-line gp-state-icon gp-state-icon--error" />
-      <p className="gp-state-text gp-state-text--error">{fetchError}</p>
-    </div>
-  );
-  if (!childData) return (
+  if (!isParentMode && !selectedChild) return (
     <div className="gp-state-center">
       <i className="ri-user-search-line gp-state-icon" />
       <p className="gp-state-text">Select a child to view the growth chart.</p>
     </div>
   );
 
-  const pred = buildPrediction(childData);
-  if (!pred) return (
+  if (loading) return (
+    <div className="gp-state-center">
+      <div className="gp-spinner" />
+      <p className="gp-state-text">Running LSTM growth prediction…</p>
+      <p className="gp-state-text" style={{ fontSize:"0.8rem", color:"#94a3b8", marginTop:"4px" }}>
+        Loading model from server
+      </p>
+    </div>
+  );
+
+  if (error) return (
+    <div className="gp-state-center">
+      <i className="ri-error-warning-line gp-state-icon gp-state-icon--error" />
+      <p className="gp-state-text gp-state-text--error">{error}</p>
+    </div>
+  );
+
+  if (!predData) return null;
+
+  const genderStr   = predData.gender || "boy";
+  const isBoy       = genderStr === "boy";
+  const visits      = predData.actuals     || [];
+  const predictions = predData.predictions || [];
+  const isMLModel   = predData.model_used !== "who_fallback";
+  const blendInfo   = predData.blend_info  || null;
+  const lstmPct     = blendInfo ? Math.round(blendInfo.lstm_weight * 100) : 5;
+  const whoPct      = blendInfo ? Math.round(blendInfo.who_weight  * 100) : 95;
+
+  if (!visits.length) return (
     <div className="gp-state-center">
       <i className="ri-bar-chart-grouped-line gp-state-icon" />
       <h3 className="gp-state-heading">No Growth Data Available</h3>
@@ -239,23 +219,32 @@ export default function GrowthPredictionChart({ selectedChild }) {
     </div>
   );
 
-  const { visits, predictions, genderStr } = pred;
-  const isBoy     = genderStr === "boy";
   const lastVisit = visits[visits.length - 1];
   const nextPred  = predictions[0];
 
   return (
     <div className="gp-wrapper">
+
       <div className={`gp-banner ${isBoy ? "gp-banner--boy" : "gp-banner--girl"}`}>
         <div className="gp-banner-icon"><i className="ri-heart-pulse-line" /></div>
         <div className="gp-banner-body">
           <div className="gp-banner-top">
             <span className="gp-banner-title">
-              {childData.name}
+              {isParentMode ? "Your Child" : selectedChild?.name}
               <span className="gp-banner-subtitle">WHO Growth Chart — Sri Lankan Health Card Standard</span>
             </span>
-            <span className="gp-model-badge"><i className="ri-cpu-line" /> ML Prediction Active</span>
+
+            {isMLModel ? (
+              <span className="gp-model-badge" style={{ background:"#ede9fe", color:"#7c3aed" }}>
+                <i className="ri-cpu-line" /> LSTM {lstmPct}% · WHO {whoPct}%
+              </span>
+            ) : (
+              <span className="gp-model-badge" style={{ background:"#fef3c7", color:"#b45309", fontSize:"0.7rem" }}>
+                <i className="ri-alert-line" /> WHO Fallback — run generate_model_files.py
+              </span>
+            )}
           </div>
+
           <div className="gp-legend-grid">
             <div className="gp-legend-item"><span className="gp-swatch gp-swatch--red" />    &lt;-3SD<span className="gp-legend-desc">Severely Underweight</span></div>
             <div className="gp-legend-item"><span className="gp-swatch gp-swatch--amber" />  -3SD to -2SD<span className="gp-legend-desc">Mod. Underweight</span></div>
@@ -264,7 +253,7 @@ export default function GrowthPredictionChart({ selectedChild }) {
             <div className="gp-legend-item"><span className="gp-swatch gp-swatch--pink" />   &gt;+2SD<span className="gp-legend-desc">Overweight</span></div>
             <div className="gp-legend-item"><span className="gp-swatch gp-swatch--teal" />   — Median<span className="gp-legend-desc">WHO 50th %ile</span></div>
             <div className="gp-legend-item"><span className={`gp-swatch ${isBoy ? "gp-swatch--blue" : "gp-swatch--pink2"}`} /> ● Actual<span className="gp-legend-desc">Measurements</span></div>
-            <div className="gp-legend-item"><span className="gp-swatch gp-swatch--purple" /> ◆ Predicted<span className="gp-legend-desc">ML Trajectory</span></div>
+            <div className="gp-legend-item"><span className="gp-swatch gp-swatch--purple" /> ◆ Predicted<span className="gp-legend-desc">LSTM Trajectory</span></div>
           </div>
         </div>
       </div>
@@ -322,7 +311,9 @@ export default function GrowthPredictionChart({ selectedChild }) {
         <div className="gp-table-card">
           <h4 className="gp-chart-title">
             <i className="ri-table-line" /> Predicted Checkpoint Values
-            <span className="gp-ai-badge"><i className="ri-sparkling-line" /> AI Generated</span>
+            <span className="gp-ai-badge">
+              <i className="ri-sparkling-line" /> {isMLModel ? "LSTM Neural Network" : "WHO Ratio Projection"}
+            </span>
           </h4>
           <div className="gp-table-scroll">
             <table className="gp-table">
@@ -344,7 +335,9 @@ export default function GrowthPredictionChart({ selectedChild }) {
           </div>
           <p className="gp-disclaimer">
             <i className="ri-information-line" />
-            Predictions use WHO growth trajectory scaled to this child's measurements. For clinical decisions always consult a healthcare professional.
+            {isMLModel
+              ? `Predictions blend ${lstmPct}% LSTM neural network + ${whoPct}% WHO biological anchor, with bias correction applied. For clinical decisions always consult a healthcare professional.`
+              : "ML model files not found — using WHO fallback. Run generate_model_files.py inside the ml/ folder to enable LSTM predictions."}
           </p>
         </div>
       )}
