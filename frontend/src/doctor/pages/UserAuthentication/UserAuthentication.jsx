@@ -88,6 +88,11 @@ const UserAuthentication = () => {
   };
 
   const handleDecline = async (registrationId) => {
+    const reason = prompt("Please provide a reason for declining this registration:");
+    if (reason === null || reason.trim() === '') {
+      alert("Reason is required to decline the registration.");
+      return;
+    }
     try {
       const response = await fetch(
         `http://127.0.0.1:5000/pending_registrations/decline/${registrationId}`,
@@ -97,6 +102,7 @@ const UserAuthentication = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({ reason: reason.trim() }),
         }
       );
 

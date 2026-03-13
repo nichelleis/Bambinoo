@@ -11,11 +11,8 @@ import DoctorNotes from "../doctor/pages/DoctorNotes/DoctorNotes";
 import Messages from "../doctor/pages/Messages/Messages";
 import AIAnalytics from "../doctor/pages/AIAnalytics/AIAnalytics";
 import DoctorProfile from "../doctor/pages/DoctorProfile/DoctorProfile";
+import UserAuthentication from "../doctor/pages/UserAuthentication/UserAuthentication";
 import "../doctor/components/DoctorLayout.css";
-
-function Placeholder({ title }) {
-  return <h1>{title}</h1>;
-}
 
 export default function DoctorLayout() {
   const [selectedChild, setSelectedChild] = useState(null);
@@ -65,7 +62,7 @@ export default function DoctorLayout() {
             path="ai-analytics"
             element={<AIAnalytics selectedChild={selectedChild} />}
           />
-          <Route path="auth" element={<Placeholder title="User Auth" />} />
+          <Route path="auth" element={<UserAuthentication />} />
           <Route
             path="doctorprofile"
             element={<DoctorProfile selectedChild={selectedChild} />}
