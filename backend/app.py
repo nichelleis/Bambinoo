@@ -3042,7 +3042,7 @@ def list_pending_registrations():
             "registration_number": p.registration_number,
             "child_name": p.child_name,
             "child_dob": p.child_dob.isoformat() if p.child_dob else None,
-            "gender": p.gender,
+            "gender": p.child_gender,
             "nationality": p.nationality,
             "child_number": p.child_number,
             "language": p.language,
