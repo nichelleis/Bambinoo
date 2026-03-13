@@ -11,6 +11,7 @@ import NurseAIAnalytics from "../nurse/pages/NurseAIAnalytics/NurseAIAnalytics";
 import NurseDoctorProfile from "../nurse/pages/NurseProfile/NurseProfile";
 import "../nurse/components/NurseLayout.css";
 import NurseMessages from "../nurse/pages/NurseMessages/NurseMessages";
+import UserAuthentication from "../nurse/pages/UserAuthentication/UserAuthentication";
 
 function Placeholder({ title }) {
   return <h1>{title}</h1>;
@@ -55,7 +56,7 @@ export default function NurseLayout() {
             element={<NurseAIAnalytics selectedChild={selectedChild} />}
           />
 
-          <Route path="auth" element={<Placeholder title="User Auth" />} />
+          <Route path="auth" element={<UserAuthentication />} />
 
           <Route
             path="profile"
