@@ -3114,6 +3114,7 @@ def create_pending_registration():
             registration_number=data['registrationNumber'],
             child_name=data['childName'],
             child_dob=child_dob,
+            child_gender=data.get('gender', 'Unknown'),
             nationality=data['nationality'],
             child_number=data['childNumber'],
             language=data['language'],
@@ -3164,7 +3165,8 @@ def approve_registration(registration_id):
             password_hash=pending.password_hash,
             email=pending.mother_email,
             phone=pending.mother_phone,
-            role='parent'
+            role='parent',
+            MOH_ID=pending.registration_number
         )
         db.session.add(new_user)
         db.session.flush()
