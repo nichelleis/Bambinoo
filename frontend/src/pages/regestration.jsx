@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import style from '../assets/styleSheets/Registration.module.css';
 
 const Registration = () => {
@@ -14,6 +16,7 @@ const Registration = () => {
   const [formData, setFormData] = useState({
     childName: '',
     childDOB: '',
+    gender: '',
     nationality: '',
     childNumber: '',
     language: '',
@@ -34,6 +37,11 @@ const Registration = () => {
     registrationDate: new Date().toISOString().split('T')[0]
   });
 
+  // account credentials entered by user
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -53,39 +61,51 @@ const Registration = () => {
 
       case 1:
         return (
-          formData.childName &&
-          formData.childDOB &&
-          formData.nationality &&
-          formData.childNumber &&
-          formData.language
+          formData.childName.trim() !== '' &&
+          formData.childDOB.trim() !== '' &&
+          formData.gender.trim() !== '' &&
+          formData.nationality.trim() !== '' &&
+          formData.childNumber.trim() !== '' &&
+          formData.language.trim() !== ''
         );
 
       case 2:
         return (
-          formData.motherName &&
-          formData.motherDOB &&
-          formData.motherEmail &&
-          formData.motherPhone
+          formData.motherName.trim() !== '' &&
+          formData.motherDOB.trim() !== '' &&
+          formData.motherEmail.trim() !== '' &&
+          formData.motherPhone.trim() !== ''
         );
 
       case 3:
         return (
-          formData.birthLocation &&
-          formData.birthHospital &&
-          formData.deliveryType &&
-          formData.surgery &&
-          formData.birthWeight &&
-          formData.birthLength &&
-          formData.headCircumference
+          formData.birthLocation.trim() !== '' &&
+          formData.birthHospital.trim() !== '' &&
+          formData.deliveryType.trim() !== '' &&
+          formData.surgery.trim() !== '' &&
+          formData.birthWeight.trim() !== '' &&
+          formData.birthLength.trim() !== '' &&
+          formData.headCircumference.trim() !== ''
         );
 
       case 4:
-        return formData.personnelType && formData.personnelName;
+        return formData.personnelType.trim() !== '' && formData.personnelName.trim() !== '';
 
       case 5:
-        return formData.livingAddress;
+        return formData.livingAddress.trim() !== '';
 
       case 6:
+        // account credentials step: username/password validations
+        return (
+          username && username.length >= 4 &&
+          /^[a-zA-Z0-9]+$/.test(username) &&
+          password &&
+          confirmPassword &&
+          password === confirmPassword &&
+          password.length >= 8
+        );
+
+      case 7:
         return confirmCorrect;
 
       default:
@@ -95,12 +115,43 @@ const Registration = () => {
 
   const nextSection = () => {
     if (!isStepValid()) {
-      setPopupMessage('Please fill all required fields before continuing.');
+      let missingFields = [];
+      if (currentStep === 1) {
+        if (!formData.childName.trim()) missingFields.push('Child Name');
+        if (!formData.childDOB.trim()) missingFields.push('Date of Birth');
+        if (!formData.gender.trim()) missingFields.push('Gender');
+        if (!formData.nationality.trim()) missingFields.push('Nationality');
+        if (!formData.childNumber.trim()) missingFields.push('Child Number');
+        if (!formData.language.trim()) missingFields.push('Language');
+      } else if (currentStep === 2) {
+        if (!formData.motherName.trim()) missingFields.push('Mother Name');
+        if (!formData.motherDOB.trim()) missingFields.push('Mother Date of Birth');
+        if (!formData.motherEmail.trim()) missingFields.push('Mother Email');
+        if (!formData.motherPhone.trim()) missingFields.push('Mother Phone');
+      } else if (currentStep === 3) {
+        if (!formData.birthLocation.trim()) missingFields.push('Birth Location');
+        if (!formData.birthHospital.trim()) missingFields.push('Birth Hospital');
+        if (!formData.deliveryType.trim()) missingFields.push('Delivery Type');
+        if (!formData.surgery.trim()) missingFields.push('Surgery');
+        if (!formData.birthWeight.trim()) missingFields.push('Birth Weight');
+        if (!formData.birthLength.trim()) missingFields.push('Birth Length');
+        if (!formData.headCircumference.trim()) missingFields.push('Head Circumference');
+      } else if (currentStep === 4) {
+        if (!formData.personnelType.trim()) missingFields.push('Personnel Type');
+        if (!formData.personnelName.trim()) missingFields.push('Personnel Name');
+      } else if (currentStep === 5) {
+        if (!formData.livingAddress.trim()) missingFields.push('Living Address');
+      }
+      
+      const message = missingFields.length > 0 
+        ? `Please fill the following required fields: ${missingFields.join(', ')}`
+        : 'Please fill all required fields before continuing.';
+      setPopupMessage(message);
       setShowPopup(true);
       return;
     }
 
-    if (currentStep < 6) {
+    if (currentStep < 7) {
       setCurrentStep(currentStep + 1);
       updateProgressBar(currentStep + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -116,32 +167,14 @@ const Registration = () => {
   };
 
   const updateProgressBar = (step) => {
-    const progressPercentage = (step / 6) * 100;
+    const progressPercentage = (step / 7) * 100;
     document.getElementById('progressFill').style.width = `${progressPercentage}%`;
-  };
-
-  const generateUsername = (childName) => {
-    const namePart = childName.replace(/\s+/g, '').toLowerCase().slice(0, 5);
-    const randomNumber = Math.floor(1000 + Math.random() * 9000);
-    return `${namePart}${randomNumber}`;
-  };
-
-  const generatePassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
-    let password = "";
-    for (let i = 0; i < 8; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
   };
 
   const submitForm = async () => {
     if (!confirmCorrect) return;
 
     const regNumber = generateRegistrationNumber();
-    const username = generateUsername(formData.childName);
-    const password = generatePassword();
-
     const payload = {
       registrationNumber: regNumber,
       username,
@@ -168,7 +201,7 @@ const Registration = () => {
       setRegistrationNumber(regNumber);
       setIsSubmitted(true);
 
-      setPopupMessage(`Registration Successful!\n\nUsername: ${username}\nPassword: ${password}`);
+      setPopupMessage("Registration Successful! Your account details have been sent securely.");
       setShowPopup(true);
 
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -188,6 +221,7 @@ const Registration = () => {
     setFormData({
       childName: '',
       childDOB: '',
+      gender: '',
       nationality: '',
       childNumber: '',
       language: '',
@@ -207,8 +241,114 @@ const Registration = () => {
       livingAddress: '',
       registrationDate: new Date().toISOString().split('T')[0]
     });
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
     updateProgressBar(0);
   };
+
+  const downloadReviewPDF = () => {
+  try {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Ensure we have an ID to show
+    const displayID = registrationNumber || "PENDING-REGISTRATION";
+
+    // --- Header Section ---
+    doc.setFontSize(22);
+    doc.setTextColor(102, 126, 234); // Matches your CSS #667eea
+    doc.text('Bambinooo Registry', 14, 20);
+
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text('Child Health & Development Registry Official Record', 14, 27);
+
+    // Registration Number Badge (Top Right)
+    doc.setFillColor(248, 250, 252);
+    doc.rect(pageWidth - 95, 12, 81, 18, 'F');
+    doc.setDrawColor(102, 126, 234);
+    doc.rect(pageWidth - 95, 12, 81, 18, 'S');
+    
+    doc.setFontSize(8);
+    doc.setTextColor(71, 85, 105);
+    doc.text('REGISTRATION NUMBER', pageWidth - 90, 18);
+    doc.setFontSize(11);
+    doc.setTextColor(0);
+    doc.text(displayID, pageWidth - 90, 25);
+
+    doc.setDrawColor(226, 232, 240);
+    doc.line(14, 32, pageWidth - 14, 32);
+
+    // --- Data Preparation (Including ALL Form Data) ---
+    const tableData = [
+      // Section 1: Child Info
+      [{ content: '1. CHILD INFORMATION', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
+      ['Full Name', formData.childName],
+      ['Date of Birth', formData.childDOB],
+      ['Gender', formData.gender],
+      ['Nationality', formData.nationality],
+      ['Family Position', `${formData.childNumber} Baby`],
+      ['Preferred Language', formData.language],
+
+      // Section 2: Mother Info
+      [{ content: '2. MOTHER DETAILS', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
+      ['Mother Name', formData.motherName],
+      ['Mother DOB', formData.motherDOB],
+      ['Contact Phone', formData.motherPhone],
+      ['Email Address', formData.motherEmail],
+
+      // Section 3: Birth & Medical Data
+      [{ content: '3. BIRTH & MEDICAL DATA', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
+      ['Hospital', formData.birthHospital],
+      ['Birth Location', formData.birthLocation],
+      ['Delivery Type', formData.deliveryType],
+      ['Surgery Performed', formData.surgery],
+      ['Birth Weight', `${formData.birthWeight} kg`],
+      ['Birth Length', `${formData.birthLength} cm`],
+      ['Head Circumference', `${formData.headCircumference} cm`],
+
+      // Section 4: Assigned Personnel
+      [{ content: '4. HEALTHCARE PERSONNEL', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
+      ['Provider Type', formData.personnelType],
+      ['Provider Name', formData.personnelName],
+
+      // Section 5: Account & Logistics
+      [{ content: '5. REGISTRATION LOGS', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
+      ['Account Username', username],
+      ['Home Address', formData.livingAddress],
+      ['Registration Date', formData.registrationDate],
+    ];
+
+    // --- Execute Table Generation ---
+    // Use autoTable(doc, ...) instead of doc.autoTable to avoid the "not a function" error
+    autoTable(doc, {
+      startY: 40,
+      body: tableData,
+      theme: 'striped',
+      styles: { fontSize: 10, cellPadding: 5 },
+      columnStyles: {
+        0: { cellWidth: 55, fontStyle: 'bold', fillColor: [248, 250, 252] },
+        1: { cellWidth: 'auto' }
+      },
+      margin: { left: 14, right: 14 }
+    });
+
+    // --- Footer ---
+    const finalY = doc.lastAutoTable.finalY || 150;
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`Official Document - Generated on: ${new Date().toLocaleString()}`, 14, finalY + 15);
+    doc.text('This is a secure system record from the Bambinooo Registry.', 14, finalY + 20);
+
+    doc.save(`Bambinooo_Record_${displayID}.pdf`);
+
+  } catch (error) {
+    console.error("PDF Generation Error:", error);
+    setPopupMessage("Error generating PDF. Please ensure all data is filled.");
+    setShowPopup(true);
+  }
+};
 
   return (
     <div className={style.container}>
@@ -248,8 +388,12 @@ const Registration = () => {
                 <div className={style.stepNumber}>6</div>
                 <div className={style.stepLabel}>Address</div>
               </div>
-              <div className={`${style.step} ${currentStep === 6 ? style.active : ''}`}>
+              <div className={`${style.step} ${currentStep === 6 ? style.active : ''} ${currentStep > 6 ? style.completed : ''}`}>
                 <div className={style.stepNumber}>7</div>
+                <div className={style.stepLabel}>Account</div>
+              </div>
+              <div className={`${style.step} ${currentStep === 7 ? style.active : ''}`}>
+                <div className={style.stepNumber}>8</div>
                 <div className={style.stepLabel}>Review</div>
               </div>
             </div>
@@ -328,6 +472,22 @@ const Registration = () => {
               />
             </div>
             <div className={style.formGroup}>
+              <label>Gender <span className={style.required}>*</span></label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div className={style.formRow}>
+            <div className={style.formGroup}>
               <label>Nationality <span className={style.required}>*</span></label>
               <input
                 type="text"
@@ -338,9 +498,6 @@ const Registration = () => {
                 required
               />
             </div>
-          </div>
-
-          <div className={style.formRow}>
             <div className={style.formGroup}>
               <label>Child Number in Family <span className={style.required}>*</span></label>
               <select
@@ -358,20 +515,21 @@ const Registration = () => {
                 <option value="6">6th Baby or More</option>
               </select>
             </div>
-            <div className={style.formGroup}>
-              <label>Preferred Language <span className={style.required}>*</span></label>
-              <select
-                name="language"
-                value={formData.language}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select language</option>
-                <option value="Sinhala">Sinhala</option>
-                <option value="Tamil">Tamil</option>
-                <option value="English">English</option>
-              </select>
-            </div>
+          </div>
+
+          <div className={style.formGroup}>
+            <label>Preferred Language <span className={style.required}>*</span></label>
+            <select
+              name="language"
+              value={formData.language}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select language</option>
+              <option value="Sinhala">Sinhala</option>
+              <option value="Tamil">Tamil</option>
+              <option value="English">English</option>
+            </select>
           </div>
 
           <div className={style.btnGroup}>
@@ -648,12 +806,75 @@ const Registration = () => {
               Back
             </button>
             <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
-              Review Information
+              Continue
             </button>
           </div>
         </div>
 
         <div className={`${style.section} ${currentStep === 6 && !isSubmitted ? style.active : ''}`} id="section6">
+          <h2 className={style.sectionTitle}>Account Credentials</h2>
+          <p className={style.sectionDescription}>
+            Choose a username and password you will use to log in later.
+          </p>
+
+          <div className={style.formGroup}>
+            <label>Username <span className={style.required}>*</span></label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter desired username"
+              required
+            />
+          </div>
+
+          <div className={style.formGroup}>
+            <label>Password <span className={style.required}>*</span></label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 8 characters"
+              required
+            />
+          </div>
+
+          <div className={style.formGroup}>
+            <label>Confirm Password <span className={style.required}>*</span></label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className={style.validationMessage}>
+            {username && username.length < 4 && (
+              <p className={style.error}>Username must be at least 4 characters</p>
+            )}
+            {username && !/^[a-zA-Z0-9]+$/.test(username) && (
+              <p className={style.error}>Username must be alphanumeric only</p>
+            )}
+            {password && password.length < 8 && (
+              <p className={style.error}>Password must be at least 8 characters</p>
+            )}
+            {password && confirmPassword && password !== confirmPassword && (
+              <p className={style.error}>Passwords do not match</p>
+            )}
+          </div>
+
+          <div className={style.btnGroup}>
+            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+              Back
+            </button>
+            <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
+              Continue
+            </button>
+          </div>
+        </div>
+
+        <div className={`${style.section} ${currentStep === 7 && !isSubmitted ? style.active : ''}`} id="section7">
           <h2 className={style.sectionTitle}>Review Your Information</h2>
           <p className={style.sectionDescription}>
             Please review all the information carefully before submitting
@@ -807,6 +1028,15 @@ const Registration = () => {
               Please save this registration number for your records. You will need it for future
               reference and accessing your child's health records in the CHDR system.
             </p>
+          </div>
+
+          <p className={style.downloadNote}>
+            Please download your registration details as a PDF before refreshing this page.
+          </p>
+          <div className={style.btnGroup}>
+            <button className={`${style.btn} ${style.btnPrimary}`} onClick={downloadReviewPDF}>
+              Download PDF
+            </button>
           </div>
 
           <button

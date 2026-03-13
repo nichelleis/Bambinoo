@@ -73,7 +73,7 @@ class Child(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     date_of_birth = db.Column(db.Date, nullable=False)
-    gender = db.Column(db.String(10), nullable=False)
+    gender = db.Column(db.String(10), nullable=True)
 
     
     growth_records = db.relationship('GrowthRecord', backref='child', lazy=True, cascade='all, delete-orphan')
@@ -180,10 +180,12 @@ class PendingRegistration(db.Model):
     __tablename__ = 'pending_registration'
 
     id = db.Column(db.Integer, primary_key=True)
-
+    username = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
     registration_number = db.Column(db.String(100), unique=True, nullable=False)
     child_name = db.Column(db.String(255), nullable=False)
     child_dob = db.Column(db.Date, nullable=False)
+    child_gender = db.Column(db.String(10), nullable=True)
     nationality = db.Column(db.String(100), nullable=False)
     child_number = db.Column(db.String(10), nullable=False)
     language = db.Column(db.String(50), nullable=False)
@@ -202,7 +204,42 @@ class PendingRegistration(db.Model):
     personnel_name = db.Column(db.String(255), nullable=False)
     living_address = db.Column(db.Text, nullable=False)
     registration_date = db.Column(db.Date, nullable=False)
-    status = db.Column(db.String(20), default='pending')
+    status = db.Column(db.String(20), default='PENDING')
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+    
+class RegisteredPatient(db.Model):
+    __tablename__ = 'registered_patient'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    registration_number = db.Column(db.String(100), unique=True, nullable=False)
+    child_name = db.Column(db.String(255), nullable=False)
+    child_dob = db.Column(db.Date, nullable=False)
+    child_gender = db.Column(db.String(10), nullable=True)
+    nationality = db.Column(db.String(100), nullable=False)
+    child_number = db.Column(db.String(10), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
+    mother_name = db.Column(db.String(255), nullable=False)
+    mother_dob = db.Column(db.Date, nullable=False)
+    mother_email = db.Column(db.String, nullable=False)
+    mother_phone = db.Column(db.String, nullable=False)
+    birth_location = db.Column(db.String(255), nullable=False)
+    birth_hospital = db.Column(db.String(255), nullable=False)
+    delivery_type = db.Column(db.String(100), nullable=False)
+    surgery = db.Column(db.String(10), nullable=False)
+    birth_weight = db.Column(db.Float, nullable=False)
+    birth_length = db.Column(db.Float, nullable=False)
+    head_circumference = db.Column(db.Float, nullable=False)
+    personnel_type = db.Column(db.String(100), nullable=False)
+    personnel_name = db.Column(db.String(255), nullable=False)
+    living_address = db.Column(db.Text, nullable=False)
+    registration_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(20), default='APPROVED')
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
@@ -211,7 +248,45 @@ class PendingRegistration(db.Model):
         onupdate=datetime.utcnow
     )
 
-#am using this to represent one chat between 2 diff users so a new chat doesnt need to be made everytime a new message is sent by and to the same people
+    user = db.relationship("User", backref="registered_patient")
+
+class DeclinedRegistration(db.Model):
+    __tablename__ = 'declined_registration'
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    registration_number = db.Column(db.String(100), unique=True, nullable=False)
+    child_name = db.Column(db.String(255), nullable=False)
+    child_dob = db.Column(db.Date, nullable=False)
+    child_gender = db.Column(db.String(10), nullable=True)
+    nationality = db.Column(db.String(100), nullable=False)
+    child_number = db.Column(db.String(10), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
+    mother_name = db.Column(db.String(255), nullable=False)
+    mother_dob = db.Column(db.Date, nullable=False)
+    mother_email = db.Column(db.String, nullable=False)
+    mother_phone = db.Column(db.String, nullable=False)
+    birth_location = db.Column(db.String(255), nullable=False)
+    birth_hospital = db.Column(db.String(255), nullable=False)
+    delivery_type = db.Column(db.String(100), nullable=False)
+    surgery = db.Column(db.String(10), nullable=False)
+    birth_weight = db.Column(db.Float, nullable=False)
+    birth_length = db.Column(db.Float, nullable=False)
+    head_circumference = db.Column(db.Float, nullable=False)
+    personnel_type = db.Column(db.String(100), nullable=False)
+    personnel_name = db.Column(db.String(255), nullable=False)
+    living_address = db.Column(db.Text, nullable=False)
+    registration_date = db.Column(db.Date, nullable=False)
+    status = db.Column(db.String(20), default='DECLINED')
+    reason = db.Column(db.Text, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
 class Conversation(db.Model):   
     __tablename__ = "conversation"
     id = db.Column(db.Integer, primary_key=True)
@@ -770,70 +845,6 @@ def total_vaccines_count():
             count += 1
 
     return jsonify({ "total": count })
-
-@app.route("/pending_registration", methods=["POST"])
-def pending_registration():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"message": "No data provided"}), 400
-        
-        password_hash=generate_password_hash(data["password"])
-
-        new_user = User(
-            username=data["username"],
-            password_hash=password_hash,
-            email=data["motherEmail"],
-            phone=data["motherPhone"],
-            role="parent"
-        )
-
-        db.session.add(new_user)
-        db.session.flush()
-
-        child_dob = datetime.strptime(data["childDOB"], "%Y-%m-%d").date()
-        mother_dob = datetime.strptime(data["motherDOB"], "%Y-%m-%d").date()
-        registration_date = datetime.strptime(data["registrationDate"], "%Y-%m-%d").date()
-        birth_weight = float(data["birthWeight"])
-        birth_length = float(data["birthLength"])
-        head_circumference = float(data["headCircumference"])
-
-        pending_registration = PendingRegistration(
-            registration_number=data["registrationNumber"],
-            child_name=data["childName"],
-            child_dob=child_dob,
-            nationality=data["nationality"],
-            child_number=data["childNumber"],
-            language=data["language"],
-            mother_name=data["motherName"],
-            mother_dob=mother_dob,
-            mother_email=data["motherEmail"],
-            mother_phone=data["motherPhone"],
-            birth_location=data["birthLocation"],
-            birth_hospital=data["birthHospital"],
-            delivery_type=data["deliveryType"],
-            surgery=data["surgery"],
-            birth_weight=birth_weight,
-            birth_length=birth_length,
-            head_circumference=head_circumference,
-            personnel_type=data["personnelType"],
-            personnel_name=data["personnelName"],
-            living_address=data["livingAddress"],
-            registration_date=registration_date,
-            status=data.get("status", "PENDING")
-        )
-
-        # Add to session and commit
-        db.session.add(pending_registration)
-        db.session.commit()
-
-        return jsonify({"message": "Registration submitted successfully!"}), 200
-
-    except Exception as e:
-        db.session.rollback()
-        print("Error saving registration:", e)
-        return jsonify({"message": str(e)}), 500
-
 
 
 
@@ -3009,6 +3020,283 @@ def delete_event(event_id):
     except Exception as ex:
         db.session.rollback()
         return jsonify({"error": str(ex)}), 500
+
+
+# Pending Registrations Management Routes
+@app.route("/pending_registrations", methods=["GET", "OPTIONS"])
+@cross_origin()
+@jwt_required(optional=True)
+def list_pending_registrations():
+    # respond to preflight without requiring token
+    if request.method == "OPTIONS":
+        return jsonify({}), 200
+
+    user = User.query.get(get_jwt_identity())
+    if not user or user.role not in ("doctor", "admin"):
+        return jsonify({"message": "Unauthorized access"}), 403
+
+    pendings = PendingRegistration.query.filter_by(status="PENDING").all()
+    out = []
+    for p in pendings:
+        out.append({
+            "id": p.id,
+            "registration_number": p.registration_number,
+            "child_name": p.child_name,
+            "child_dob": p.child_dob.isoformat() if p.child_dob else None,
+            "gender": p.child_gender,
+            "nationality": p.nationality,
+            "child_number": p.child_number,
+            "language": p.language,
+            "mother_name": p.mother_name,
+            "mother_dob": p.mother_dob.isoformat() if p.mother_dob else None,
+            "mother_email": p.mother_email,
+            "mother_phone": p.mother_phone,
+            "birth_location": p.birth_location,
+            "birth_hospital": p.birth_hospital,
+            "delivery_type": p.delivery_type,
+            "surgery": p.surgery,
+            "birth_weight": p.birth_weight,
+            "birth_length": p.birth_length,
+            "head_circumference": p.head_circumference,
+            "personnel_type": p.personnel_type,
+            "personnel_name": p.personnel_name,
+            "living_address": p.living_address,
+            "registration_date": p.registration_date.isoformat() if p.registration_date else None,
+            "status": p.status,
+            "created_at": p.created_at.isoformat() if p.created_at else None,
+            "updated_at": p.updated_at.isoformat() if p.updated_at else None,
+            "username": p.username,
+        })
+    return jsonify(out)
+
+@app.route('/pending_registration', methods=['POST', 'OPTIONS'])
+@cross_origin()
+def create_pending_registration():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No data provided"}), 400
+    
+    required_fields = [
+        'registrationNumber', 'username', 'password', 'childName', 'childDOB', 
+        'nationality', 'childNumber', 'language', 'motherName', 'motherDOB', 
+        'motherEmail', 'motherPhone', 'birthLocation', 'birthHospital', 
+        'deliveryType', 'surgery', 'birthWeight', 'birthLength', 
+        'headCircumference', 'personnelType', 'personnelName', 'livingAddress'
+    ]
+    
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"message": f"Missing required field: {field}"}), 400
+    
+    # Check if username or registration number already exists
+    existing_user = User.query.filter_by(username=data['username']).first()
+    if existing_user:
+        return jsonify({"message": "Username already exists"}), 400
+    
+    existing_reg = PendingRegistration.query.filter_by(registration_number=data['registrationNumber']).first()
+    if existing_reg:
+        return jsonify({"message": "Registration number already exists"}), 400
+    
+    try:
+        # Parse dates
+        child_dob = datetime.strptime(data['childDOB'], '%Y-%m-%d').date()
+        mother_dob = datetime.strptime(data['motherDOB'], '%Y-%m-%d').date()
+        registration_date = date.today()
+        
+        # Hash password
+        password_hash = generate_password_hash(data['password'])
+        
+        new_registration = PendingRegistration(
+            username=data['username'],
+            password_hash=password_hash,
+            registration_number=data['registrationNumber'],
+            child_name=data['childName'],
+            child_dob=child_dob,
+            child_gender=data.get('gender', 'Unknown'),
+            nationality=data['nationality'],
+            child_number=data['childNumber'],
+            language=data['language'],
+            mother_name=data['motherName'],
+            mother_dob=mother_dob,
+            mother_email=data['motherEmail'],
+            mother_phone=data['motherPhone'],
+            birth_location=data['birthLocation'],
+            birth_hospital=data['birthHospital'],
+            delivery_type=data['deliveryType'],
+            surgery=data['surgery'],
+            birth_weight=float(data['birthWeight']),
+            birth_length=float(data['birthLength']),
+            head_circumference=float(data['headCircumference']),
+            personnel_type=data['personnelType'],
+            personnel_name=data['personnelName'],
+            living_address=data['livingAddress'],
+            registration_date=registration_date,
+            status='PENDING'
+        )
+        
+        db.session.add(new_registration)
+        db.session.commit()
+        
+        return jsonify({"message": "Registration submitted successfully", "registration_number": data['registrationNumber']}), 201
+    
+    except ValueError as e:
+        return jsonify({"message": f"Invalid data format: {str(e)}"}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Internal server error: {str(e)}"}), 500
+
+@app.route('/pending_registrations/approve/<int:registration_id>', methods=['POST'])
+@cross_origin()
+@jwt_required()
+def approve_registration(registration_id):
+    user_id = get_jwt_identity()
+    current_user = User.query.get(user_id)
+    if not current_user or current_user.role.lower() not in ['admin', 'doctor']:
+        return jsonify({"message": "Unauthorized"}), 403
+    pending = PendingRegistration.query.get_or_404(registration_id)
+    if pending.status != 'PENDING':
+        return jsonify({'error': 'Registration already processed'}), 400
+    try:
+        # Create User
+        new_user = User(
+            username=pending.username,
+            password_hash=pending.password_hash,
+            email=pending.mother_email,
+            phone=pending.mother_phone,
+            role='parent',
+            MOH_ID=pending.registration_number
+        )
+        db.session.add(new_user)
+        db.session.flush()
+        # Create Child
+        child = Child(
+            parent_id=new_user.id,
+            name=pending.child_name,
+            date_of_birth=pending.child_dob,
+            gender=getattr(pending, 'gender', 'Unknown')
+        )
+        db.session.add(child)
+        # Create RegisteredPatient
+        new_registered = RegisteredPatient(
+            user_id=new_user.id,
+            registration_number=pending.registration_number,
+            child_name=pending.child_name,
+            child_dob=pending.child_dob,
+            child_gender=pending.child_gender,
+            nationality=pending.nationality,
+            child_number=pending.child_number,
+            language=pending.language,
+            mother_name=pending.mother_name,
+            mother_dob=pending.mother_dob,
+            mother_email=pending.mother_email,
+            mother_phone=pending.mother_phone,
+            birth_location=pending.birth_location,
+            birth_hospital=pending.birth_hospital,
+            delivery_type=pending.delivery_type,
+            surgery=pending.surgery,
+            birth_weight=pending.birth_weight,
+            birth_length=pending.birth_length,
+            head_circumference=pending.head_circumference,
+            personnel_type=pending.personnel_type,
+            personnel_name=pending.personnel_name,
+            living_address=pending.living_address,
+            registration_date=pending.registration_date,
+            status='APPROVED'
+        )
+        db.session.add(new_registered)
+        db.session.delete(pending)
+        # Update pending status
+        pending.status = 'APPROVED'
+        db.session.commit()
+        return jsonify({'message': 'Registration approved successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/pending_registrations/decline/<int:registration_id>', methods=['POST'])
+@cross_origin()
+@jwt_required()
+def decline_registration(registration_id):
+    user_id = get_jwt_identity()
+    current_user = User.query.get(user_id)
+    if not current_user or current_user.role.lower() not in ['admin', 'doctor']:
+        return jsonify({"message": "Unauthorized"}), 403
+    data = request.get_json()
+    reason = data.get('reason', '')
+    if not reason:
+        return jsonify({'error': 'Reason is required for decline'}), 400
+    pending = PendingRegistration.query.get_or_404(registration_id)
+    if pending.status != 'PENDING':
+        return jsonify({'error': 'Registration already processed'}), 400
+    try:
+        # Create DeclinedRegistration
+        new_declined = DeclinedRegistration(
+            username=pending.username,
+            password_hash=pending.password_hash,
+            registration_number=pending.registration_number,
+            child_name=pending.child_name,
+            child_dob=pending.child_dob,
+            child_gender=pending.child_gender,
+            nationality=pending.nationality,
+            child_number=pending.child_number,
+            language=pending.language,
+            mother_name=pending.mother_name,
+            mother_dob=pending.mother_dob,
+            mother_email=pending.mother_email,
+            mother_phone=pending.mother_phone,
+            birth_location=pending.birth_location,
+            birth_hospital=pending.birth_hospital,
+            delivery_type=pending.delivery_type,
+            surgery=pending.surgery,
+            birth_weight=pending.birth_weight,
+            birth_length=pending.birth_length,
+            head_circumference=pending.head_circumference,
+            personnel_type=pending.personnel_type,
+            personnel_name=pending.personnel_name,
+            living_address=pending.living_address,
+            registration_date=pending.registration_date,
+            status='DECLINED',
+            reason=reason
+        )
+        db.session.add(new_declined)
+        db.session.delete(pending)
+        # Update pending status
+        pending.status = 'DECLINED'
+        db.session.commit()
+        return jsonify({'message': 'Registration declined successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/search_registration/<string:reg_num>', methods=['GET'])
+@jwt_required()
+def search_registration(reg_num):
+    try:
+        # Helper to convert model object to dictionary for all columns
+        def to_dict(obj):
+            return {c.name: getattr(obj, c.name).isoformat() if isinstance(getattr(obj, c.name), (date, datetime)) else getattr(obj, c.name) for c in obj.__table__.columns}
+
+        # 1. Check Pending
+        pending = PendingRegistration.query.filter_by(registration_number=reg_num).first()
+        if pending:
+            return jsonify({"type": "PENDING", "data": to_dict(pending)}), 200
+
+        # 2. Check Registered
+        registered = RegisteredPatient.query.filter_by(registration_number=reg_num).first()
+        if registered:
+            return jsonify({"type": "REGISTERED", "data": to_dict(registered)}), 200
+
+        # 3. Check Declined
+        declined = DeclinedRegistration.query.filter_by(registration_number=reg_num).first()
+        if declined:
+            return jsonify({"type": "DECLINED", "data": to_dict(declined)}), 200
+
+        return jsonify({"message": "No record found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # SocketIO and Main Block 
