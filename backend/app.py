@@ -3066,6 +3066,84 @@ def list_pending_registrations():
         })
     return jsonify(out)
 
+@app.route('/pending_registration', methods=['POST', 'OPTIONS'])
+@cross_origin()
+def create_pending_registration():
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No data provided"}), 400
+    
+    required_fields = [
+        'registrationNumber', 'username', 'password', 'childName', 'childDOB', 
+        'nationality', 'childNumber', 'language', 'motherName', 'motherDOB', 
+        'motherEmail', 'motherPhone', 'birthLocation', 'birthHospital', 
+        'deliveryType', 'surgery', 'birthWeight', 'birthLength', 
+        'headCircumference', 'personnelType', 'personnelName', 'livingAddress'
+    ]
+    
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"message": f"Missing required field: {field}"}), 400
+    
+    # Check if username or registration number already exists
+    existing_user = User.query.filter_by(username=data['username']).first()
+    if existing_user:
+        return jsonify({"message": "Username already exists"}), 400
+    
+    existing_reg = PendingRegistration.query.filter_by(registration_number=data['registrationNumber']).first()
+    if existing_reg:
+        return jsonify({"message": "Registration number already exists"}), 400
+    
+    try:
+        # Parse dates
+        child_dob = datetime.strptime(data['childDOB'], '%Y-%m-%d').date()
+        mother_dob = datetime.strptime(data['motherDOB'], '%Y-%m-%d').date()
+        registration_date = date.today()
+        
+        # Hash password
+        password_hash = generate_password_hash(data['password'])
+        
+        new_registration = PendingRegistration(
+            username=data['username'],
+            password_hash=password_hash,
+            registration_number=data['registrationNumber'],
+            child_name=data['childName'],
+            child_dob=child_dob,
+            nationality=data['nationality'],
+            child_number=data['childNumber'],
+            language=data['language'],
+            mother_name=data['motherName'],
+            mother_dob=mother_dob,
+            mother_email=data['motherEmail'],
+            mother_phone=data['motherPhone'],
+            birth_location=data['birthLocation'],
+            birth_hospital=data['birthHospital'],
+            delivery_type=data['deliveryType'],
+            surgery=data['surgery'],
+            birth_weight=float(data['birthWeight']),
+            birth_length=float(data['birthLength']),
+            head_circumference=float(data['headCircumference']),
+            personnel_type=data['personnelType'],
+            personnel_name=data['personnelName'],
+            living_address=data['livingAddress'],
+            registration_date=registration_date,
+            status='PENDING'
+        )
+        
+        db.session.add(new_registration)
+        db.session.commit()
+        
+        return jsonify({"message": "Registration submitted successfully", "registration_number": data['registrationNumber']}), 201
+    
+    except ValueError as e:
+        return jsonify({"message": f"Invalid data format: {str(e)}"}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Internal server error: {str(e)}"}), 500
+
 @app.route('/pending_registrations/approve/<int:registration_id>', methods=['POST'])
 @cross_origin()
 @jwt_required()
