@@ -217,10 +217,10 @@ class RegisteredPatient(db.Model):
     __tablename__ = 'registered_patient'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
     registration_number = db.Column(db.String(100), unique=True, nullable=False)
     child_name = db.Column(db.String(255), nullable=False)
     child_dob = db.Column(db.Date, nullable=False)
+    child_gender = db.Column(db.String(10), nullable=True)
     nationality = db.Column(db.String(100), nullable=False)
     child_number = db.Column(db.String(10), nullable=False)
     language = db.Column(db.String(50), nullable=False)
@@ -259,6 +259,7 @@ class DeclinedRegistration(db.Model):
     registration_number = db.Column(db.String(100), unique=True, nullable=False)
     child_name = db.Column(db.String(255), nullable=False)
     child_dob = db.Column(db.Date, nullable=False)
+    child_gender = db.Column(db.String(10), nullable=True)
     nationality = db.Column(db.String(100), nullable=False)
     child_number = db.Column(db.String(10), nullable=False)
     language = db.Column(db.String(50), nullable=False)
@@ -3184,7 +3185,7 @@ def approve_registration(registration_id):
             registration_number=pending.registration_number,
             child_name=pending.child_name,
             child_dob=pending.child_dob,
-            gender=getattr(pending, 'gender', 'Unknown'),
+            child_gender=pending.child_gender,
             nationality=pending.nationality,
             child_number=pending.child_number,
             language=pending.language,
@@ -3237,7 +3238,7 @@ def decline_registration(registration_id):
             registration_number=pending.registration_number,
             child_name=pending.child_name,
             child_dob=pending.child_dob,
-            gender=getattr(pending, 'gender', 'Unknown'),
+            child_gender=pending.child_gender,
             nationality=pending.nationality,
             child_number=pending.child_number,
             language=pending.language,

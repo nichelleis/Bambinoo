@@ -8,6 +8,9 @@ const UserAuthentication = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
+  const [declineReason, setDeclineReason] = useState("");
+  const [currentDeclineId, setCurrentDeclineId] = useState(null);
 
   const token = localStorage.getItem("token");
 
@@ -87,25 +90,33 @@ const UserAuthentication = () => {
     }
   };
 
-  const handleDecline = async (registrationId) => {
-    const reason = prompt("Please provide a reason for declining this registration:");
-    if (reason === null || reason.trim() === '') {
-      alert("Reason is required to decline the registration.");
+
+  const handleDeclineClick = (id) => {
+    setCurrentDeclineId(id);
+    setShowDeclineModal(true);
+  };
+
+  // Submits the reason to the backend
+  const confirmDecline = async () => {
+    if (!declineReason.trim()) {
+      alert("Reason is required to decline.");
       return;
     }
+
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/pending_registrations/decline/${registrationId}`,
+        `http://127.0.0.1:5000/pending_registrations/decline/${currentDeclineId}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ reason: reason.trim() }),
+          body: JSON.stringify({ reason: declineReason.trim() }),
         }
       );
 
+      // IMPROVED ERROR HANDLING
       if (!response.ok) {
         let errTxt;
         try {
@@ -114,18 +125,22 @@ const UserAuthentication = () => {
         } catch {
           errTxt = await response.text();
         }
-        throw new Error(errTxt || `Failed to decline registration (${response.status})`);
+        throw new Error(errTxt || `Decline failed with status ${response.status}`);
       }
 
       setMessage("Registration declined successfully!");
       setMessageType("success");
+      setShowDeclineModal(false);
+      setDeclineReason("");
       setShowDetails(false);
       fetchPendingRegistrations();
     } catch (error) {
+      // This will now show the actual message from your Flask server
       setMessage(error.message);
       setMessageType("error");
     }
   };
+
 
   const handleViewDetails = (record) => {
     setSelectedRecord(record);
@@ -350,13 +365,31 @@ const UserAuthentication = () => {
               </button>
               <button
                 className="btn btn-decline"
-                onClick={() => handleDecline(selectedRecord.id)}
+                onClick={() => handleDeclineClick(selectedRecord.id)}
               >
                 Decline Registration
               </button>
               <button className="btn btn-cancel" onClick={handleCloseDetails}>
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeclineModal && (
+        <div className="custom-modal-overlay">
+          <div className="custom-modal">
+            <h3>Reason for Rejection</h3>
+            <textarea
+              className="reason-input"
+              placeholder="Enter reason here..."
+              value={declineReason}
+              onChange={(e) => setDeclineReason(e.target.value)}
+            />
+            <div className="modal-actions">
+              <button className="btn btn-confirm" onClick={confirmDecline}>Submit</button>
+              <button className="btn btn-cancel" onClick={() => setShowDeclineModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
