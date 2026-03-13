@@ -417,6 +417,8 @@ with app.app_context():
 
     db.session.add_all([
         PendingRegistration(
+            username="noah_f",
+            password_hash=generate_password_hash("Noah123!"),
             registration_number="CHDR-2026-001",
             child_name="Noah Fernando",
             child_dob=date(2024, 1, 10),
@@ -443,6 +445,8 @@ with app.app_context():
             updated_at=datetime.now(UTC),
         ),
         PendingRegistration(
+            username="emma_s",
+            password_hash=generate_password_hash("Emma123!"),
             registration_number="CHDR-2026-002",
             child_name="Emma Silva",
             child_dob=date(2024, 6, 15),

@@ -3032,7 +3032,7 @@ def list_pending_registrations():
         return jsonify({}), 200
 
     user = User.query.get(get_jwt_identity())
-    if not user or user.role not in ("doctor", "admin"):
+    if not user or user.role not in ("doctor", "admin", "nurse"):
         return jsonify({"message": "Unauthorized access"}), 403
 
     pendings = PendingRegistration.query.filter_by(status="PENDING").all()
