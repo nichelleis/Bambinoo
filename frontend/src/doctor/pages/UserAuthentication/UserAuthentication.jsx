@@ -11,6 +11,30 @@ const UserAuthentication = () => {
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [currentDeclineId, setCurrentDeclineId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResult, setSearchResult] = useState(null);
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    setLoading(true);
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/search_registration/${searchQuery}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const result = await response.json();
+        setSearchResult(result);
+        setSelectedRecord(result.data);
+        setShowDetails(true);
+      } else {
+        alert("No record found with that registration number.");
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const token = localStorage.getItem("token");
 
@@ -96,7 +120,6 @@ const UserAuthentication = () => {
     setShowDeclineModal(true);
   };
 
-  // Submits the reason to the backend
   const confirmDecline = async () => {
     if (!declineReason.trim()) {
       alert("Reason is required to decline.");
@@ -116,7 +139,6 @@ const UserAuthentication = () => {
         }
       );
 
-      // IMPROVED ERROR HANDLING
       if (!response.ok) {
         let errTxt;
         try {
@@ -135,12 +157,11 @@ const UserAuthentication = () => {
       setShowDetails(false);
       fetchPendingRegistrations();
     } catch (error) {
-      // This will now show the actual message from your Flask server
       setMessage(error.message);
       setMessageType("error");
     }
-  };
 
+  };
 
   const handleViewDetails = (record) => {
     setSelectedRecord(record);
@@ -157,6 +178,16 @@ const UserAuthentication = () => {
       <div className="user-auth-header">
         <h1>User Authentication & Access Management</h1>
         <p>Approve or decline pending patient registrations</p>
+      </div>
+      <div className="search-section" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+        <input
+          type="text"
+          placeholder="Enter Registration Number..."
+          value={searchQuery}
+          className="search-input"
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button className="btn btn-search" onClick={handleSearch}>Search Request</button>
       </div>
 
       {message && (
@@ -356,22 +387,34 @@ const UserAuthentication = () => {
               </div>
             </div>
 
-            <div className="action-buttons">
-              <button
-                className="btn btn-approve"
-                onClick={() => handleApprove(selectedRecord.id)}
-              >
-                Approve Registration
-              </button>
-              <button
-                className="btn btn-decline"
-                onClick={() => handleDeclineClick(selectedRecord.id)}
-              >
-                Decline Registration
-              </button>
-              <button className="btn btn-cancel" onClick={handleCloseDetails}>
-                Close
-              </button>
+            <div className="custom-modal-details">
+              <h3>Registration Details ({searchResult?.type || "PENDING"})</h3>
+
+              <div className="details-content">
+                <p><strong>Child Name:</strong> {selectedRecord.child_name}</p>
+                <p><strong>Reg Number:</strong> {selectedRecord.registration_number}</p>
+
+                {searchResult?.type === "DECLINED" && (
+                  <p style={{ color: 'red' }}><strong>Reason for Rejection:</strong> {selectedRecord.reason}</p>
+                )}
+              </div>
+
+              <div className="action-buttons">
+                {(searchResult?.type === "PENDING" || !searchResult) && (
+                  <>
+                    <button className="btn btn-approve" onClick={() => handleApprove(selectedRecord.id)}>
+                      Approve Registration
+                    </button>
+                    <button className="btn btn-decline" onClick={() => handleDeclineClick(selectedRecord.id)}>
+                      Decline Registration
+                    </button>
+                  </>
+                )}
+
+                <button className="btn btn-cancel" onClick={() => { setShowDetails(false); setSearchResult(null); }}>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

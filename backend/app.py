@@ -3207,6 +3207,7 @@ def approve_registration(registration_id):
             status='APPROVED'
         )
         db.session.add(new_registered)
+        db.session.delete(pending)
         # Update pending status
         pending.status = 'APPROVED'
         db.session.commit()
@@ -3261,6 +3262,7 @@ def decline_registration(registration_id):
             reason=reason
         )
         db.session.add(new_declined)
+        db.session.delete(pending)
         # Update pending status
         pending.status = 'DECLINED'
         db.session.commit()
@@ -3269,7 +3271,32 @@ def decline_registration(registration_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/search_registration/<string:reg_num>', methods=['GET'])
+@jwt_required()
+def search_registration(reg_num):
+    try:
+        # Helper to convert model object to dictionary for all columns
+        def to_dict(obj):
+            return {c.name: getattr(obj, c.name).isoformat() if isinstance(getattr(obj, c.name), (date, datetime)) else getattr(obj, c.name) for c in obj.__table__.columns}
 
+        # 1. Check Pending
+        pending = PendingRegistration.query.filter_by(registration_number=reg_num).first()
+        if pending:
+            return jsonify({"type": "PENDING", "data": to_dict(pending)}), 200
+
+        # 2. Check Registered
+        registered = RegisteredPatient.query.filter_by(registration_number=reg_num).first()
+        if registered:
+            return jsonify({"type": "REGISTERED", "data": to_dict(registered)}), 200
+
+        # 3. Check Declined
+        declined = DeclinedRegistration.query.filter_by(registration_number=reg_num).first()
+        if declined:
+            return jsonify({"type": "DECLINED", "data": to_dict(declined)}), 200
+
+        return jsonify({"message": "No record found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # SocketIO and Main Block 
