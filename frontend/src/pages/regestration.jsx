@@ -16,6 +16,7 @@ const Registration = () => {
   const [formData, setFormData] = useState({
     childName: '',
     childDOB: '',
+    gender: '',
     nationality: '',
     childNumber: '',
     language: '',
@@ -60,37 +61,38 @@ const Registration = () => {
 
       case 1:
         return (
-          formData.childName &&
-          formData.childDOB &&
-          formData.nationality &&
-          formData.childNumber &&
-          formData.language
+          formData.childName.trim() !== '' &&
+          formData.childDOB.trim() !== '' &&
+          formData.gender.trim() !== '' &&
+          formData.nationality.trim() !== '' &&
+          formData.childNumber.trim() !== '' &&
+          formData.language.trim() !== ''
         );
 
       case 2:
         return (
-          formData.motherName &&
-          formData.motherDOB &&
-          formData.motherEmail &&
-          formData.motherPhone
+          formData.motherName.trim() !== '' &&
+          formData.motherDOB.trim() !== '' &&
+          formData.motherEmail.trim() !== '' &&
+          formData.motherPhone.trim() !== ''
         );
 
       case 3:
         return (
-          formData.birthLocation &&
-          formData.birthHospital &&
-          formData.deliveryType &&
-          formData.surgery &&
-          formData.birthWeight &&
-          formData.birthLength &&
-          formData.headCircumference
+          formData.birthLocation.trim() !== '' &&
+          formData.birthHospital.trim() !== '' &&
+          formData.deliveryType.trim() !== '' &&
+          formData.surgery.trim() !== '' &&
+          formData.birthWeight.trim() !== '' &&
+          formData.birthLength.trim() !== '' &&
+          formData.headCircumference.trim() !== ''
         );
 
       case 4:
-        return formData.personnelType && formData.personnelName;
+        return formData.personnelType.trim() !== '' && formData.personnelName.trim() !== '';
 
       case 5:
-        return formData.livingAddress;
+        return formData.livingAddress.trim() !== '';
 
       case 6:
         // account credentials step: username/password validations
@@ -113,7 +115,38 @@ const Registration = () => {
 
   const nextSection = () => {
     if (!isStepValid()) {
-      setPopupMessage('Please fill all required fields before continuing.');
+      let missingFields = [];
+      if (currentStep === 1) {
+        if (!formData.childName.trim()) missingFields.push('Child Name');
+        if (!formData.childDOB.trim()) missingFields.push('Date of Birth');
+        if (!formData.gender.trim()) missingFields.push('Gender');
+        if (!formData.nationality.trim()) missingFields.push('Nationality');
+        if (!formData.childNumber.trim()) missingFields.push('Child Number');
+        if (!formData.language.trim()) missingFields.push('Language');
+      } else if (currentStep === 2) {
+        if (!formData.motherName.trim()) missingFields.push('Mother Name');
+        if (!formData.motherDOB.trim()) missingFields.push('Mother Date of Birth');
+        if (!formData.motherEmail.trim()) missingFields.push('Mother Email');
+        if (!formData.motherPhone.trim()) missingFields.push('Mother Phone');
+      } else if (currentStep === 3) {
+        if (!formData.birthLocation.trim()) missingFields.push('Birth Location');
+        if (!formData.birthHospital.trim()) missingFields.push('Birth Hospital');
+        if (!formData.deliveryType.trim()) missingFields.push('Delivery Type');
+        if (!formData.surgery.trim()) missingFields.push('Surgery');
+        if (!formData.birthWeight.trim()) missingFields.push('Birth Weight');
+        if (!formData.birthLength.trim()) missingFields.push('Birth Length');
+        if (!formData.headCircumference.trim()) missingFields.push('Head Circumference');
+      } else if (currentStep === 4) {
+        if (!formData.personnelType.trim()) missingFields.push('Personnel Type');
+        if (!formData.personnelName.trim()) missingFields.push('Personnel Name');
+      } else if (currentStep === 5) {
+        if (!formData.livingAddress.trim()) missingFields.push('Living Address');
+      }
+      
+      const message = missingFields.length > 0 
+        ? `Please fill the following required fields: ${missingFields.join(', ')}`
+        : 'Please fill all required fields before continuing.';
+      setPopupMessage(message);
       setShowPopup(true);
       return;
     }
@@ -188,6 +221,7 @@ const Registration = () => {
     setFormData({
       childName: '',
       childDOB: '',
+      gender: '',
       nationality: '',
       childNumber: '',
       language: '',
@@ -252,6 +286,7 @@ const Registration = () => {
       [{ content: '1. CHILD INFORMATION', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
       ['Full Name', formData.childName],
       ['Date of Birth', formData.childDOB],
+      ['Gender', formData.gender],
       ['Nationality', formData.nationality],
       ['Family Position', `${formData.childNumber} Baby`],
       ['Preferred Language', formData.language],
@@ -437,6 +472,22 @@ const Registration = () => {
               />
             </div>
             <div className={style.formGroup}>
+              <label>Gender <span className={style.required}>*</span></label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+          </div>
+
+          <div className={style.formRow}>
+            <div className={style.formGroup}>
               <label>Nationality <span className={style.required}>*</span></label>
               <input
                 type="text"
@@ -447,9 +498,6 @@ const Registration = () => {
                 required
               />
             </div>
-          </div>
-
-          <div className={style.formRow}>
             <div className={style.formGroup}>
               <label>Child Number in Family <span className={style.required}>*</span></label>
               <select
@@ -467,20 +515,21 @@ const Registration = () => {
                 <option value="6">6th Baby or More</option>
               </select>
             </div>
-            <div className={style.formGroup}>
-              <label>Preferred Language <span className={style.required}>*</span></label>
-              <select
-                name="language"
-                value={formData.language}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select language</option>
-                <option value="Sinhala">Sinhala</option>
-                <option value="Tamil">Tamil</option>
-                <option value="English">English</option>
-              </select>
-            </div>
+          </div>
+
+          <div className={style.formGroup}>
+            <label>Preferred Language <span className={style.required}>*</span></label>
+            <select
+              name="language"
+              value={formData.language}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select language</option>
+              <option value="Sinhala">Sinhala</option>
+              <option value="Tamil">Tamil</option>
+              <option value="English">English</option>
+            </select>
           </div>
 
           <div className={style.btnGroup}>

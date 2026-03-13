@@ -230,7 +230,7 @@ const UserAuthentication = () => {
                 </div>
                 <div className="detail-item">
                   <label>Gender:</label>
-                  <span>-</span>
+                  <span>{selectedRecord.gender || '-'}</span>
                 </div>
                 <div className="detail-item">
                   <label>Nationality:</label>
