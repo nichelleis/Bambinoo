@@ -13,6 +13,14 @@ const UserAuthentication = () => {
   const [currentDeclineId, setCurrentDeclineId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState(null);
+  const [activeTab, setActiveTab] = useState("registration"); // "registration" or "reports"
+  const [reportRequests, setReportRequests] = useState([]);
+  const [fetchingReports, setFetchingReports] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [reviewDescription, setReviewDescription] = useState("");
+  const [collectionDate, setCollectionDate] = useState("");
+  const [reviewAction, setReviewAction] = useState(""); // "approve" or "reject"
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -173,78 +181,269 @@ const UserAuthentication = () => {
     setSelectedRecord(null);
   };
 
+  const fetchReportRequests = useCallback(async () => {
+    setFetchingReports(true);
+    try {
+      const response = await fetch("http://127.0.0.1:5000/admin/report-requests", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setReportRequests(data);
+      } else {
+        throw new Error("Failed to fetch report requests");
+      }
+    } catch (error) {
+      setMessage(error.message);
+      setMessageType("error");
+    } finally {
+      setFetchingReports(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (activeTab === "reports") {
+      fetchReportRequests();
+    }
+  }, [activeTab, fetchReportRequests]);
+
+  const handleReviewClick = (request, action) => {
+    setSelectedReport(request);
+    setReviewAction(action);
+    setReviewDescription("");
+    setCollectionDate("");
+    setShowReportModal(true);
+  };
+
+  const submitReportReview = async () => {
+    if (!reviewDescription.trim()) {
+      alert("Description is required.");
+      return;
+    }
+    if (reviewAction === "approve" && !collectionDate.trim()) {
+      alert("Collection date is required for approval.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:5000/admin/report-requests/review/${selectedReport.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            action: reviewAction,
+            description: reviewDescription,
+            collection_date: collectionDate,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setMessage(`Report request ${reviewAction}d successfully!`);
+        setMessageType("success");
+        setShowReportModal(false);
+        fetchReportRequests();
+      } else {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to submit review");
+      }
+    } catch (error) {
+      setMessage(error.message);
+      setMessageType("error");
+    }
+  };
+
   return (
     <div className="user-auth-container">
       <div className="user-auth-header">
         <h1>User Authentication & Access Management</h1>
-        <p>Approve or decline pending patient registrations</p>
-      </div>
-      <div className="search-section" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-        <input
-          type="text"
-          placeholder="Enter Registration Number..."
-          value={searchQuery}
-          className="search-input"
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button className="btn btn-search" onClick={handleSearch}>Search Request</button>
+        <p>Approve or decline pending patient registrations and report requests</p>
       </div>
 
-      {message && (
-        <div className={`message ${messageType}`}>
-          {message}
-          <button onClick={() => setMessage("")} className="message-close">
-            ×
-          </button>
-        </div>
-      )}
+      <div className="auth-tabs" style={{ display: 'flex', gap: '20px', marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+        <button
+          className={`tab-btn ${activeTab === 'registration' ? 'active' : ''}`}
+          onClick={() => setActiveTab('registration')}
+          style={{
+            padding: '10px 20px',
+            border: 'none',
+            background: activeTab === 'registration' ? '#25a5b9' : 'transparent',
+            color: activeTab === 'registration' ? '#fff' : '#333',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
+        >
+          Registration Requests
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'reports' ? 'active' : ''}`}
+          onClick={() => setActiveTab('reports')}
+          style={{
+            padding: '10px 20px',
+            border: 'none',
+            background: activeTab === 'reports' ? '#25a5b9' : 'transparent',
+            color: activeTab === 'reports' ? '#fff' : '#333',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontWeight: '600'
+          }}
+        >
+          Report Requests
+        </button>
+      </div>
 
-      {loading ? (
-        <div className="loading">Loading pending registrations...</div>
-      ) : pendingRegistrations.length === 0 ? (
-        <div className="empty-state">
-          <p>No pending registrations at this time.</p>
-        </div>
+      {activeTab === 'registration' ? (
+        <>
+          <div className="search-section" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+            <input
+              type="text"
+              placeholder="Enter Registration Number..."
+              value={searchQuery}
+              className="search-input"
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button className="btn btn-search" onClick={handleSearch}>Search Request</button>
+          </div>
+
+          {message && (
+            <div className={`message ${messageType}`}>
+              {message}
+              <button onClick={() => setMessage("")} className="message-close">
+                ×
+              </button>
+            </div>
+          )}
+
+          {loading ? (
+            <div className="loading">Loading pending registrations...</div>
+          ) : pendingRegistrations.length === 0 ? (
+            <div className="empty-state">
+              <p>No pending registrations at this time.</p>
+            </div>
+          ) : (
+            <div className="registrations-table-wrapper">
+              <table className="registrations-table">
+                <thead>
+                  <tr>
+                    <th>Registration #</th>
+                    <th>Child Name</th>
+                    <th>Mother Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingRegistrations.map((reg) => (
+                    <tr key={reg.id} className="registration-row">
+                      <td>{reg.registration_number}</td>
+                      <td>{reg.child_name}</td>
+                      <td>{reg.mother_name}</td>
+                      <td>{reg.mother_email}</td>
+                      <td>{reg.mother_phone}</td>
+                      <td>
+                        <span className={`status-badge ${reg.status.toLowerCase()}`}>
+                          {reg.status}
+                        </span>
+                      </td>
+                      <td className="actions-cell">
+                        <button
+                          className="btn btn-view"
+                          onClick={() => handleViewDetails(reg)}
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       ) : (
-        <div className="registrations-table-wrapper">
-          <table className="registrations-table">
-            <thead>
-              <tr>
-                <th>Registration #</th>
-                <th>Child Name</th>
-                <th>Mother Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pendingRegistrations.map((reg) => (
-                <tr key={reg.id} className="registration-row">
-                  <td>{reg.registration_number}</td>
-                  <td>{reg.child_name}</td>
-                  <td>{reg.mother_name}</td>
-                  <td>{reg.mother_email}</td>
-                  <td>{reg.mother_phone}</td>
-                  <td>
-                    <span className={`status-badge ${reg.status.toLowerCase()}`}>
-                      {reg.status}
-                    </span>
-                  </td>
-                  <td className="actions-cell">
-                    <button
-                      className="btn btn-view"
-                      onClick={() => handleViewDetails(reg)}
-                    >
-                      View Details
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <>
+          {message && (
+            <div className={`message ${messageType}`}>
+              {message}
+              <button onClick={() => setMessage("")} className="message-close">
+                ×
+              </button>
+            </div>
+          )}
+
+          {fetchingReports ? (
+            <div className="loading">Loading report requests...</div>
+          ) : reportRequests.length === 0 ? (
+            <div className="empty-state">
+              <p>No report requests at this time.</p>
+            </div>
+          ) : (
+            <div className="registrations-table-wrapper">
+              <table className="registrations-table">
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>Patient Name</th>
+                    <th>Requested By</th>
+                    <th>Reports</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {reportRequests.map((req) => (
+                    <tr key={req.id} className="registration-row">
+                      <td>{req.report_request_id}</td>
+                      <td>{req.name}</td>
+                      <td>{req.requested_by}</td>
+                      <td>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                          {req.reports_requested.map((r, i) => (
+                            <span key={i} style={{ fontSize: '11px', background: '#eee', padding: '2px 5px', borderRadius: '3px' }}>{r}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`status-badge ${req.status.toLowerCase()}`}>
+                          {req.status}
+                        </span>
+                      </td>
+                      <td className="actions-cell" style={{ display: 'flex', gap: '5px' }}>
+                        {req.status === 'Pending' ? (
+                          <>
+                            <button
+                              className="btn btn-approve"
+                              onClick={() => handleReviewClick(req, "approve")}
+                              style={{ padding: '5px 10px', fontSize: '12px' }}
+                            >
+                              Approve
+                            </button>
+                            <button
+                              className="btn btn-decline"
+                              onClick={() => handleReviewClick(req, "reject")}
+                              style={{ padding: '5px 10px', fontSize: '12px' }}
+                            >
+                              Reject
+                            </button>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: '12px', color: '#666' }}>Reviewed</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
       {/* Details Modal */}
@@ -413,6 +612,67 @@ const UserAuthentication = () => {
 
                 <button className="btn btn-cancel" onClick={() => { setShowDetails(false); setSearchResult(null); }}>
                   Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showReportModal && selectedReport && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <button className="modal-close" onClick={() => setShowReportModal(false)}>
+              ×
+            </button>
+            <h2 style={{ textTransform: 'capitalize' }}>{reviewAction} Report Request</h2>
+            
+            <div className="details-section" style={{ textAlign: 'left' }}>
+              <p><strong>Request ID:</strong> {selectedReport.report_request_id}</p>
+              <p><strong>Patient Name:</strong> {selectedReport.name}</p>
+              <p><strong>Requested Reports:</strong> {selectedReport.reports_requested.join(", ")}</p>
+            </div>
+
+            <div className="review-form" style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
+              <div className="form-group">
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                  Description / Note to parent:
+                </label>
+                <textarea
+                  style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', minHeight: '80px' }}
+                  placeholder="Enter details about the approval/rejection..."
+                  value={reviewDescription}
+                  onChange={(e) => setReviewDescription(e.target.value)}
+                />
+              </div>
+
+              {reviewAction === "approve" && (
+                <div className="form-group">
+                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                    When can collect the report:
+                  </label>
+                  <input
+                    type="text"
+                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                    placeholder="e.g. Next Monday after 10 AM"
+                    value={collectionDate}
+                    onChange={(e) => setCollectionDate(e.target.value)}
+                  />
+                </div>
+              )}
+
+              <div className="modal-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button 
+                   className={`btn ${reviewAction === 'approve' ? 'btn-approve' : 'btn-decline'}`}
+                  onClick={submitReportReview}
+                >
+                  Confirm {reviewAction}
+                </button>
+                <button 
+                  className="btn btn-cancel" 
+                  onClick={() => setShowReportModal(false)}
+                >
+                  Cancel
                 </button>
               </div>
             </div>

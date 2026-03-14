@@ -332,6 +332,10 @@ class ReportRequest(db.Model):
     email = db.Column(db.String(200), nullable=False)
     reports_requested = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default='Pending')
+    description = db.Column(db.Text)
+    review_date = db.Column(db.DateTime)
+    reviewed_by = db.Column(db.String(200))
+    collection_date = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     user = db.relationship('User', backref='report_requests')
@@ -3408,6 +3412,10 @@ def get_report_requests():
                 'email': r.email,
                 'reports_requested': _json.loads(r.reports_requested),
                 'status': r.status,
+                'description': r.description,
+                'review_date': r.review_date.isoformat() if r.review_date else None,
+                'reviewed_by': r.reviewed_by,
+                'collection_date': r.collection_date,
                 'created_at': r.created_at.isoformat()
             })
 
@@ -3415,6 +3423,107 @@ def get_report_requests():
 
     except Exception as e:
         print('Get Report Requests Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/report-requests', methods=['GET'])
+@jwt_required()
+def admin_get_report_requests():
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role not in ['doctor', 'nurse', 'admin']:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        requests_list = ReportRequest.query.order_by(ReportRequest.created_at.desc()).all()
+
+        result = []
+        for r in requests_list:
+            result.append({
+                'id': r.id,
+                'report_request_id': r.report_request_id,
+                'requested_by': r.requested_by,
+                'name': r.name,
+                'child_id_number': r.child_id_number,
+                'phone': r.phone,
+                'email': r.email,
+                'reports_requested': _json.loads(r.reports_requested),
+                'status': r.status,
+                'description': r.description,
+                'review_date': r.review_date.isoformat() if r.review_date else None,
+                'reviewed_by': r.reviewed_by,
+                'collection_date': r.collection_date,
+                'created_at': r.created_at.isoformat()
+            })
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        print('Admin Get Report Requests Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/report-requests/review/<int:request_id>', methods=['POST'])
+@jwt_required()
+def review_report_request(request_id):
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role not in ['doctor', 'nurse', 'admin']:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        data = request.get_json()
+        report_request = ReportRequest.query.get(request_id)
+        if not report_request:
+            return jsonify({'message': 'Report request not found'}), 404
+
+        action = data.get('action') # 'approve' or 'reject'
+        description = data.get('description', '').strip()
+        collection_date = data.get('collection_date', '').strip()
+
+        if action not in ['approve', 'reject']:
+            return jsonify({'message': 'Invalid action'}), 400
+
+        report_request.status = 'Approved' if action == 'approve' else 'Rejected'
+        report_request.description = description
+        report_request.collection_date = collection_date
+        report_request.reviewed_by = user.username
+        report_request.review_date = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({'message': f'Report request {report_request.status.lower()} successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print('Review Report Request Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/report-requests/cancel/<int:request_id>', methods=['POST'])
+@jwt_required()
+def cancel_report_request(request_id):
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role != 'parent':
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        report_request = ReportRequest.query.filter_by(id=request_id, user_id=user.id).first()
+        if not report_request:
+            return jsonify({'message': 'Report request not found'}), 404
+
+        if report_request.status != 'Pending':
+            return jsonify({'message': 'Cannot cancel a request that has already been reviewed'}), 400
+
+        db.session.delete(report_request)
+        db.session.commit()
+
+        return jsonify({'message': 'Report request cancelled successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print('Cancel Report Request Error:', e)
         return jsonify({'error': str(e)}), 500
 
 

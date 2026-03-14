@@ -14,7 +14,7 @@ function StatusBadge({ status }) {
   const map = {
     Pending: { bg: "#FFF3CD", color: "#856404", icon: "bi-hourglass-split" },
     "In Progress": { bg: "#CCE5FF", color: "#004085", icon: "bi-arrow-repeat" },
-    Completed: { bg: "#D4EDDA", color: "#155724", icon: "bi-check-circle-fill" },
+    Approved: { bg: "#D4EDDA", color: "#155724", icon: "bi-check-circle-fill" },
     Rejected: { bg: "#F8D7DA", color: "#721C24", icon: "bi-x-circle-fill" },
   };
   const s = map[status] || map["Pending"];
@@ -73,7 +73,7 @@ function ReportRequest() {
       })
       .catch(console.error);
 
-  }, []);
+  }, [token]);
 
   const loadRequests = useCallback(() => {
     setLoadingRequests(true);
@@ -94,7 +94,7 @@ function ReportRequest() {
 
   if (!profile) return <div>Loading Profile...</div>;
 
-  const { child, parent } = profile;
+  // const { child, parent } = profile;
 
   const toggleReport = (report) => {
     setSelectedReports((prev) =>
@@ -141,6 +141,24 @@ function ReportRequest() {
       setError(err.message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleCancel = async (requestId) => {
+    if (!window.confirm("Are you sure you want to cancel this request?")) return;
+    try {
+      const res = await fetch(`http://localhost:5000/report-requests/cancel/${requestId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to cancel request");
+      }
+      alert("Request cancelled successfully.");
+      loadRequests();
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -450,10 +468,29 @@ function ReportRequest() {
                           {new Date(req.created_at).toLocaleString()}
                         </span>
                       </div>
-                      <StatusBadge status={req.status} />
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        {req.status === 'Pending' && (
+                          <button
+                            onClick={() => handleCancel(req.id)}
+                            style={{
+                              border: 'none',
+                              background: '#F8D7DA',
+                              color: '#721C24',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        )}
+                        <StatusBadge status={req.status} />
+                      </div>
                     </div>
 
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
                       {req.reports_requested.map((r) => (
                         <span
                           key={r}
@@ -470,6 +507,32 @@ function ReportRequest() {
                         </span>
                       ))}
                     </div>
+
+                    {req.status !== "Pending" && (
+                      <div
+                        style={{
+                          marginTop: 10,
+                          padding: "10px 12px",
+                          background: "#fff",
+                          borderRadius: 8,
+                          border: "1px solid #efefef",
+                          fontSize: 12
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                          <span style={{ fontWeight: 'bold', color: '#555' }}>Reviewer Note:</span>
+                          <span style={{ fontSize: 10, color: '#999' }}>By {req.reviewed_by} on {new Date(req.review_date).toLocaleDateString()}</span>
+                        </div>
+                        <p style={{ margin: 0, color: '#666', fontStyle: 'italic' }}>"{req.description}"</p>
+
+                        {req.status === "Approved" && req.collection_date && (
+                          <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #f5f5f5', color: '#25a5b9', fontWeight: '600' }}>
+                            <i className="bi bi-calendar-check me-1"></i>
+                            Collection: {req.collection_date}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
