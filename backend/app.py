@@ -3176,9 +3176,19 @@ def approve_registration(registration_id):
             parent_id=new_user.id,
             name=pending.child_name,
             date_of_birth=pending.child_dob,
-            gender=getattr(pending, 'gender', 'Unknown')
+            gender=pending.child_gender
         )
         db.session.add(child)
+        # create initial growth record
+        growth_record = GrowthRecord(
+            child=child,
+            record_date=pending.child_dob,
+            height=pending.birth_length,
+            weight=pending.birth_weight,
+            head_circumference=pending.head_circumference,
+            notes="Initial measurements at birth"
+        )
+        db.session.add(growth_record)
         # Create RegisteredPatient
         new_registered = RegisteredPatient(
             user_id=new_user.id,
