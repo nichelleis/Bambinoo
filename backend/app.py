@@ -12,6 +12,8 @@ import csv
 from collections import defaultdict
 from dotenv import load_dotenv
 from flask_socketio import SocketIO, join_room, leave_room, emit
+import json as _json
+import uuid as _uuid
 
 
 load_dotenv()
@@ -3326,13 +3328,6 @@ def search_registration(reg_num):
         return jsonify({"error": str(e)}), 500
 
 
-
-
-
-# ─── Report Request Endpoints ───────────────────────────────────────
-import json as _json
-import uuid as _uuid
-
 @app.route('/report-request', methods=['POST'])
 @jwt_required()
 def create_report_request():
@@ -3340,14 +3335,16 @@ def create_report_request():
         user_id = get_jwt_identity()
         data = request.get_json()
 
-        name = data.get('name', '').strip()
-        child_id_number = data.get('child_id_number', '').strip()
-        phone = data.get('phone', '').strip()
-        email = data.get('email', '').strip()
+        name = (data.get('name') or '').strip()
+        child_id_number = (data.get('child_id_number') or '').strip()
+        phone = (data.get('phone') or '').strip()
+        email = (data.get('email') or '').strip()
         reports_requested = data.get('reports_requested', [])
 
         if not name:
-            return jsonify({'error': 'Name is required'}), 400
+            return jsonify({'error': 'Child name is required'}), 400
+        if not (data.get('requested_by') or '').strip():
+            return jsonify({'error': 'Requester name (Who request) is required'}), 400
         if not child_id_number:
             return jsonify({'error': 'Child ID is required'}), 400
         if not phone:
@@ -3357,12 +3354,10 @@ def create_report_request():
         if not reports_requested:
             return jsonify({'error': 'Please select at least one report'}), 400
 
-        # Generate unique report_request_id: RR-YYYYMMDD-XXXX
         date_part = datetime.utcnow().strftime('%Y%m%d')
         unique_part = _uuid.uuid4().hex[:6].upper()
         report_request_id = f'RR-{date_part}-{unique_part}'
 
-        # Ensure uniqueness (extremely unlikely collision, but guard anyway)
         while ReportRequest.query.filter_by(report_request_id=report_request_id).first():
             unique_part = _uuid.uuid4().hex[:6].upper()
             report_request_id = f'RR-{date_part}-{unique_part}'
@@ -3370,7 +3365,7 @@ def create_report_request():
         new_request = ReportRequest(
             report_request_id=report_request_id,
             user_id=int(user_id),
-            requested_by=data.get('requested_by', '').strip(),
+            requested_by=(data.get('requested_by') or '').strip(),
             name=name,
             child_id_number=child_id_number,
             phone=phone,
@@ -3424,7 +3419,6 @@ def get_report_requests():
 
 
 # SocketIO and Main Block 
-
 @socketio.on("connect")
 def handle_connect(auth):
     token = auth.get("token")
