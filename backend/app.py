@@ -12,6 +12,8 @@ import csv
 from collections import defaultdict
 from dotenv import load_dotenv
 from flask_socketio import SocketIO, join_room, leave_room, emit
+import json as _json
+import uuid as _uuid
 
 
 load_dotenv()
@@ -316,6 +318,27 @@ class Event(db.Model):
     location = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ReportRequest(db.Model):
+    __tablename__ = 'report_request'
+    id = db.Column(db.Integer, primary_key=True)
+    report_request_id = db.Column(db.String(20), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    requested_by = db.Column(db.String(200), nullable=False)
+    name = db.Column(db.String(200), nullable=False)         
+    child_id_number = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(30), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+    reports_requested = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default='Pending')
+    description = db.Column(db.Text)
+    review_date = db.Column(db.DateTime)
+    reviewed_by = db.Column(db.String(200))
+    collection_date = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship('User', backref='report_requests')
 
 
 with app.app_context():
@@ -3309,8 +3332,202 @@ def search_registration(reg_num):
         return jsonify({"error": str(e)}), 500
 
 
-# SocketIO and Main Block 
+@app.route('/report-request', methods=['POST'])
+@jwt_required()
+def create_report_request():
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
 
+        name = (data.get('name') or '').strip()
+        child_id_number = (data.get('child_id_number') or '').strip()
+        phone = (data.get('phone') or '').strip()
+        email = (data.get('email') or '').strip()
+        reports_requested = data.get('reports_requested', [])
+
+        if not name:
+            return jsonify({'error': 'Child name is required'}), 400
+        if not (data.get('requested_by') or '').strip():
+            return jsonify({'error': 'Requester name (Who request) is required'}), 400
+        if not child_id_number:
+            return jsonify({'error': 'Child ID is required'}), 400
+        if not phone:
+            return jsonify({'error': 'Phone number is required'}), 400
+        if not email:
+            return jsonify({'error': 'Email is required'}), 400
+        if not reports_requested:
+            return jsonify({'error': 'Please select at least one report'}), 400
+
+        date_part = datetime.utcnow().strftime('%Y%m%d')
+        unique_part = _uuid.uuid4().hex[:6].upper()
+        report_request_id = f'RR-{date_part}-{unique_part}'
+
+        while ReportRequest.query.filter_by(report_request_id=report_request_id).first():
+            unique_part = _uuid.uuid4().hex[:6].upper()
+            report_request_id = f'RR-{date_part}-{unique_part}'
+
+        new_request = ReportRequest(
+            report_request_id=report_request_id,
+            user_id=int(user_id),
+            requested_by=(data.get('requested_by') or '').strip(),
+            name=name,
+            child_id_number=child_id_number,
+            phone=phone,
+            email=email,
+            reports_requested=_json.dumps(reports_requested),
+            status='Pending'
+        )
+        db.session.add(new_request)
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Report request submitted successfully',
+            'report_request_id': report_request_id
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print('Create Report Request Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/report-requests', methods=['GET'])
+@jwt_required()
+def get_report_requests():
+    try:
+        user_id = get_jwt_identity()
+        requests_list = ReportRequest.query.filter_by(user_id=int(user_id)).order_by(
+            ReportRequest.created_at.desc()
+        ).all()
+
+        result = []
+        for r in requests_list:
+            result.append({
+                'id': r.id,
+                'report_request_id': r.report_request_id,
+                'requested_by': r.requested_by,
+                'name': r.name,
+                'child_id_number': r.child_id_number,
+                'phone': r.phone,
+                'email': r.email,
+                'reports_requested': _json.loads(r.reports_requested),
+                'status': r.status,
+                'description': r.description,
+                'review_date': r.review_date.isoformat() if r.review_date else None,
+                'reviewed_by': r.reviewed_by,
+                'collection_date': r.collection_date,
+                'created_at': r.created_at.isoformat()
+            })
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        print('Get Report Requests Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/report-requests', methods=['GET'])
+@jwt_required()
+def admin_get_report_requests():
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role not in ['doctor', 'nurse', 'admin']:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        requests_list = ReportRequest.query.order_by(ReportRequest.created_at.desc()).all()
+
+        result = []
+        for r in requests_list:
+            result.append({
+                'id': r.id,
+                'report_request_id': r.report_request_id,
+                'requested_by': r.requested_by,
+                'name': r.name,
+                'child_id_number': r.child_id_number,
+                'phone': r.phone,
+                'email': r.email,
+                'reports_requested': _json.loads(r.reports_requested),
+                'status': r.status,
+                'description': r.description,
+                'review_date': r.review_date.isoformat() if r.review_date else None,
+                'reviewed_by': r.reviewed_by,
+                'collection_date': r.collection_date,
+                'created_at': r.created_at.isoformat()
+            })
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        print('Admin Get Report Requests Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/admin/report-requests/review/<int:request_id>', methods=['POST'])
+@jwt_required()
+def review_report_request(request_id):
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role not in ['doctor', 'nurse', 'admin']:
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        data = request.get_json()
+        report_request = ReportRequest.query.get(request_id)
+        if not report_request:
+            return jsonify({'message': 'Report request not found'}), 404
+
+        action = data.get('action') # 'approve' or 'reject'
+        description = data.get('description', '').strip()
+        collection_date = data.get('collection_date', '').strip()
+
+        if action not in ['approve', 'reject']:
+            return jsonify({'message': 'Invalid action'}), 400
+
+        report_request.status = 'Approved' if action == 'approve' else 'Rejected'
+        report_request.description = description
+        report_request.collection_date = collection_date
+        report_request.reviewed_by = user.username
+        report_request.review_date = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({'message': f'Report request {report_request.status.lower()} successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print('Review Report Request Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/report-requests/cancel/<int:request_id>', methods=['POST'])
+@jwt_required()
+def cancel_report_request(request_id):
+    try:
+        user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        if not user or user.role != 'parent':
+            return jsonify({'message': 'Unauthorized'}), 403
+
+        report_request = ReportRequest.query.filter_by(id=request_id, user_id=user.id).first()
+        if not report_request:
+            return jsonify({'message': 'Report request not found'}), 404
+
+        if report_request.status != 'Pending':
+            return jsonify({'message': 'Cannot cancel a request that has already been reviewed'}), 400
+
+        db.session.delete(report_request)
+        db.session.commit()
+
+        return jsonify({'message': 'Report request cancelled successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print('Cancel Report Request Error:', e)
+        return jsonify({'error': str(e)}), 500
+
+
+# SocketIO and Main Block 
 @socketio.on("connect")
 def handle_connect(auth):
     token = auth.get("token")

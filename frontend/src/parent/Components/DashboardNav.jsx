@@ -28,6 +28,11 @@ function SideNav() {
       path: "/parent/message-doctor",
       icon: "bi-chat-dots-fill",
     },
+    {
+      name: "Report Request",
+      path: "/parent/report-request",
+      icon: "bi-file-earmark-text-fill",
+    },
   ];
   return (
     <nav className={style.mainMenu}>
