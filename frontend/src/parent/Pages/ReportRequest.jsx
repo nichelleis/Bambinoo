@@ -247,7 +247,6 @@ function ReportRequest() {
                     className="form-control"
                     name="phone"
                     value={parent.phone}
-                    readOnly
                     style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                   />
                 </div>
@@ -260,7 +259,6 @@ function ReportRequest() {
                     className="form-control"
                     name="email"
                     value={parent.email}
-                    readOnly
                     style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                   />
                 </div>
