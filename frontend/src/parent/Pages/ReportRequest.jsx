@@ -39,12 +39,9 @@ function StatusBadge({ status }) {
 }
 
 function ReportRequest() {
-  const [profile, setProfile] = useState(null); // eslint-disable-line no-unused-vars
+  const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
-    name: "",
-    child_id_number: "",
-    phone: "",
-    email: "",
+    requested_by: "",
   });
   const [selectedReports, setSelectedReports] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -63,12 +60,6 @@ function ReportRequest() {
       .then((r) => r.json())
       .then((data) => {
         setProfile(data);
-        setForm({
-          name: data?.parent?.name || "",
-          child_id_number: data?.child?.reg_number || "",
-          phone: data?.parent?.phone || "",
-          email: data?.parent?.email || "",
-        });
       })
       .catch(console.error);
     // token is stable (read once from localStorage); disabling exhaustive-deps intentionally
@@ -93,6 +84,10 @@ function ReportRequest() {
     loadRequests();
   }, [loadRequests]);
 
+  if (!profile) return <div>Loading Profile...</div>;
+
+  const { child, parent } = profile;
+
   const toggleReport = (report) => {
     setSelectedReports((prev) =>
       prev.includes(report) ? prev.filter((r) => r !== report) : [...prev, report]
@@ -111,18 +106,28 @@ function ReportRequest() {
     }
     setSubmitting(true);
     try {
+      const payload = {
+        requested_by: form.requested_by,
+        name: child.name,
+        child_id_number: child.reg_number,
+        phone: parent.phone,
+        email: parent.email,
+        reports_requested: selectedReports,
+      };
+
       const res = await fetch("http://localhost:5000/report-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ ...form, reports_requested: selectedReports }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Submission failed");
       setSuccessId(data.report_request_id);
       setSelectedReports([]);
+      setForm({ requested_by: "" });
       loadRequests();
     } catch (err) {
       setError(err.message);
@@ -130,6 +135,7 @@ function ReportRequest() {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="container-fluid">
@@ -185,20 +191,35 @@ function ReportRequest() {
             </div>
 
             <form onSubmit={handleSubmit}>
-              {/* Contact details */}
+              {/* Who request - Manual Input */}
               <div className="mb-3">
                 <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
-                  Full Name
+                  Who request
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="requested_by"
+                  value={form.requested_by}
+                  onChange={handleInput}
+                  required
+                  placeholder="Enter your name"
+                  style={{ borderRadius: 10 }}
+                />
+              </div>
+
+              {/* Auto-filled details */}
+              <div className="mb-3">
+                <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
+                  Child Name
                 </label>
                 <input
                   type="text"
                   className="form-control"
                   name="name"
-                  value={form.name}
-                  onChange={handleInput}
-                  required
-                  placeholder="Enter your name"
-                  style={{ borderRadius: 10 }}
+                  value={child.name}
+                  readOnly
+                  style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                 />
               </div>
 
@@ -210,11 +231,9 @@ function ReportRequest() {
                   type="text"
                   className="form-control"
                   name="child_id_number"
-                  value={form.child_id_number}
-                  onChange={handleInput}
-                  required
-                  placeholder="Child registration number"
-                  style={{ borderRadius: 10 }}
+                  value={child.reg_number}
+                  readOnly
+                  style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                 />
               </div>
 
@@ -227,11 +246,9 @@ function ReportRequest() {
                     type="tel"
                     className="form-control"
                     name="phone"
-                    value={form.phone}
-                    onChange={handleInput}
-                    required
-                    placeholder="+94 7X XXX XXXX"
-                    style={{ borderRadius: 10 }}
+                    value={parent.phone}
+                    readOnly
+                    style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                   />
                 </div>
                 <div className="col-6">
@@ -242,11 +259,9 @@ function ReportRequest() {
                     type="email"
                     className="form-control"
                     name="email"
-                    value={form.email}
-                    onChange={handleInput}
-                    required
-                    placeholder="you@email.com"
-                    style={{ borderRadius: 10 }}
+                    value={parent.email}
+                    readOnly
+                    style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                   />
                 </div>
               </div>
