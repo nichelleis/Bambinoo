@@ -325,15 +325,15 @@ class ReportRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     report_request_id = db.Column(db.String(20), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    requested_by = db.Column(db.String(200), nullable=False)  # parent name
-    name = db.Column(db.String(200), nullable=False)          # child name
+    requested_by = db.Column(db.String(200), nullable=False)
+    name = db.Column(db.String(200), nullable=False)         
     child_id_number = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(200), nullable=False)
-    reports_requested = db.Column(db.Text, nullable=False)  # JSON list
+    reports_requested = db.Column(db.Text, nullable=False)
     status = db.Column(db.String(20), default='Pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+    
     user = db.relationship('User', backref='report_requests')
 
 

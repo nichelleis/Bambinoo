@@ -42,6 +42,10 @@ function ReportRequest() {
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
     requested_by: "",
+    name: "",
+    child_id_number: "",
+    phone: "",
+    email: "",
   });
   const [selectedReports, setSelectedReports] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -52,7 +56,6 @@ function ReportRequest() {
 
   const token = localStorage.getItem("token");
 
-  // Pre-fill form from profile endpoint
   useEffect(() => {
     fetch("http://localhost:5000/profile", {
       headers: { Authorization: `Bearer ${token}` },
@@ -60,13 +63,18 @@ function ReportRequest() {
       .then((r) => r.json())
       .then((data) => {
         setProfile(data);
+        setForm(prev => ({
+          ...prev,
+          name: data?.child?.name || "",
+          child_id_number: data?.child?.reg_number || "",
+          phone: data?.parent?.phone || "",
+          email: data?.parent?.email || "",
+        }));
       })
       .catch(console.error);
-    // token is stable (read once from localStorage); disabling exhaustive-deps intentionally
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
-  // Load existing requests
   const loadRequests = useCallback(() => {
     setLoadingRequests(true);
     fetch("http://localhost:5000/report-requests", {
@@ -108,10 +116,10 @@ function ReportRequest() {
     try {
       const payload = {
         requested_by: form.requested_by,
-        name: child.name,
-        child_id_number: child.reg_number,
-        phone: parent.phone,
-        email: parent.email,
+        name: form.name,
+        child_id_number: form.child_id_number,
+        phone: form.phone,
+        email: form.email,
         reports_requested: selectedReports,
       };
 
@@ -139,7 +147,6 @@ function ReportRequest() {
 
   return (
     <div className="container-fluid">
-      {/* ── Page header ── */}
       <div
         style={{
           background:
@@ -179,7 +186,6 @@ function ReportRequest() {
       </div>
 
       <div className="row g-4">
-        {/* ── Left: New Request Form ── */}
         <div className="col-lg-6">
           <div className={style.dashboardCard} style={{ borderRadius: 16 }}>
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 20 }}>
@@ -191,7 +197,6 @@ function ReportRequest() {
             </div>
 
             <form onSubmit={handleSubmit}>
-              {/* Who request - Manual Input */}
               <div className="mb-3">
                 <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
                   Who request
@@ -207,8 +212,6 @@ function ReportRequest() {
                   style={{ borderRadius: 10 }}
                 />
               </div>
-
-              {/* Auto-filled details */}
               <div className="mb-3">
                 <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
                   Child Name
@@ -217,8 +220,9 @@ function ReportRequest() {
                   type="text"
                   className="form-control"
                   name="name"
-                  value={child.name}
-                  readOnly
+                  value={form.name}
+                  onChange={handleInput}
+                  required
                   style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                 />
               </div>
@@ -231,8 +235,9 @@ function ReportRequest() {
                   type="text"
                   className="form-control"
                   name="child_id_number"
-                  value={child.reg_number}
-                  readOnly
+                  value={form.child_id_number}
+                  onChange={handleInput}
+                  required
                   style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                 />
               </div>
@@ -246,7 +251,9 @@ function ReportRequest() {
                     type="tel"
                     className="form-control"
                     name="phone"
-                    value={parent.phone}
+                    value={form.phone}
+                    onChange={handleInput}
+                    required
                     style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                   />
                 </div>
@@ -258,13 +265,14 @@ function ReportRequest() {
                     type="email"
                     className="form-control"
                     name="email"
-                    value={parent.email}
+                    value={form.email}
+                    onChange={handleInput}
+                    required
                     style={{ borderRadius: 10, backgroundColor: "#f8f9fa" }}
                   />
                 </div>
               </div>
 
-              {/* Report type selection */}
               <div className="mb-4">
                 <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
                   Select Reports Needed
@@ -361,7 +369,6 @@ function ReportRequest() {
           </div>
         </div>
 
-        {/* ── Right: My Requests list ── */}
         <div className="col-lg-6">
           <div className={style.dashboardCard} style={{ borderRadius: 16 }}>
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 20 }}>
@@ -471,7 +478,6 @@ function ReportRequest() {
         </div>
       </div>
 
-      {/* ── Success Modal ── */}
       {successId && (
         <div
           style={{
