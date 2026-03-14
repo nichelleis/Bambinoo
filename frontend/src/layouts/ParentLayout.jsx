@@ -10,6 +10,7 @@ import Milestones from "../parent/Pages/MileStones";
 import MessageDoctor from "../parent/Pages/MessageDoctor";
 import Education from "../parent/Pages/Education";
 import Profile from "../parent/Pages/Profile";
+import ReportRequest from "../parent/Pages/ReportRequest";
 
 function ParentLayout() {
   return (
@@ -28,6 +29,7 @@ function ParentLayout() {
             <Route path="education" element={<Education />} />
             <Route path="message-doctor" element={<MessageDoctor />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="report-request" element={<ReportRequest />} />
           </Routes>
         </main>
       </div>
