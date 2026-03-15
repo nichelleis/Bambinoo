@@ -1750,6 +1750,11 @@ def get_children():
     for child in children:
         parent = User.query.get(child.parent_id)
 
+        registered_patient = RegisteredPatient.query.filter_by(
+            child_name=child.name,
+            child_dob=child.date_of_birth
+        ).first()
+
         growth_history = (
             GrowthRecord.query
             .filter_by(child_id=child.id)
@@ -1779,8 +1784,9 @@ def get_children():
             "age": calculate_age(child.date_of_birth),
             "date_of_birth": child.date_of_birth.isoformat(),
             "gender": child.gender,
-            "parent": parent.username if parent else None,
+            "parent": registered_patient.mother_name if registered_patient else None,
             "phone": parent.email if parent else None,
+            "moh_id": parent.MOH_ID if parent else None,
             "allergies": [a.name for a in child.allergies],
             "activeConditions": [c.name for c in child.active_conditions],
             "growth": {

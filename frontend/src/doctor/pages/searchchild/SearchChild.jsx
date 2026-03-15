@@ -29,11 +29,14 @@ const SearchChild = ({ onSelect }) => {
   };
 
   useEffect(() => {
-    const filtered = children.filter(
-      (child) =>
-        child.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        child.id.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
+    const filtered = children.filter((child) => {
+      const term = searchTerm.toLowerCase();
+
+      return (
+        child.name.toLowerCase().includes(term) ||
+        child.moh_id?.toLowerCase().includes(term)
+      );
+    });
     setFilteredChildren(filtered);
   }, [searchTerm, children]);
 
@@ -116,6 +119,9 @@ const SearchChild = ({ onSelect }) => {
               </p>
               <p>
                 <strong>Email:</strong> {child.phone}
+              </p>
+              <p>
+                <strong>ID:</strong> {child.moh_id}
               </p>
 
               <div className="allergy-tags">
