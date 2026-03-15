@@ -6,10 +6,11 @@ const API_BASE = "http://localhost:5000";
 function formatDate(dateStr) {
   if (!dateStr) return "N/A";
   return new Date(dateStr).toLocaleDateString("en-GB", {
-    day: "numeric", month: "short", year: "numeric",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 }
-
 
 function GrowthRow({ record, isNew }) {
   return (
@@ -17,20 +18,19 @@ function GrowthRow({ record, isNew }) {
       <td>{formatDate(record.record_date)}</td>
       <td>{record.weight ? `${record.weight} kg` : "N/A"}</td>
       <td>{record.height ? `${record.height} cm` : "N/A"}</td>
-      <td>{record.head   ? `${record.head} cm`   : "N/A"}</td>
+      <td>{record.head ? `${record.head} cm` : "N/A"}</td>
       {record.notes && <td className="notes-cell">{record.notes}</td>}
       {!record.notes && <td className="notes-cell">—</td>}
     </tr>
   );
 }
 
-
 export default function Growth({ selectedChild }) {
-  const [history, setHistory]   = useState([]);
-  const [newId, setNewId]       = useState(null);   
-  const [saving, setSaving]     = useState(false);
-  const [error, setError]       = useState("");
-  const [success, setSuccess]   = useState("");
+  const [history, setHistory] = useState([]);
+  const [newId, setNewId] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const emptyForm = { date: "", weight: "", height: "", head: "", notes: "" };
   const [form, setForm] = useState(emptyForm);
@@ -45,8 +45,8 @@ export default function Growth({ selectedChild }) {
 
     const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
     fetch(`${API_BASE}/children/${numericId}/growth`)
-      .then(r => r.json())
-      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .then((r) => r.json())
+      .then((data) => setHistory(Array.isArray(data) ? data : []))
       .catch(() => setHistory([]));
   }, [selectedChild]);
 
@@ -67,12 +67,13 @@ export default function Growth({ selectedChild }) {
   }
 
   function handleChange(e) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError(""); setSuccess("");
+    setError("");
+    setSuccess("");
 
     setSaving(true);
     const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
@@ -92,15 +93,15 @@ export default function Growth({ selectedChild }) {
       }
 
       const newRecord = {
-        id:          result.id,
+        id: result.id,
         record_date: form.date,
-        weight:      form.weight,
-        height:      form.height,
-        head:        form.head,
-        notes:       form.notes,
+        weight: form.weight,
+        height: form.height,
+        head: form.head,
+        notes: form.notes,
       };
 
-      setHistory(prev => [newRecord, ...prev]);
+      setHistory((prev) => [newRecord, ...prev]);
       setNewId(newRecord.id ?? 0);
       setTimeout(() => setNewId(null), 3000);
 
@@ -118,17 +119,20 @@ export default function Growth({ selectedChild }) {
     <div className="growth-page">
       <div className="growth-header">
         <h2>Growth Data</h2>
-        <p>Recording for: <strong>{selectedChild.name}</strong></p>
+        <p>
+          Recording for: <strong>{selectedChild.name}</strong>
+        </p>
       </div>
 
       <div className="growth-grid">
-        {/* ── Form ── */}
         <div className="growth-card">
           <h4>Add New Measurement</h4>
           <form className="growth-form" onSubmit={handleSubmit}>
             <div className="growth-row">
               <div className="growth-field">
-                <label>Date <span style={{ color: "var(--danger)" }}>*</span></label>
+                <label>
+                  Date <span style={{ color: "var(--danger)" }}>*</span>
+                </label>
                 <input
                   type="date"
                   name="date"
@@ -138,7 +142,9 @@ export default function Growth({ selectedChild }) {
                 />
               </div>
               <div className="growth-field">
-                <label>Weight (kg) <span style={{ color: "var(--danger)" }}>*</span></label>
+                <label>
+                  Weight (kg) <span style={{ color: "var(--danger)" }}>*</span>
+                </label>
                 <input
                   type="number"
                   step="0.1"
@@ -153,7 +159,9 @@ export default function Growth({ selectedChild }) {
 
             <div className="growth-row">
               <div className="growth-field">
-                <label>Height (cm) <span style={{ color: "var(--danger)" }}>*</span></label>
+                <label>
+                  Height (cm) <span style={{ color: "var(--danger)" }}>*</span>
+                </label>
                 <input
                   type="number"
                   step="0.1"
@@ -187,7 +195,7 @@ export default function Growth({ selectedChild }) {
               />
             </div>
 
-            {error   && <p className="form-error">{error}</p>}
+            {error && <p className="form-error">{error}</p>}
             {success && <p className="form-success">{success}</p>}
 
             <button type="submit" className="growth-save-btn" disabled={saving}>
@@ -196,7 +204,6 @@ export default function Growth({ selectedChild }) {
           </form>
         </div>
 
-        {/* ── History ── */}
         <div className="growth-card">
           <h4>Growth History</h4>
           {history.length === 0 ? (

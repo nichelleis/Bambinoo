@@ -466,6 +466,9 @@ def get_child():
     })
 
 
+
+
+
 @app.route('/growth-trend', methods=["GET"])
 @jwt_required()
 def growth_trend():

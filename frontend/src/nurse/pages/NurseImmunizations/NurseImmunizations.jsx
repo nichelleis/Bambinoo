@@ -316,10 +316,12 @@ const NurseImmunizations = ({ selectedChild }) => {
           ) : history.length === 0 ? (
             <p className="ni-empty-text">No immunization records found.</p>
           ) : (
-            <div className="ni-history-list">
-              {history.map((item, index) => (
-                <VaccinationCard key={item.id ?? index} item={item} />
-              ))}
+            <div className="ni-history-wrapper">
+              <div className="ni-history-list">
+                {history.map((item, index) => (
+                  <VaccinationCard key={item.id ?? index} item={item} />
+                ))}
+              </div>
             </div>
           )}
         </div>

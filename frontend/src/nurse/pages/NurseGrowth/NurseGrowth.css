@@ -1,31 +1,27 @@
-
-
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap");
 
 :root {
-  --ng-bg:          #f2f7f4;
-  --ng-surface:     #ffffff;
-  --ng-card:        #ffffff;
-  --ng-border:      #d4e4da;
-  --ng-green:       #3a8c5c;
+  --ng-bg: #f2f7f4;
+  --ng-surface: #ffffff;
+  --ng-card: #ffffff;
+  --ng-border: #d4e4da;
+  --ng-green: #3a8c5c;
   --ng-green-light: #e8f5ee;
-  --ng-green-mid:   #6ab187;
-  --ng-green-dim:   rgba(58,140,92,0.1);
-  --ng-teal:        #2e7d6e;
-  --ng-danger:      #dc2626;
-  --ng-danger-dim:  rgba(220,38,38,0.08);
-  --ng-amber:       #d97706;
-  --ng-text:        #1a2e23;
-  --ng-muted:       #6b8c78;
-  --ng-subtle:      #f5faf7;
-  --ng-radius:      14px;
-  --ng-font:        'Nunito', sans-serif;
-  --ng-body:        'Lato', sans-serif;
-  --ng-shadow:      0 2px 12px rgba(58,140,92,0.08);
-  --ng-shadow-md:   0 4px 24px rgba(58,140,92,0.13);
+  --ng-green-mid: #6ab187;
+  --ng-green-dim: rgba(58, 140, 92, 0.1);
+  --ng-teal: #2e7d6e;
+  --ng-danger: #dc2626;
+  --ng-danger-dim: rgba(220, 38, 38, 0.08);
+  --ng-amber: #d97706;
+  --ng-text: #1a2e23;
+  --ng-muted: #6b8c78;
+  --ng-subtle: #f5faf7;
+  --ng-radius: 14px;
+  --ng-font: "Nunito", sans-serif;
+  --ng-body: "Lato", sans-serif;
+  --ng-shadow: 0 2px 12px rgba(58, 140, 92, 0.08);
+  --ng-shadow-md: 0 4px 24px rgba(58, 140, 92, 0.13);
 }
-
 
 .ng-empty {
   display: flex;
@@ -69,7 +65,6 @@
   margin: 0;
 }
 
-
 .ng-page {
   background: var(--ng-bg);
   min-height: 100vh;
@@ -77,7 +72,6 @@
   font-family: var(--ng-body);
   color: var(--ng-text);
 }
-
 
 .ng-header {
   background: linear-gradient(135deg, #fff 55%, #eaf4ee 100%);
@@ -120,7 +114,7 @@
 
 .ng-role-badge {
   background: var(--ng-green-dim);
-  border: 1px solid rgba(58,140,92,0.25);
+  border: 1px solid rgba(58, 140, 92, 0.25);
   color: var(--ng-green);
   padding: 0.35rem 0.9rem;
   border-radius: 999px;
@@ -131,13 +125,11 @@
   white-space: nowrap;
 }
 
-
 .ng-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
 }
-
 
 .ng-card {
   background: var(--ng-card);
@@ -186,7 +178,6 @@
   margin: 0;
 }
 
-
 .ng-form {
   display: flex;
   flex-direction: column;
@@ -223,7 +214,9 @@
   font-family: var(--ng-body);
   color: var(--ng-text);
   background: var(--ng-subtle);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   outline: none;
   width: 100%;
   box-sizing: border-box;
@@ -246,17 +239,15 @@
   color: #b0c4b8;
 }
 
-
 .ng-required {
   color: var(--ng-danger);
 }
-
 
 .ng-error {
   font-size: 0.8rem;
   color: var(--ng-danger);
   background: var(--ng-danger-dim);
-  border: 1px solid rgba(220,38,38,0.2);
+  border: 1px solid rgba(220, 38, 38, 0.2);
   border-radius: 8px;
   padding: 0.5rem 0.85rem;
   margin: 0;
@@ -266,7 +257,7 @@
   font-size: 0.8rem;
   color: var(--ng-green);
   background: var(--ng-green-dim);
-  border: 1px solid rgba(58,140,92,0.2);
+  border: 1px solid rgba(58, 140, 92, 0.2);
   border-radius: 8px;
   padding: 0.5rem 0.85rem;
   margin: 0;
@@ -282,15 +273,17 @@
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s, box-shadow 0.2s;
-  box-shadow: 0 3px 10px rgba(58,140,92,0.25);
+  transition:
+    opacity 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 3px 10px rgba(58, 140, 92, 0.25);
   width: 100%;
   margin-top: 0.25rem;
 }
 
 .ng-save-btn:hover:not(:disabled) {
   opacity: 0.9;
-  box-shadow: 0 5px 16px rgba(58,140,92,0.35);
+  box-shadow: 0 5px 16px rgba(58, 140, 92, 0.35);
 }
 
 .ng-save-btn:disabled {
@@ -298,11 +291,32 @@
   cursor: not-allowed;
 }
 
-
 .ng-table-wrapper {
   overflow-x: auto;
   border-radius: 10px;
   border: 1px solid var(--ng-border);
+  max-height: 20.8rem;
+}
+
+.ng-table-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ng-table-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(78, 142, 92, 0.4);
+  border-radius: 4px;
+}
+
+.ng-table-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ng-table-wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.ng-table-wrapper:hover::-webkit-scrollbar {
+  width: 4px;
 }
 
 .ng-table {
@@ -362,14 +376,27 @@
 }
 
 @keyframes ng-fade-row {
-  0%   { background: rgba(58,140,92,0.18); }
-  100% { background: transparent; }
+  0% {
+    background: rgba(58, 140, 92, 0.18);
+  }
+  100% {
+    background: transparent;
+  }
 }
 
-
 @media (max-width: 860px) {
-  .ng-grid     { grid-template-columns: 1fr; }
-  .ng-form-row { grid-template-columns: 1fr; }
-  .ng-page     { padding: 1rem; }
-  .ng-header   { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .ng-grid {
+    grid-template-columns: 1fr;
+  }
+  .ng-form-row {
+    grid-template-columns: 1fr;
+  }
+  .ng-page {
+    padding: 1rem;
+  }
+  .ng-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
 }

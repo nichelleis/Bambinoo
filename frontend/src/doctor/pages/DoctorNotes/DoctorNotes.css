@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap");
 
 :root {
   --pink-900: #500724;
@@ -10,45 +10,49 @@
   --pink-300: #f9a8d4;
   --pink-200: #fbcfe8;
   --pink-100: #fce7f3;
-  --pink-50:  #fdf2f8;
+  --pink-50: #fdf2f8;
 
-  --red-800:  #991b1b;
-  --red-700:  #b91c1c;
-  --red-600:  #dc2626;
-  --red-200:  #fecaca;
-  --red-100:  #fee2e2;
-  --red-50:   #fef2f2;
+  --red-800: #991b1b;
+  --red-700: #b91c1c;
+  --red-600: #dc2626;
+  --red-200: #fecaca;
+  --red-100: #fee2e2;
+  --red-50: #fef2f2;
 
-  --surface-0:   #ffffff;
-  --surface-1:   #fdf5f9;
-  --border:      #f4c2d8;
+  --surface-0: #ffffff;
+  --surface-1: #fdf5f9;
+  --border: #f4c2d8;
   --border-soft: #f9d9e9;
 
-  --text-primary:   #2d0a18;
+  --text-primary: #2d0a18;
   --text-secondary: #5c1a36;
-  --text-tertiary:  #8c3a5a;
-  --text-muted:     #c48da8;
+  --text-tertiary: #8c3a5a;
+  --text-muted: #c48da8;
 
   --green-700: #15623a;
-  --green-50:  #f0fdf4;
+  --green-50: #f0fdf4;
   --green-200: #a7f3d0;
 
   --danger: #b91c1c;
 
-  --shadow-xs: 0 1px 3px rgba(80,7,36,.05);
-  --shadow-sm: 0 1px 6px rgba(80,7,36,.07);
-  --shadow-md: 0 4px 16px rgba(80,7,36,.09);
+  --shadow-xs: 0 1px 3px rgba(80, 7, 36, 0.05);
+  --shadow-sm: 0 1px 6px rgba(80, 7, 36, 0.07);
+  --shadow-md: 0 4px 16px rgba(80, 7, 36, 0.09);
 
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 16px;
 
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 .cn-page,
 .cn-page *,
@@ -219,8 +223,12 @@
   animation: fadeUp 0.38s ease both;
 }
 
-.cn-forms { animation-delay: 0.06s; }
-.cn-history { animation-delay: 0.12s; }
+.cn-forms {
+  animation-delay: 0.06s;
+}
+.cn-history {
+  animation-delay: 0.12s;
+}
 
 .cn-form-card {
   background: var(--surface-0);
@@ -284,7 +292,9 @@
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   outline: none;
-  transition: border-color 0.16s, box-shadow 0.16s;
+  transition:
+    border-color 0.16s,
+    box-shadow 0.16s;
 }
 
 .cn-field input::placeholder,
@@ -296,7 +306,7 @@
 .cn-field input:focus,
 .cn-field textarea:focus {
   border-color: var(--pink-400);
-  box-shadow: 0 0 0 3px rgba(236,72,153,.09);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.09);
 }
 
 .cn-field textarea {
@@ -376,7 +386,9 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  transition: background 0.16s, transform 0.14s;
+  transition:
+    background 0.16s,
+    transform 0.14s;
   margin-top: 2px;
 }
 
@@ -409,7 +421,7 @@
 }
 
 .cn-btn:disabled {
-  opacity: 0.50;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
@@ -625,8 +637,14 @@
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1024px) {
@@ -653,4 +671,32 @@
   .cn-history {
     padding: 18px 16px;
   }
+}
+
+.scrollable-records {
+  max-height: 31.1rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding-right: 12px;
+}
+
+.scrollable-records::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-records::-webkit-scrollbar-thumb {
+  background-color: rgba(132, 78, 142, 0.4);
+  border-radius: 3px;
+}
+
+.scrollable-records:hover::-webkit-scrollbar-track {
+  background: none;
+}
+
+.scrollable-records::-webkit-scrollbar {
+  width: 0px;
+}
+
+.scrollable-records:hover::-webkit-scrollbar {
+  width: 4px;
 }

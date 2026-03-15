@@ -193,7 +193,7 @@ const Immunizations = ({ selectedChild }) => {
         <form className="immunization-form" onSubmit={handleSubmit}>
           <h3>Record New Immunization</h3>
 
-          <div className="ni-field">
+          <div className="ng-field">
             <label>
               Vaccine Name <span className="ni-required">*</span>
             </label>
@@ -224,7 +224,7 @@ const Immunizations = ({ selectedChild }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="ni-field">
+            <div className="ng-field">
               <label>
                 Dose Number <span className="ni-required">*</span>
               </label>

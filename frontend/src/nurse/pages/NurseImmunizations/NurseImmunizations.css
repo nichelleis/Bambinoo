@@ -1,28 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Lato:wght@300;400;700&display=swap");
 
 :root {
-  --ni-bg:          #fdf5f7;
-  --ni-surface:     #ffffff;
-  --ni-card:        #ffffff;
-  --ni-border:      #f0d9df;
-  --ni-pink:        #c2607a;
-  --ni-pink-light:  #fce8ed;
-  --ni-pink-mid:    #e0899a;
-  --ni-pink-dim:    rgba(194,96,122,0.1);
-  --ni-rose:        #a8485f;
-  --ni-danger:      #dc2626;
-  --ni-danger-dim:  rgba(220,38,38,0.08);
-  --ni-amber:       #d97706;
-  --ni-green:       #2e7d52;
-  --ni-green-dim:   rgba(46,125,82,0.1);
-  --ni-text:        #2e1a20;
-  --ni-muted:       #9c7080;
-  --ni-subtle:      #fdf8f9;
-  --ni-radius:      14px;
-  --ni-font:        'Nunito', sans-serif;
-  --ni-body:        'Lato', sans-serif;
-  --ni-shadow:      0 2px 12px rgba(194,96,122,0.08);
-  --ni-shadow-md:   0 4px 24px rgba(194,96,122,0.13);
+  --ni-bg: #fdf5f7;
+  --ni-surface: #ffffff;
+  --ni-card: #ffffff;
+  --ni-border: #f0d9df;
+  --ni-pink: #c2607a;
+  --ni-pink-light: #fce8ed;
+  --ni-pink-mid: #e0899a;
+  --ni-pink-dim: rgba(194, 96, 122, 0.1);
+  --ni-rose: #a8485f;
+  --ni-danger: #dc2626;
+  --ni-danger-dim: rgba(220, 38, 38, 0.08);
+  --ni-amber: #d97706;
+  --ni-green: #2e7d52;
+  --ni-green-dim: rgba(46, 125, 82, 0.1);
+  --ni-text: #2e1a20;
+  --ni-muted: #9c7080;
+  --ni-subtle: #fdf8f9;
+  --ni-radius: 14px;
+  --ni-font: "Nunito", sans-serif;
+  --ni-body: "Lato", sans-serif;
+  --ni-shadow: 0 2px 12px rgba(194, 96, 122, 0.08);
+  --ni-shadow-md: 0 4px 24px rgba(194, 96, 122, 0.13);
 }
 
 .ni-empty {
@@ -116,7 +116,7 @@
 
 .ni-role-badge {
   background: var(--ni-pink-dim);
-  border: 1px solid rgba(194,96,122,0.25);
+  border: 1px solid rgba(194, 96, 122, 0.25);
   color: var(--ni-pink);
   padding: 0.35rem 0.9rem;
   border-radius: 999px;
@@ -216,7 +216,9 @@
   font-family: var(--ni-body);
   color: var(--ni-text);
   background: var(--ni-subtle);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   outline: none;
   width: 100%;
   box-sizing: border-box;
@@ -247,7 +249,7 @@
   font-size: 0.8rem;
   color: var(--ni-danger);
   background: var(--ni-danger-dim);
-  border: 1px solid rgba(220,38,38,0.2);
+  border: 1px solid rgba(220, 38, 38, 0.2);
   border-radius: 8px;
   padding: 0.5rem 0.85rem;
   margin: 0;
@@ -257,7 +259,7 @@
   font-size: 0.8rem;
   color: var(--ni-green);
   background: var(--ni-green-dim);
-  border: 1px solid rgba(46,125,82,0.2);
+  border: 1px solid rgba(46, 125, 82, 0.2);
   border-radius: 8px;
   padding: 0.5rem 0.85rem;
   margin: 0;
@@ -273,15 +275,17 @@
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s, box-shadow 0.2s;
-  box-shadow: 0 3px 10px rgba(194,96,122,0.25);
+  transition:
+    opacity 0.2s,
+    box-shadow 0.2s;
+  box-shadow: 0 3px 10px rgba(194, 96, 122, 0.25);
   width: 100%;
   margin-top: 0.25rem;
 }
 
 .ni-save-btn:hover:not(:disabled) {
   opacity: 0.9;
-  box-shadow: 0 5px 16px rgba(194,96,122,0.35);
+  box-shadow: 0 5px 16px rgba(194, 96, 122, 0.35);
 }
 
 .ni-save-btn:disabled {
@@ -353,7 +357,7 @@
 .ni-dose-badge {
   background: var(--ni-pink-light);
   color: var(--ni-pink);
-  border: 1px solid rgba(194,96,122,0.25);
+  border: 1px solid rgba(194, 96, 122, 0.25);
   border-radius: 999px;
   padding: 0.25rem 0.7rem;
   font-size: 0.72rem;
@@ -364,8 +368,45 @@
 }
 
 @media (max-width: 860px) {
-  .ni-layout   { grid-template-columns: 1fr; }
-  .ni-form-row { grid-template-columns: 1fr; }
-  .ni-page     { padding: 1rem; }
-  .ni-header   { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+  .ni-layout {
+    grid-template-columns: 1fr;
+  }
+  .ni-form-row {
+    grid-template-columns: 1fr;
+  }
+  .ni-page {
+    padding: 1rem;
+  }
+  .ni-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
+
+.ni-history-wrapper {
+  max-height: 31rem;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.ni-history-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ni-history-wrapper::-webkit-scrollbar-thumb {
+  background-color: rgba(142, 78, 88, 0.4);
+  border-radius: 4px;
+}
+
+.ni-history-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ni-history-wrapper::-webkit-scrollbar {
+  width: 0;
+}
+
+.ni-history-wrapper:hover::-webkit-scrollbar {
+  width: 4px;
 }
