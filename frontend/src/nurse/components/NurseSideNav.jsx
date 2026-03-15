@@ -25,9 +25,8 @@ export default function Sidebar() {
         <NavLink to="/nurse/chdr">CHDR View</NavLink>
         <NavLink to="/nurse/growth">Growth Data</NavLink>
         <NavLink to="/nurse/immunizations">Immunizations</NavLink>
-        
       </div>
-      
+
       <div className="menu-section">
         <p className="sidesection-title">COMMUNICATION</p>
         <NavLink to="/nurse/messaging">Messaging</NavLink>
@@ -39,9 +38,8 @@ export default function Sidebar() {
       </div>
       <div className="menu-section">
         <p className="sidesection-title">AUTHENTICATION</p>
-        <NavLink to="/nurse/auth">User Authentication</NavLink>
+        <NavLink to="/nurse/auth">Authentication</NavLink>
       </div>
-      
 
       <div className="menu-section logout-section">
         <button className="logout-btn" onClick={handleLogout}>

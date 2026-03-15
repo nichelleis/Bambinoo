@@ -996,7 +996,6 @@ def toggle_milestone():
     db.session.commit()
     return jsonify({"success": True})
 
-
 @app.route("/profile", methods=["GET"])
 @jwt_required()
 def get_profile_data():
@@ -1008,39 +1007,40 @@ def get_profile_data():
 
         if not user or not child:
             return jsonify({"message": "Profile not found"}), 404
-        
-        pending = PendingRegistration.query.filter_by(child_name=child.name).order_by(PendingRegistration.created_at.desc()).first() ##### change with Registration when thats done
+
+        registration = RegisteredPatient.query.filter_by(child_name=child.name)\
+            .order_by(RegisteredPatient.created_at.desc()).first()
 
         return jsonify({
             "child": {
                 "name": child.name,
                 "dob": child.date_of_birth.isoformat(),
                 "gender": child.gender,
-                "reg_number": pending.registration_number if pending else None
+                "reg_number": registration.registration_number if registration else None
             },
             "birth": {
-                "hospital": pending.birth_hospital if pending else None,
-                "location": pending.birth_location if pending else None,
-                "delivery": pending.delivery_type if pending else None,
-                "weight": pending.birth_weight if pending else None,
-                "length": pending.birth_length if pending else None,
-                "head": pending.head_circumference if pending else None,
-                "surgery": pending.surgery if pending else None 
+                "hospital": registration.birth_hospital if registration else None,
+                "location": registration.birth_location if registration else None,
+                "delivery": registration.delivery_type if registration else None,
+                "weight": registration.birth_weight if registration else None,
+                "length": registration.birth_length if registration else None,
+                "head": registration.head_circumference if registration else None,
+                "surgery": registration.surgery if registration else None
             },
             "background": {
-                "nationality": pending.nationality if pending else None,
-                "language": pending.language if pending else None
+                "nationality": registration.nationality if registration else None,
+                "language": registration.language if registration else None
             },
             "parent": {
-                "name": pending.mother_name if pending else user.username,
-                "email": user.email,
-                "phone": user.phone,
-                "Address":pending.living_address if pending else None
+                "name": registration.mother_name if registration else user.username,
+                "email": registration.mother_email if registration else user.email,
+                "phone": registration.mother_phone if registration else user.phone,
+                "Address": registration.living_address if registration else None
             }
         })
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 #messaging component
 

@@ -39,7 +39,7 @@ export default function Sidebar() {
       </div>
       <div className="menu-section">
         <p className="sidesection-title">AUTHENTICATION</p>
-        <NavLink to="/doctor/auth">User Authentication</NavLink>
+        <NavLink to="/doctor/auth">Authentication</NavLink>
       </div>
       <div className="menu-section">
         <p className="sidesection-title">Settings</p>
