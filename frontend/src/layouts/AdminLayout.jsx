@@ -1,5 +1,4 @@
 import "../admin/components/AdminLayout.css";
-// 1. Change Link to NavLink
 import { Routes, Route, NavLink } from "react-router-dom"; 
 import AdminDashboard from "../admin/pages/AdminDashboard"; 
 import ManageUsers from "../admin/pages/ManageUsers";
@@ -19,10 +18,8 @@ export default function AdminLayout() {
       <div className="admin-sidebar">
         <h2 className="admin-title">Admin Panel</h2>
         <nav className="admin-nav">
-          {/* 2. Change all Links to NavLinks */}
-          {/* end prop ensures the Dashboard isn't always highlighted */}
-          <NavLink to="/admin" end className="admin-link">Dashboard</NavLink>
-          <NavLink to="/admin/users" className="admin-link">Manage Users</NavLink>
+          <NavLink to="/admin" end className="admin-link">Overview</NavLink>
+          <NavLink to="/admin/users" className="admin-link">User Managment</NavLink>
           <NavLink to="/admin/user-management" className="admin-link">Event Management</NavLink>
           <NavLink to="/admin/reports" className="admin-link">Reports</NavLink>
           <NavLink to="/admin/profile" className="admin-link">Profile</NavLink>

@@ -5,25 +5,25 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchAdmin = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:5000/admin-profile");
-      const data = await response.json();
+    const fetchAdmin = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/admin-profile");
+        const data = await response.json();
 
-      if (response.ok && data.username) {
-        setUser(data);
-      } else {
-        console.error("Admin not found:", data);
+        if (response.ok && data.username) {
+          setUser(data);
+        } else {
+          console.error("Admin not found:", data);
+        }
+      } catch (err) {
+        console.error("Admin fetch failed:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Admin fetch failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchAdmin();
-}, []);
+    fetchAdmin();
+  }, []);
 
   if (loading) return <div className="admin-content">Loading...</div>;
   if (!user) return <div className="admin-content">User not found.</div>;
@@ -54,8 +54,6 @@ export default function Profile() {
             <label>Role</label>
             <div className="profile-role">{user.role}</div>
           </div>
-
-          
         </div>
       </div>
     </div>

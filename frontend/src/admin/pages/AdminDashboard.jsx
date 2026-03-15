@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 
@@ -63,9 +72,13 @@ export default function AdminDashboard() {
   return (
     <div className="admin-content" style={{ padding: "20px" }}>
       <div className="dashboard-header">
-        <h1 className="admin-title">Overview</h1>
-        <p style={{ color: "#64748b", marginBottom: "30px", fontSize: "18px" }}>
-          Welcome back, <span style={{ fontWeight: "bold", color: "#0f172a" }}>{stats.adminName || 'Admin'}</span>
+        <p
+          style={{ color: "#64748b", marginBottom: "30px", fontSize: "1.5rem" }}
+        >
+          Welcome back,{" "}
+          <span style={{ fontWeight: "bold", color: "#0f172a" }}>
+            {stats.adminName || "Admin"}
+          </span>
         </p>
       </div>
 
@@ -78,28 +91,28 @@ export default function AdminDashboard() {
           marginBottom: "20px",
         }}
       >
-        <div className="stat-card" style={cardStyle}>
+        <div className="stat-card-admin" style={cardStyle}>
           <h3 style={cardTitleStyle}>Total Users</h3>
           <p className="stat-number" style={numberStyle}>
             {loading ? "..." : stats.totalUsers}
           </p>
         </div>
 
-        <div className="stat-card" style={cardStyle}>
+        <div className="stat-card0admin" style={cardStyle}>
           <h3 style={cardTitleStyle}>Active Doctors</h3>
           <p className="stat-number" style={numberStyle}>
             {loading ? "..." : stats.activeDoctors}
           </p>
         </div>
 
-        <div className="stat-card" style={cardStyle}>
+        <div className="stat-card-admin" style={cardStyle}>
           <h3 style={cardTitleStyle}>Children Enrolled</h3>
           <p className="stat-number" style={numberStyle}>
             {loading ? "..." : stats.totalChildren}
           </p>
         </div>
 
-        <div className="stat-card" style={cardStyle}>
+        <div className="stat-card-admin" style={cardStyle}>
           <h3 style={cardTitleStyle}>Active Events</h3>
           <p
             className="stat-number"
@@ -118,7 +131,10 @@ export default function AdminDashboard() {
           marginBottom: "20px",
         }}
       >
-        <div className="stat-card" style={{ ...cardStyle, minHeight: "350px" }}>
+        <div
+          className="stat-card-admin"
+          style={{ ...cardStyle, minHeight: "350px" }}
+        >
           <h3
             style={{
               marginBottom: "20px",
@@ -159,12 +175,27 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <div className="stat-card" style={{ ...cardStyle, minHeight: "350px", display: "flex", flexDirection: "column" }}>
-          <h3 style={{ marginBottom: "20px", color: "#64748b", fontSize: "14px", textTransform: "uppercase" }}>
+        <div
+          className="stat-card-admin"
+          style={{
+            ...cardStyle,
+            minHeight: "350px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <h3
+            style={{
+              marginBottom: "20px",
+              color: "#64748b",
+              fontSize: "14px",
+              textTransform: "uppercase",
+            }}
+          >
             User Registrations (Monthly)
           </h3>
           {loading ? (
-             <p>Loading Chart...</p>
+            <p>Loading Chart...</p>
           ) : (
             <div style={{ width: "100%", flexGrow: 1, minHeight: "250px" }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -174,25 +205,44 @@ export default function AdminDashboard() {
                 >
                   <defs>
                     <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 12, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: '#1e293b', borderRadius: '8px', border: 'none', color: '#f8fafc' }}
-                    itemStyle={{ color: '#14b8a6', fontWeight: 'bold' }}
+                  <XAxis
+                    dataKey="name"
+                    tick={{ fontSize: 12, fill: "#64748b" }}
+                    axisLine={false}
+                    tickLine={false}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="users" 
-                    stroke="#14b8a6" 
+                  <YAxis
+                    tick={{ fontSize: 12, fill: "#64748b" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#bedbe5",
+                      borderRadius: "8px",
+                      border: "none",
+                      color: "#f8fafc",
+                    }}
+                    itemStyle={{ color: "#14b8a6", fontWeight: "bold" }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="users"
+                    stroke="#14b8a6"
                     strokeWidth={2}
-                    fillOpacity={1} 
-                    fill="url(#colorUsers)" 
-                    activeDot={{ r: 6, fill: "#14b8a6", stroke: "#fff", strokeWidth: 2 }}
+                    fillOpacity={1}
+                    fill="url(#colorUsers)"
+                    activeDot={{
+                      r: 6,
+                      fill: "#14b8a6",
+                      stroke: "#fff",
+                      strokeWidth: 2,
+                    }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -204,7 +254,7 @@ export default function AdminDashboard() {
       <div
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}
       >
-        <div className="stat-card" style={cardStyle}>
+        <div className="stat-card-admin" style={cardStyle}>
           <h3
             style={{
               marginBottom: "20px",
@@ -292,7 +342,7 @@ export default function AdminDashboard() {
         </div>
 
         <div
-          className="stat-card"
+          className="stat-card-admin"
           style={{ ...cardStyle, borderTop: "4px solid #f59e0b" }}
         >
           <h3
