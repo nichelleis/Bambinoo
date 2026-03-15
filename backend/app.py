@@ -14,6 +14,8 @@ from dotenv import load_dotenv
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import json as _json
 import uuid as _uuid
+from flask_mail import Mail, Message as MailMessage
+
 
 
 load_dotenv()
@@ -57,6 +59,15 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY")
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER", 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv("MAIL_PORT", 587))
+app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS", 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv("MAIL_DEFAULT_SENDER")
+
+mail = Mail(app)
+
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -67,7 +78,20 @@ class User(db.Model):
     phone = db.Column(db.String(20))
     role = db.Column(db.String(50), nullable=False, default='parent')
     MOH_ID = db.Column(db.String(20), unique=True)   
+    reset_tokens = db.relationship('PasswordResetId', backref='user', cascade="all, delete-orphan")
 
+
+
+class PasswordResetId(db.Model):
+    __tablename__ = 'password_reset_id'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reset_id = db.Column(db.String(36), unique=True, default=lambda: str(_uuid.uuid4()))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def is_expired(self):
+        expires_at = self.created_at + timedelta(minutes=10)          # Link valid for 10 minutes
+        return datetime.utcnow() > expires_at
 
 class Child(db.Model):
     __tablename__ = 'child'
@@ -377,6 +401,59 @@ def login():
         return jsonify({
             "error": str(e)
         }), 500
+    
+
+
+
+@app.route('/forgot-password', methods=['POST'])
+@cross_origin()
+def forgot_password():
+    data = request.get_json()
+    email = data.get('email')
+    
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return jsonify({"message": "If this email is registered, a reset link has been sent."}), 200
+
+    PasswordResetId.query.filter_by(user_id=user.id).delete()
+    new_reset = PasswordResetId(user_id=user.id)
+    db.session.add(new_reset)
+    db.session.commit()
+
+    reset_link = f"{os.getenv('FRONTEND_URL')}/reset-password/{new_reset.reset_id}"
+
+    msg = MailMessage("Bambinoo - Reset Your Password", recipients=[email])
+    msg.body = f"Click the link below to reset your password. It expires in 10 minutes:\n\n{reset_link}"
+    
+    try:
+        mail.send(msg)
+        return jsonify({"message": "Reset link sent to your email"}), 200
+    except Exception as e:
+        print(f"Mail Error: {e}") 
+        return jsonify({"error": "Failed to send email"}), 500
+
+@app.route('/reset-password/<reset_id>', methods=['POST'])
+@cross_origin()
+def reset_password(reset_id):
+    data = request.get_json()
+    new_password = data.get('password')
+
+    token_record = PasswordResetId.query.filter_by(reset_id=reset_id).first()
+
+    if not token_record or token_record.is_expired():
+        return jsonify({"error": "Invalid or expired reset link"}), 400
+
+    user = User.query.get(token_record.user_id)
+    user.password_hash = generate_password_hash(new_password)
+    
+    db.session.delete(token_record)
+    db.session.commit()
+
+    return jsonify({"message": "Password updated successfully"}), 200
+
+
+
 
 
 # Admin Profile route
@@ -423,6 +500,9 @@ def verify_token():
             "valid": False,
             "error": "Internal server error"
         }), 500
+
+
+
 
 
 @app.route('/header', methods=["GET"])

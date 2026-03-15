@@ -48,7 +48,7 @@ const Login = () => {
       }
     } catch (err) {
       setError(
-        "Connection error. Please check if the backend server is running."
+        "Connection error. Please check if the backend server is running.",
       );
       console.error(err);
     } finally {
@@ -175,10 +175,9 @@ const Login = () => {
 
           <div className={style.footerText}>
             <p>
-              <a href="#">Forget Password?</a> Reset your password <br />
-              <Link to="/register">
-                Don't have an account?
-              </Link>
+              <Link to="/forgot-password">Forget Password?</Link> Reset your
+              password <br />
+              <Link to="/register">Don't have an account?</Link>
               Visit your nearest clinic.
             </p>
             <a href="http://bambinoo.net/" className={style.footerLink}>

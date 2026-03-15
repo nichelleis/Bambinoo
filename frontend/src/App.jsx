@@ -6,12 +6,16 @@ import ParentLayout from "./layouts/ParentLayout";
 import NurseLayout from "./layouts/NurseLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import DoctorLayout from "./layouts/DoctorLayout";
+import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./RestPassword";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<RegistrationForm />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:reset_id" element={<ResetPassword />} />
       <Route path="/admin/*" element={<AdminLayout />} />
       <Route path="/doctor/*" element={<DoctorLayout />} />
       <Route path="/nurse/*" element={<NurseLayout />} />
