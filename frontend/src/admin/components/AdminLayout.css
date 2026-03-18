@@ -139,7 +139,7 @@
 .profile-container {
   max-width: 520px;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
   display: flex;
   gap: 32px;
   align-items: flex-start;
