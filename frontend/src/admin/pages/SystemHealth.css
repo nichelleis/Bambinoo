@@ -28,3 +28,16 @@
 }
 .sh-refresh-btn:hover:not(:disabled) { background: #1e293b; }
 .sh-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Slim refresh progress bar */
+.sh-refresh-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1 0%, #a5b4fc 50%, #6366f1 100%);
+  background-size: 200% 100%;
+  border-radius: 2px;
+  animation: sh-shimmer 1.2s linear infinite;
+}
+@keyframes sh-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
