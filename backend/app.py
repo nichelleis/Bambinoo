@@ -3616,6 +3616,98 @@ def cancel_report_request(request_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/admin/system-health', methods=['GET'])
+@jwt_required()
+def get_system_health():
+    try:
+        import platform
+        import time
+
+        user_id = get_jwt_identity()
+        current_user = db.session.get(User, int(user_id))
+        if not current_user or current_user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+        
+
+        db_path = os.path.join(BASE_DIR, 'bambinoo.db')
+        db_size_kb = round(os.path.getsize(db_path) / 1024, 1) if os.path.exists(db_path) else 0
+
+
+        db_status = 'Error'
+        db_response_ms = None
+        try:
+            t0 = time.perf_counter()
+            with db.engine.connect() as conn:
+                conn.execute(db.text('SELECT 1'))
+            db_response_ms = round((time.perf_counter() - t0) * 1000, 1)
+            db_status = 'Healthy'
+        except Exception as db_err:
+            app.logger.error(f'[SystemHealth] DB connectivity check failed: {db_err}')
+
+
+        def safe_count(table, where=''):
+            try:
+                sql = 'SELECT COUNT(*) FROM {} {}'.format(table, where)
+                with db.engine.connect() as conn:
+                    return conn.execute(db.text(sql)).scalar() or 0
+            except Exception as count_err:
+                app.logger.warning(f'[SystemHealth] safe_count({table}) failed: {count_err}')
+                return 0
+
+
+        predictor = _get_growth_predictor()
+        ml_status = 'Loaded' if predictor is not None else 'Not Loaded'
+
+
+        mem_used_mb = mem_total_mb = mem_percent = cpu_percent = uptime_h = None
+        try:
+            import psutil as _psutil
+            mem          = _psutil.virtual_memory()
+            mem_used_mb  = round(mem.used  / (1024 * 1024), 1)
+            mem_total_mb = round(mem.total / (1024 * 1024), 1)
+            mem_percent  = mem.percent
+            cpu_percent  = _psutil.cpu_percent(interval=0.2)
+            uptime_h     = round((time.time() - _psutil.boot_time()) / 3600, 1)
+        except ImportError:
+            app.logger.info('[SystemHealth] psutil not installed — run: pip install psutil')
+        except Exception as res_err:
+            app.logger.warning(f'[SystemHealth] Resource metrics unavailable: {res_err}')
+
+        return jsonify({
+            # Service info
+            'db_status':       db_status,
+            'db_size_kb':      db_size_kb,
+            'db_response_ms':  db_response_ms,
+            'ml_status':       ml_status,
+            'platform':        platform.system(),
+            'python':          platform.python_version(),
+            'timestamp': (datetime.utcnow() + timedelta(hours=5, minutes=30)).strftime('%Y-%m-%d %H:%M:%S IST'),
+
+            # System resources
+            'cpu_percent':     cpu_percent,
+            'mem_used_mb':     mem_used_mb,
+            'mem_total_mb':    mem_total_mb,
+            'mem_percent':     mem_percent,
+            'uptime_hours':    uptime_h,
+
+            # Database record counts
+            'total_users':     safe_count('user'),
+            'total_children':  safe_count('child'),
+            'total_growth':    safe_count('growth_record'),
+            'total_vacc':      safe_count('vaccination'),
+            'total_appts':     safe_count('appointment'),
+            'total_events':    safe_count('event'),
+            'total_messages':  safe_count('message'),
+            'pending_regs':    safe_count('pending_registration', "WHERE status='PENDING'"),
+            'pending_reports': safe_count('report_request', "WHERE status='Pending'"),
+            'unread_alerts':   safe_count('health_alert', 'WHERE is_read=0'),
+        }), 200
+
+    except Exception as e:
+        app.logger.error(f'[SystemHealth] Unexpected error: {e}', exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
 # SocketIO and Main Block 
 @socketio.on("connect")
 def handle_connect(auth):
