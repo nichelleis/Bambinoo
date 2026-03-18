@@ -29,7 +29,7 @@
 .sh-refresh-btn:hover:not(:disabled) { background: #1e293b; }
 .sh-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* Slim refresh progress bar */
+/* Slim refresh progress bar (shown while data is already visible) */
 .sh-refresh-bar {
   height: 3px;
   background: linear-gradient(90deg, #6366f1 0%, #a5b4fc 50%, #6366f1 100%);
@@ -90,7 +90,9 @@
 .sh-service-detail { font-size: 0.75rem; color: #94a3b8; }
 .sh-service-ping   { color: #6366f1; }
 
-.sh-dot { width: 10px; height: 10px; border-radius: 50%; }
+.sh-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
 .sh-dot--green  { background: #10b981; box-shadow: 0 0 0 3px #dcfce7; }
 .sh-dot--yellow { background: #f59e0b; box-shadow: 0 0 0 3px #fef3c7; }
 .sh-dot--red    { background: #ef4444; box-shadow: 0 0 0 3px #fee2e2; }

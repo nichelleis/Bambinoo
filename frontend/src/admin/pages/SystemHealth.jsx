@@ -47,12 +47,9 @@ export default function SystemHealth() {
       setLoading(false);
       setRefreshing(false);
     }
-
   }, [data, retryCount]);
 
-
   useEffect(() => { fetchHealth(); }, []);
-
 
   useEffect(() => {
     const t = setInterval(() => fetchHealth(), REFRESH_INTERVAL);
@@ -63,7 +60,6 @@ export default function SystemHealth() {
   }, [fetchHealth]);
 
   const handleManualRefresh = () => fetchHealth(true);
-
 
   const dbDot   = data?.db_status === "Healthy" ? "sh-dot--green" : "sh-dot--red";
   const dbColor = data?.db_status === "Healthy" ? "sh-status--green" : "sh-status--red";
@@ -168,6 +164,7 @@ export default function SystemHealth() {
             </div>
 
           </div>
+
           {(cpuBar != null || memBar != null) && (
             <>
               <div className="sh-section-label">System Resources</div>
@@ -213,8 +210,6 @@ export default function SystemHealth() {
               </div>
             </>
           )}
-        </>
-      )}
 
           <div className="sh-section-label">Database Records</div>
           <div className="sh-counts-grid">
@@ -261,6 +256,8 @@ export default function SystemHealth() {
           </div>
 
           <div className="sh-footer">Server time: {fmt(data.timestamp)}</div>
+        </>
+      )}
     </div>
   );
 }

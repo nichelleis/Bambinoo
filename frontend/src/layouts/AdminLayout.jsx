@@ -1,6 +1,6 @@
 import "../admin/components/AdminLayout.css";
 import { Routes, Route, NavLink, useNavigate } from "react-router-dom";
-import { useEffect } from "react"; 
+import { useEffect } from "react";
 import AdminDashboard from "../admin/pages/AdminDashboard"; 
 import ManageUsers from "../admin/pages/ManageUsers";
 import UserManagement from "../admin/pages/UserManagement";
@@ -9,7 +9,7 @@ import Profile from "../admin/pages/Profile";
 import SystemHealth from "../admin/pages/SystemHealth";
 
 export default function AdminLayout() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,7 +31,7 @@ const navigate = useNavigate();
         <h2 className="admin-title">Admin Panel</h2>
         <nav className="admin-nav">
           <NavLink to="/admin" end className="admin-link">Overview</NavLink>
-          <NavLink to="/admin/users" className="admin-link">User Managment</NavLink>
+          <NavLink to="/admin/users" className="admin-link">User Management</NavLink>
           <NavLink to="/admin/user-management" className="admin-link">Event Management</NavLink>
           <NavLink to="/admin/system-health" className="admin-link">System Health</NavLink>
           <NavLink to="/admin/reports" className="admin-link">Reports</NavLink>
