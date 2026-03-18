@@ -120,6 +120,56 @@ export default function SystemHealth() {
           )}
         </div>
       )}
+
+      {data && (
+        <>
+          <div className="sh-section-label">Services</div>
+          <div className="sh-services-row">
+
+            <div className="sh-service-card">
+              <div className="sh-service-top">
+                <span className="sh-service-name">Database</span>
+                <span className={`sh-dot ${dbDot}`} />
+              </div>
+              <div className={`sh-service-status ${dbColor}`}>
+                {fmt(data.db_status)}
+              </div>
+              <div className="sh-service-detail">
+                SQLite · {fmt(data.db_size_kb)} KB
+                {data.db_response_ms != null && (
+                  <span className="sh-service-ping"> · {data.db_response_ms} ms</span>
+                )}
+              </div>
+            </div>
+
+            <div className="sh-service-card">
+              <div className="sh-service-top">
+                <span className="sh-service-name">Flask Server</span>
+                <span className="sh-dot sh-dot--green" />
+              </div>
+              <div className="sh-service-status sh-status--green">Running</div>
+              <div className="sh-service-detail">
+                {fmt(data.platform)} · Python {fmt(data.python)}
+                {data.uptime_hours != null && (
+                  <span> · up {data.uptime_hours}h</span>
+                )}
+              </div>
+            </div>
+
+            <div className="sh-service-card">
+              <div className="sh-service-top">
+                <span className="sh-service-name">ML Engine</span>
+                <span className={`sh-dot ${mlDot}`} />
+              </div>
+              <div className={`sh-service-status ${mlColor}`}>
+                {fmt(data.ml_status)}
+              </div>
+              <div className="sh-service-detail">LSTM Growth Predictor</div>
+            </div>
+
+          </div>
+        </>
+      )}
     </div>
-  )
+  );
 }
