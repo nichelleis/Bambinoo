@@ -3681,7 +3681,7 @@ def get_system_health():
             'ml_status':       ml_status,
             'platform':        platform.system(),
             'python':          platform.python_version(),
-            'timestamp':       datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+            'timestamp': (datetime.utcnow() + timedelta(hours=5, minutes=30)).strftime('%Y-%m-%d %H:%M:%S IST'),
 
             # System resources
             'cpu_percent':     cpu_percent,
