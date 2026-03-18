@@ -38,6 +38,11 @@ export default function SystemHealth() {
       setLastRefresh(new Date().toLocaleTimeString());
     } catch (e) {
       setError(e.message);
+      if (!isManual) {
+        const delay = Math.min(10_000 * Math.pow(2, retryCount), 120_000);
+        setRetryCount((c) => c + 1);
+        retryTimer.current = setTimeout(() => fetchHealth(), delay);
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
