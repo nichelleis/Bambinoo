@@ -49,4 +49,18 @@ export default function SystemHealth() {
     }
 
   }, [data, retryCount]);
+
+  
+  useEffect(() => { fetchHealth(); }, []);
+
+
+  useEffect(() => {
+    const t = setInterval(() => fetchHealth(), REFRESH_INTERVAL);
+    return () => {
+      clearInterval(t);
+      if (retryTimer.current) clearTimeout(retryTimer.current);
+    };
+  }, [fetchHealth]);
+
+  const handleManualRefresh = () => fetchHealth(true);
 }
