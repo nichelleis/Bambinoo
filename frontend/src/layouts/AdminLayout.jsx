@@ -36,6 +36,7 @@ export default function AdminLayout() {
           <Route index element={<AdminDashboard />} />
           <Route path="users" element={<ManageUsers />} />
           <Route path="user-management" element={<UserManagement />} />
+          <Route path="system-health" element={<SystemHealth />} />
           <Route path="reports" element={<Reports />} />
           <Route path="profile" element={<Profile />} />
         </Routes>
