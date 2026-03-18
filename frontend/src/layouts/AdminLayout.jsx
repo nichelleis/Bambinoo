@@ -1,5 +1,6 @@
 import "../admin/components/AdminLayout.css";
-import { Routes, Route, NavLink } from "react-router-dom"; 
+import { Routes, Route, NavLink, useNavigate } from "react-router-dom";
+import { useEffect } from "react"; 
 import AdminDashboard from "../admin/pages/AdminDashboard"; 
 import ManageUsers from "../admin/pages/ManageUsers";
 import UserManagement from "../admin/pages/UserManagement";
