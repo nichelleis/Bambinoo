@@ -3644,6 +3644,16 @@ def get_system_health():
         except Exception as db_err:
             app.logger.error(f'[SystemHealth] DB connectivity check failed: {db_err}')
 
+
+        def safe_count(table, where=''):
+            try:
+                sql = 'SELECT COUNT(*) FROM {} {}'.format(table, where)
+                with db.engine.connect() as conn:
+                    return conn.execute(db.text(sql)).scalar() or 0
+            except Exception as count_err:
+                app.logger.warning(f'[SystemHealth] safe_count({table}) failed: {count_err}')
+                return 0
+
     except Exception as e:
         app.logger.error(f'[SystemHealth] Unexpected error: {e}', exc_info=True)
         return jsonify({"error": str(e)}), 500
