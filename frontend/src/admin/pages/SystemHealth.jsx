@@ -215,6 +215,52 @@ export default function SystemHealth() {
           )}
         </>
       )}
+
+          <div className="sh-section-label">Database Records</div>
+          <div className="sh-counts-grid">
+            <div className="sh-count-card">
+              <span className="sh-count-value">{fmt(data.total_users)}</span>
+              <span className="sh-count-label">Users</span>
+            </div>
+            <div className="sh-count-card">
+              <span className="sh-count-value">{fmt(data.total_children)}</span>
+              <span className="sh-count-label">Children</span>
+            </div>
+            <div className="sh-count-card">
+              <span className="sh-count-value">{fmt(data.total_growth)}</span>
+              <span className="sh-count-label">Growth Records</span>
+            </div>
+            <div className="sh-count-card">
+              <span className="sh-count-value">{fmt(data.total_vacc)}</span>
+              <span className="sh-count-label">Vaccinations</span>
+            </div>
+            <div className="sh-count-card">
+              <span className="sh-count-value">{fmt(data.total_appts)}</span>
+              <span className="sh-count-label">Appointments</span>
+            </div>
+            <div className="sh-count-card">
+              <span className="sh-count-value">{fmt(data.total_events)}</span>
+              <span className="sh-count-label">Events</span>
+            </div>
+            <div className="sh-count-card">
+              <span className="sh-count-value">{fmt(data.total_messages)}</span>
+              <span className="sh-count-label">Messages</span>
+            </div>
+            <div className="sh-count-card sh-count-card--warn">
+              <span className="sh-count-value">{fmt(data.pending_regs)}</span>
+              <span className="sh-count-label">Pending Registrations</span>
+            </div>
+            <div className="sh-count-card sh-count-card--warn">
+              <span className="sh-count-value">{fmt(data.pending_reports)}</span>
+              <span className="sh-count-label">Pending Reports</span>
+            </div>
+            <div className="sh-count-card sh-count-card--warn">
+              <span className="sh-count-value">{fmt(data.unread_alerts)}</span>
+              <span className="sh-count-label">Unread Health Alerts</span>
+            </div>
+          </div>
+
+          <div className="sh-footer">Server time: {fmt(data.timestamp)}</div>
     </div>
   );
 }
