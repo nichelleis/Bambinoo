@@ -102,6 +102,24 @@ export default function SystemHealth() {
           </button>
         </div>
       </div>
+
+      {loading && !data && (
+        <div className="sh-center">
+          <div className="sh-spinner" />
+          <p>Loading diagnostics…</p>
+        </div>
+      )}
+
+      {refreshing && data && <div className="sh-refresh-bar" />}
+
+      {error && (
+        <div className="sh-error">
+          ⚠ {error}
+          {retryCount > 0 && (
+            <span className="sh-error-retry"> — retrying automatically</span>
+          )}
+        </div>
+      )}
     </div>
   )
 }
