@@ -3673,6 +3673,36 @@ def get_system_health():
         except Exception as res_err:
             app.logger.warning(f'[SystemHealth] Resource metrics unavailable: {res_err}')
 
+        return jsonify({
+            # Service info
+            'db_status':       db_status,
+            'db_size_kb':      db_size_kb,
+            'db_response_ms':  db_response_ms,
+            'ml_status':       ml_status,
+            'platform':        platform.system(),
+            'python':          platform.python_version(),
+            'timestamp':       datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'),
+
+            # System resources
+            'cpu_percent':     cpu_percent,
+            'mem_used_mb':     mem_used_mb,
+            'mem_total_mb':    mem_total_mb,
+            'mem_percent':     mem_percent,
+            'uptime_hours':    uptime_h,
+
+            # Database record counts
+            'total_users':     safe_count('user'),
+            'total_children':  safe_count('child'),
+            'total_growth':    safe_count('growth_record'),
+            'total_vacc':      safe_count('vaccination'),
+            'total_appts':     safe_count('appointment'),
+            'total_events':    safe_count('event'),
+            'total_messages':  safe_count('message'),
+            'pending_regs':    safe_count('pending_registration', "WHERE status='PENDING'"),
+            'pending_reports': safe_count('report_request', "WHERE status='Pending'"),
+            'unread_alerts':   safe_count('health_alert', 'WHERE is_read=0'),
+        }), 200
+
     except Exception as e:
         app.logger.error(f'[SystemHealth] Unexpected error: {e}', exc_info=True)
         return jsonify({"error": str(e)}), 500
