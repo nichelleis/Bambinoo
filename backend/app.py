@@ -3616,6 +3616,23 @@ def cancel_report_request(request_id):
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/admin/system-health', methods=['GET'])
+@jwt_required()
+def get_system_health():
+    try:
+        import platform
+        import time
+
+        user_id = get_jwt_identity()
+        current_user = db.session.get(User, int(user_id))
+        if not current_user or current_user.role.lower() != 'admin':
+            return jsonify({"message": "Unauthorized"}), 403
+
+    except Exception as e:
+        app.logger.error(f'[SystemHealth] Unexpected error: {e}', exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
 # SocketIO and Main Block 
 @socketio.on("connect")
 def handle_connect(auth):
