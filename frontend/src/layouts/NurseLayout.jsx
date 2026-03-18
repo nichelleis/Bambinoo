@@ -9,7 +9,7 @@ import NurseGrowth from "../nurse/pages/NurseGrowth/NurseGrowth";
 import NurseImmunizations from "../nurse/pages/NurseImmunizations/NurseImmunizations";
 import NurseAIAnalytics from "../nurse/pages/NurseAIAnalytics/NurseAIAnalytics";
 import NurseDoctorProfile from "../nurse/pages/NurseProfile/NurseProfile";
-import "../nurse/components/NurseLayout.css";
+import "../assets/styleSheets/NurseLayout.css";
 import NurseMessages from "../nurse/pages/NurseMessages/NurseMessages";
 import NurseUserAuthentication from "../nurse/pages/NurseUserAuthentication/NurseUserAuthentication";
 

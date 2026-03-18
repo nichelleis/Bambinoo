@@ -222,7 +222,7 @@ export default function ManageUsers() {
           </span>
           <input
             type="text"
-            placeholder="Search by MOH ID or Username"
+            placeholder="Search by MOH ID "
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={searchInputStyle}

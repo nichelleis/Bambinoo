@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import style from "./assets/styleSheets/Login.module.css";
+import style from "../assets/styleSheets/Login.module.css";
 
 const ResetPassword = () => {
   const { reset_id } = useParams();
