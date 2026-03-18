@@ -3654,9 +3654,24 @@ def get_system_health():
                 app.logger.warning(f'[SystemHealth] safe_count({table}) failed: {count_err}')
                 return 0
 
-        # ML Engine — attempt live load if not already cached
+
         predictor = _get_growth_predictor()
         ml_status = 'Loaded' if predictor is not None else 'Not Loaded'
+
+
+        mem_used_mb = mem_total_mb = mem_percent = cpu_percent = uptime_h = None
+        try:
+            import psutil as _psutil
+            mem          = _psutil.virtual_memory()
+            mem_used_mb  = round(mem.used  / (1024 * 1024), 1)
+            mem_total_mb = round(mem.total / (1024 * 1024), 1)
+            mem_percent  = mem.percent
+            cpu_percent  = _psutil.cpu_percent(interval=0.2)
+            uptime_h     = round((time.time() - _psutil.boot_time()) / 3600, 1)
+        except ImportError:
+            app.logger.info('[SystemHealth] psutil not installed — run: pip install psutil')
+        except Exception as res_err:
+            app.logger.warning(f'[SystemHealth] Resource metrics unavailable: {res_err}')
 
     except Exception as e:
         app.logger.error(f'[SystemHealth] Unexpected error: {e}', exc_info=True)
