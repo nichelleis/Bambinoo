@@ -134,3 +134,34 @@
 .sh-bar--green  { background: #10b981; }
 .sh-bar--yellow { background: #f59e0b; }
 .sh-bar--red    { background: #ef4444; }
+
+/* Count cards */
+.sh-counts-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+.sh-count-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex; flex-direction: column; gap: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.sh-count-card--warn {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+.sh-count-value {
+  font-size: 1.75rem; font-weight: 800;
+  color: #0f172a; line-height: 1.1;
+}
+.sh-count-card--warn .sh-count-value { color: #b45309; }
+.sh-count-label {
+  font-size: 0.72rem; font-weight: 600; color: #94a3b8;
+}
+
+.sh-footer {
+  font-size: 0.73rem; color: #94a3b8; padding-top: 4px;
+}
