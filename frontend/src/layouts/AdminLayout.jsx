@@ -17,12 +17,12 @@ export default function AdminLayout() {
     if (!token || user.role?.toLowerCase() !== "admin") {
       navigate("/", { replace: true });
     }
-  }, [navigate]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    window.location.href = "/";
+    navigate("/", { replace: true });
   };
 
   return (
