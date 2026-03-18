@@ -50,7 +50,7 @@ export default function SystemHealth() {
 
   }, [data, retryCount]);
 
-  
+
   useEffect(() => { fetchHealth(); }, []);
 
 
@@ -63,4 +63,19 @@ export default function SystemHealth() {
   }, [fetchHealth]);
 
   const handleManualRefresh = () => fetchHealth(true);
+
+  
+  const dbDot   = data?.db_status === "Healthy" ? "sh-dot--green" : "sh-dot--red";
+  const dbColor = data?.db_status === "Healthy" ? "sh-status--green" : "sh-status--red";
+  const mlDot   = data?.ml_status === "Loaded"  ? "sh-dot--green" : "sh-dot--yellow";
+  const mlColor = data?.ml_status === "Loaded"  ? "sh-status--green" : "sh-status--yellow";
+
+  const cpuBar = data?.cpu_percent != null ? Math.round(data.cpu_percent) : null;
+  const memBar = data?.mem_percent != null ? Math.round(data.mem_percent) : null;
+
+  function barColor(pct) {
+    if (pct >= 85) return "sh-bar--red";
+    if (pct >= 65) return "sh-bar--yellow";
+    return "sh-bar--green";
+  }
 }
