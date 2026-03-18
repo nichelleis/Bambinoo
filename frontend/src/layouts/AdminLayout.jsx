@@ -5,6 +5,7 @@ import ManageUsers from "../admin/pages/ManageUsers";
 import UserManagement from "../admin/pages/UserManagement";
 import Reports from "../admin/pages/Reports"; 
 import Profile from "../admin/pages/Profile";
+import SystemHealth from "../admin/pages/SystemHealth";
 
 export default function AdminLayout() {
   const handleLogout = () => {
