@@ -559,7 +559,7 @@ def growth_trend():
     if not child:
         return jsonify({"message": "Child not found"}), 404
     
-    one_year_ago = datetime.utcnow() - timedelta(days=730)     #  change this to one year (365) its 730 just for testing
+    one_year_ago = datetime.utcnow() - timedelta(days=730)     #  change this to one year (365) its 730 just for showing at viva
 
     records = GrowthRecord.query.filter(
         GrowthRecord.child_id == child.id,
@@ -638,7 +638,7 @@ def vaccines_status():
 
                 if scheduled_months < age_in_months:
                     status = "missed"
-                elif age_in_months <= scheduled_months <= age_in_months + 26: ## change 26 to like 6 months this is just for testing
+                elif age_in_months <= scheduled_months <= age_in_months + 26: ## change 26 to like 6 months this is just for showing at viva
                     status = "upcoming"
                 else:
                     continue
@@ -766,7 +766,7 @@ def update_appointment(appointment_id):
         except ValueError:
             return jsonify({'error': 'Invalid date format'}), 400
 
-        # Update fields
+      
         appointment.appointment_type = data['appointment_type'].strip()
         appointment.doctor_name = data['doctor_name'].strip()
         appointment.appointment_date = appointment_datetime
@@ -1277,7 +1277,7 @@ def get_growth_records():
         measurements = []
         for r in records:
             measurements.append({
-                "date": r.record_date.strftime("%Y-%m"), # "2025-01"
+                "date": r.record_date.strftime("%Y-%m"), 
                 "height": r.height,
                 "weight": r.weight
             })
@@ -1327,22 +1327,21 @@ def clean_ai_response(text):
     return text.replace("```html", "").replace("```", "")
 
 
-# 1. MEAL PLAN API 
-# React calls this to generate a meal plan
+# MEAL PLAN API 
 @app.route('/generate-plan', methods=['POST'])
-@jwt_required()  # Add JWT authentication
+@jwt_required()  
 def generate_plan():
     try:
-        # Get the logged-in parent's user_id from JWT token
+     
         parent_id = get_jwt_identity()
         
-        # Fetch the child belonging to this parent
+       
         child = Child.query.filter_by(parent_id=parent_id).first()
         
         if not child:
             return jsonify({"success": False, "error": "No child found for this parent"}), 404
         
-        # Get the latest growth record for this child
+   
         latest_growth = (
             GrowthRecord.query
             .filter_by(child_id=child.id)
@@ -1353,11 +1352,11 @@ def generate_plan():
         if not latest_growth or not latest_growth.weight:
             return jsonify({"success": False, "error": "No weight data found for this child"}), 404
         
-        # --- ADDED: Fetch Allergies ---
+       
         allergies = Allergy.query.filter_by(child_id=child.id).all()
         allergy_list = [a.name for a in allergies]
         allergy_display = ", ".join(allergy_list) if allergy_list else "None"
-        # ------------------------------
+      
 
         # Calculate age in months
         today = date.today()
@@ -1368,7 +1367,7 @@ def generate_plan():
         # Get weight from latest growth record
         weight = latest_growth.weight
 
-        # Prompt engineering for meal plan generation
+        # Prompt for meal plan generation
         prompt = f"""
         Act as a highly intelligent Sri Lankan Pediatric Nutritionist.
         
@@ -1449,7 +1448,7 @@ def generate_plan():
         </div>
         """
         
-        # Specific AI call and clean up
+        # Specific AI call 
         model = genai.GenerativeModel(MODEL_NAME)
         response = model.generate_content(prompt)
         html_content = clean_ai_response(response.text)
@@ -1460,7 +1459,7 @@ def generate_plan():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
         
-        # Specific AI call and clean up
+        # Specific AI call
         model = genai.GenerativeModel(MODEL_NAME)
         response = model.generate_content(prompt)
         html_content = clean_ai_response(response.text)
@@ -1473,35 +1472,34 @@ def generate_plan():
 
 
 
-# 2. RESOURCE API 
-# React calls this to get book/video recommendations
+# RESOURCE API 
+
 @app.route('/get-resources', methods=['POST'])
-@jwt_required()  # Add JWT authentication
+@jwt_required() 
 def get_resources():
     try:
-        # Get the logged-in parent's user_id from JWT token
+      
         parent_id = get_jwt_identity()
         
-        # Fetch the child belonging to this parent
+        
         child = Child.query.filter_by(parent_id=parent_id).first()
         
         if not child:
             return jsonify({"success": False, "error": "No child found for this parent"}), 404
         
-        # Calculate age in months
+       
         today = date.today()
         age = (today.year - child.date_of_birth.year) * 12 + (today.month - child.date_of_birth.month)
         if today.day < child.date_of_birth.day:
             age -= 1
         
-        # Extract the user's concern from the request
         data = request.json
         concern = data.get('concern')
         
         if not concern:
             return jsonify({"success": False, "error": "Please select a topic"}), 400
 
-        # Prompt engineering for educational content generation
+        # Prompt for educational content generation
         prompt = f"""
     Act as a Pediatric Media Curator.
     User: Parent of a {age} month old. Topic: "{concern}".
@@ -1541,12 +1539,12 @@ def get_resources():
         </div>
     """
 
-        # Specific AI call and clean up
+        
         model = genai.GenerativeModel(MODEL_NAME)
         response = model.generate_content(prompt)
         html_content = clean_ai_response(response.text)
 
-        # Send the clean HTML back to React as JSON
+        
         return jsonify({"success": True, "html": html_content})
 
     except Exception as e:
@@ -2056,7 +2054,7 @@ def add_vaccination(child_id):
         if not data.get("dateAdministered"):
             return jsonify({"error": "Date administered is required"}), 400
 
-        # Safe date parsing
+      
         try:
             administered_date = datetime.strptime(data["dateAdministered"], "%Y-%m-%d").date()
         except ValueError:
@@ -2115,11 +2113,11 @@ def get_health_records(child_id):
             "record_type":      r.record_type,
             "title":            r.title,
             "doctor_name":      r.doctor_name,
-            # ── Doctor Note fields ──
+          
             "diagnosis":        r.diagnosis,
             "treatment":        r.treatment,
             "notes":            r.notes,
-            # ── Prescription fields ──
+       
             "medication_name":  r.medication_name,
             "medication_dosage": r.medication_dosage,
             "record_date":      r.record_date.isoformat() if r.record_date else None,
@@ -3401,17 +3399,17 @@ def search_registration(reg_num):
         def to_dict(obj):
             return {c.name: getattr(obj, c.name).isoformat() if isinstance(getattr(obj, c.name), (date, datetime)) else getattr(obj, c.name) for c in obj.__table__.columns}
 
-        # 1. Check Pending
+        # Check Pending
         pending = PendingRegistration.query.filter_by(registration_number=reg_num).first()
         if pending:
             return jsonify({"type": "PENDING", "data": to_dict(pending)}), 200
 
-        # 2. Check Registered
+        # Check Registered
         registered = RegisteredPatient.query.filter_by(registration_number=reg_num).first()
         if registered:
             return jsonify({"type": "REGISTERED", "data": to_dict(registered)}), 200
 
-        # 3. Check Declined
+        # Check Declined
         declined = DeclinedRegistration.query.filter_by(registration_number=reg_num).first()
         if declined:
             return jsonify({"type": "DECLINED", "data": to_dict(declined)}), 200
@@ -3708,7 +3706,7 @@ def get_system_health():
         return jsonify({"error": str(e)}), 500
 
 
-# SocketIO and Main Block 
+ 
 @socketio.on("connect")
 def handle_connect(auth):
     token = auth.get("token")

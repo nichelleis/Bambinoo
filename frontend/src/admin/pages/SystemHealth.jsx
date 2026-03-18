@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import "./SystemHealth.css";
+import "../../assets/styleSheets/SystemHealth.css";
 
 const REFRESH_INTERVAL = 60_000;
 
@@ -8,48 +8,58 @@ function fmt(val, fallback = "—") {
 }
 
 export default function SystemHealth() {
-  const [data, setData]               = useState(null);
-  const [loading, setLoading]         = useState(true);
-  const [refreshing, setRefreshing]   = useState(false);
-  const [error, setError]             = useState(null);
-  const [retryCount, setRetryCount]   = useState(0);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
   const [lastRefresh, setLastRefresh] = useState(null);
   const retryTimer = useRef(null);
 
-  const fetchHealth = useCallback(async (isManual = false) => {
-    if (data) setRefreshing(true);
-    else setLoading(true);
-    setError(null);
+  const fetchHealth = useCallback(
+    async (isManual = false) => {
+      if (data) setRefreshing(true);
+      else setLoading(true);
+      setError(null);
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://127.0.0.1:5000/api/admin/system-health", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || json.message || `Server error ${res.status}`);
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(
+          "http://127.0.0.1:5000/api/admin/system-health",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(
+            json.error || json.message || `Server error ${res.status}`,
+          );
+        }
+        setData(json);
+        setRetryCount(0);
+        setLastRefresh(new Date().toLocaleTimeString());
+      } catch (e) {
+        setError(e.message);
+        if (!isManual) {
+          const delay = Math.min(10_000 * Math.pow(2, retryCount), 120_000);
+          setRetryCount((c) => c + 1);
+          retryTimer.current = setTimeout(() => fetchHealth(), delay);
+        }
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-      setData(json);
-      setRetryCount(0);
-      setLastRefresh(new Date().toLocaleTimeString());
-    } catch (e) {
-      setError(e.message);
-      if (!isManual) {
-        const delay = Math.min(10_000 * Math.pow(2, retryCount), 120_000);
-        setRetryCount((c) => c + 1);
-        retryTimer.current = setTimeout(() => fetchHealth(), delay);
-      }
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [data, retryCount]);
+    },
+    [data, retryCount],
+  );
 
-  useEffect(() => { fetchHealth(); }, []);
+  useEffect(() => {
+    fetchHealth();
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => fetchHealth(), REFRESH_INTERVAL);
@@ -61,13 +71,18 @@ export default function SystemHealth() {
 
   const handleManualRefresh = () => fetchHealth(true);
 
-  const dbDot   = data?.db_status === "Healthy" ? "sh-dot--green" : "sh-dot--red";
-  const dbColor = data?.db_status === "Healthy" ? "sh-status--green" : "sh-status--red";
-  const mlDot   = data?.ml_status === "Loaded"  ? "sh-dot--green" : "sh-dot--yellow";
-  const mlColor = data?.ml_status === "Loaded"  ? "sh-status--green" : "sh-status--yellow";
+  const dbDot = data?.db_status === "Healthy" ? "sh-dot--green" : "sh-dot--red";
+  const dbColor =
+    data?.db_status === "Healthy" ? "sh-status--green" : "sh-status--red";
+  const mlDot =
+    data?.ml_status === "Loaded" ? "sh-dot--green" : "sh-dot--yellow";
+  const mlColor =
+    data?.ml_status === "Loaded" ? "sh-status--green" : "sh-status--yellow";
 
-  const cpuBar = data?.cpu_percent != null ? Math.round(data.cpu_percent) : null;
-  const memBar = data?.mem_percent != null ? Math.round(data.mem_percent) : null;
+  const cpuBar =
+    data?.cpu_percent != null ? Math.round(data.cpu_percent) : null;
+  const memBar =
+    data?.mem_percent != null ? Math.round(data.mem_percent) : null;
 
   function barColor(pct) {
     if (pct >= 85) return "sh-bar--red";
@@ -77,7 +92,6 @@ export default function SystemHealth() {
 
   return (
     <div className="sh-page">
-
       <div className="sh-header">
         <div>
           <h2 className="sh-title">System Health</h2>
@@ -121,7 +135,6 @@ export default function SystemHealth() {
         <>
           <div className="sh-section-label">Services</div>
           <div className="sh-services-row">
-
             <div className="sh-service-card">
               <div className="sh-service-top">
                 <span className="sh-service-name">Database</span>
@@ -133,7 +146,10 @@ export default function SystemHealth() {
               <div className="sh-service-detail">
                 SQLite · {fmt(data.db_size_kb)} KB
                 {data.db_response_ms != null && (
-                  <span className="sh-service-ping"> · {data.db_response_ms} ms</span>
+                  <span className="sh-service-ping">
+                    {" "}
+                    · {data.db_response_ms} ms
+                  </span>
                 )}
               </div>
             </div>
@@ -162,14 +178,12 @@ export default function SystemHealth() {
               </div>
               <div className="sh-service-detail">LSTM Growth Predictor</div>
             </div>
-
           </div>
 
           {(cpuBar != null || memBar != null) && (
             <>
               <div className="sh-section-label">System Resources</div>
               <div className="sh-resources-row">
-
                 {cpuBar != null && (
                   <div className="sh-resource-card">
                     <div className="sh-resource-header">
@@ -191,11 +205,13 @@ export default function SystemHealth() {
                       <span className="sh-resource-name">Memory Usage</span>
                       <span className="sh-resource-value">
                         {memBar}%
-                        {data.mem_used_mb != null && data.mem_total_mb != null && (
-                          <span className="sh-resource-sub">
-                            {" "}({data.mem_used_mb} / {data.mem_total_mb} MB)
-                          </span>
-                        )}
+                        {data.mem_used_mb != null &&
+                          data.mem_total_mb != null && (
+                            <span className="sh-resource-sub">
+                              {" "}
+                              ({data.mem_used_mb} / {data.mem_total_mb} MB)
+                            </span>
+                          )}
                       </span>
                     </div>
                     <div className="sh-bar-track">
@@ -206,7 +222,6 @@ export default function SystemHealth() {
                     </div>
                   </div>
                 )}
-
               </div>
             </>
           )}
@@ -246,7 +261,9 @@ export default function SystemHealth() {
               <span className="sh-count-label">Pending Registrations</span>
             </div>
             <div className="sh-count-card sh-count-card--warn">
-              <span className="sh-count-value">{fmt(data.pending_reports)}</span>
+              <span className="sh-count-value">
+                {fmt(data.pending_reports)}
+              </span>
               <span className="sh-count-label">Pending Reports</span>
             </div>
             <div className="sh-count-card sh-count-card--warn">

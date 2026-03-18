@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./Login";
+import Login from "./pages/Login.jsx";
 import RegistrationForm from "./pages/regestration";
 import ParentLayout from "./layouts/ParentLayout";
 import NurseLayout from "./layouts/NurseLayout";
 import AdminLayout from "./layouts/AdminLayout";
 import DoctorLayout from "./layouts/DoctorLayout";
-import ForgotPassword from "./ForgotPassword";
-import ResetPassword from "./RestPassword";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/RestPassword.jsx";
 
 function App() {
   return (

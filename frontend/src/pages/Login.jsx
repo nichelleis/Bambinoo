@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import style from "./assets/styleSheets/Login.module.css";
-import logo from "./assets/images/site icon.png";
+import style from "../assets/styleSheets/Login.module.css";
+import logo from "../assets/images/site icon.png";
 import { Link } from "react-router-dom";
 
 const API_URL = "http://127.0.0.1:5000";

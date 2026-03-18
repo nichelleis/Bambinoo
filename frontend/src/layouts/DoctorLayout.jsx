@@ -12,7 +12,7 @@ import Messages from "../doctor/pages/Messages/Messages";
 import AIAnalytics from "../doctor/pages/AIAnalytics/AIAnalytics";
 import DoctorProfile from "../doctor/pages/DoctorProfile/DoctorProfile";
 import UserAuthentication from "../doctor/pages/UserAuthentication/UserAuthentication";
-import "../doctor/components/DoctorLayout.css";
+import "../assets/styleSheets/DoctorLayout.css";
 
 export default function DoctorLayout() {
   const [selectedChild, setSelectedChild] = useState(null);
@@ -23,11 +23,9 @@ export default function DoctorLayout() {
 
       <main className="main-content">
         <Routes>
-          
           <Route path="/" element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
 
-      
           <Route
             path="search"
             element={<SearchChild onSelect={setSelectedChild} />}
@@ -48,7 +46,6 @@ export default function DoctorLayout() {
             element={<Immunizations selectedChild={selectedChild} />}
           />
 
-                  
           <Route
             path="doctornotes"
             element={<DoctorNotes selectedChild={selectedChild} />}
@@ -68,7 +65,6 @@ export default function DoctorLayout() {
             element={<DoctorProfile selectedChild={selectedChild} />}
           />
         </Routes>
-        
       </main>
     </div>
   );
