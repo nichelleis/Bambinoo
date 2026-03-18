@@ -9,6 +9,16 @@ import Profile from "../admin/pages/Profile";
 import SystemHealth from "../admin/pages/SystemHealth";
 
 export default function AdminLayout() {
+const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user  = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!token || user.role?.toLowerCase() !== "admin") {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
