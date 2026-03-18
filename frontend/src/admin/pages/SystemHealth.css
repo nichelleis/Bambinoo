@@ -98,3 +98,39 @@
 .sh-status--green  { color: #10b981; }
 .sh-status--yellow { color: #f59e0b; }
 .sh-status--red    { color: #ef4444; }
+
+/* Resource cards (CPU / Memory) */
+.sh-resources-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.sh-resource-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.sh-resource-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.sh-resource-name  { font-size: 0.82rem; font-weight: 700; color: #64748b; }
+.sh-resource-value { font-size: 0.9rem; font-weight: 700; color: #0f172a; }
+.sh-resource-sub   { font-size: 0.72rem; font-weight: 400; color: #94a3b8; }
+
+.sh-bar-track {
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.sh-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+.sh-bar--green  { background: #10b981; }
+.sh-bar--yellow { background: #f59e0b; }
+.sh-bar--red    { background: #ef4444; }
