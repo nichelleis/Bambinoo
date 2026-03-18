@@ -64,7 +64,7 @@ export default function SystemHealth() {
 
   const handleManualRefresh = () => fetchHealth(true);
 
-  
+
   const dbDot   = data?.db_status === "Healthy" ? "sh-dot--green" : "sh-dot--red";
   const dbColor = data?.db_status === "Healthy" ? "sh-status--green" : "sh-status--red";
   const mlDot   = data?.ml_status === "Loaded"  ? "sh-dot--green" : "sh-dot--yellow";
@@ -78,4 +78,30 @@ export default function SystemHealth() {
     if (pct >= 65) return "sh-bar--yellow";
     return "sh-bar--green";
   }
+
+  return (
+    <div className="sh-page">
+
+      <div className="sh-header">
+        <div>
+          <h2 className="sh-title">System Health</h2>
+          <p className="sh-subtitle">Live platform diagnostics</p>
+        </div>
+        <div className="sh-header-right">
+          {lastRefresh && (
+            <span className="sh-refresh-time">
+              {refreshing ? "Refreshing…" : `Updated: ${lastRefresh}`}
+            </span>
+          )}
+          <button
+            className="sh-refresh-btn"
+            onClick={handleManualRefresh}
+            disabled={loading || refreshing}
+          >
+            {loading || refreshing ? "Loading…" : "↻  Refresh"}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
