@@ -67,3 +67,34 @@
   text-transform: uppercase; letter-spacing: 0.07em;
   color: #94a3b8;
 }
+
+/* Service cards */
+.sh-services-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.sh-service-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.sh-service-top {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sh-service-name   { font-size: 0.82rem; font-weight: 700; color: #64748b; }
+.sh-service-status { font-size: 1rem; font-weight: 800; }
+.sh-service-detail { font-size: 0.75rem; color: #94a3b8; }
+.sh-service-ping   { color: #6366f1; }
+
+.sh-dot { width: 10px; height: 10px; border-radius: 50%; }
+.sh-dot--green  { background: #10b981; box-shadow: 0 0 0 3px #dcfce7; }
+.sh-dot--yellow { background: #f59e0b; box-shadow: 0 0 0 3px #fef3c7; }
+.sh-dot--red    { background: #ef4444; box-shadow: 0 0 0 3px #fee2e2; }
+
+.sh-status--green  { color: #10b981; }
+.sh-status--yellow { color: #f59e0b; }
+.sh-status--red    { color: #ef4444; }
