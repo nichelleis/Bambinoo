@@ -22,6 +22,7 @@ export default function AdminLayout() {
           <NavLink to="/admin" end className="admin-link">Overview</NavLink>
           <NavLink to="/admin/users" className="admin-link">User Managment</NavLink>
           <NavLink to="/admin/user-management" className="admin-link">Event Management</NavLink>
+          <NavLink to="/admin/system-health" className="admin-link">System Health</NavLink>
           <NavLink to="/admin/reports" className="admin-link">Reports</NavLink>
           <NavLink to="/admin/profile" className="admin-link">Profile</NavLink>
         </nav>
