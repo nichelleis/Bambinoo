@@ -3627,6 +3627,22 @@ def get_system_health():
         current_user = db.session.get(User, int(user_id))
         if not current_user or current_user.role.lower() != 'admin':
             return jsonify({"message": "Unauthorized"}), 403
+        
+
+        db_path = os.path.join(BASE_DIR, 'bambinoo.db')
+        db_size_kb = round(os.path.getsize(db_path) / 1024, 1) if os.path.exists(db_path) else 0
+
+
+        db_status = 'Error'
+        db_response_ms = None
+        try:
+            t0 = time.perf_counter()
+            with db.engine.connect() as conn:
+                conn.execute(db.text('SELECT 1'))
+            db_response_ms = round((time.perf_counter() - t0) * 1000, 1)
+            db_status = 'Healthy'
+        except Exception as db_err:
+            app.logger.error(f'[SystemHealth] DB connectivity check failed: {db_err}')
 
     except Exception as e:
         app.logger.error(f'[SystemHealth] Unexpected error: {e}', exc_info=True)
