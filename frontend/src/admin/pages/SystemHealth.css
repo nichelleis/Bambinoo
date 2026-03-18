@@ -1,0 +1,30 @@
+.sh-page {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-family: "Inter", system-ui, sans-serif;
+  max-width: 960px;
+}
+
+/* Header */
+.sh-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.sh-title    { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin: 0; }
+.sh-subtitle { font-size: 0.83rem; color: #64748b; margin: 3px 0 0; }
+.sh-header-right { display: flex; align-items: center; gap: 12px; }
+.sh-refresh-time { font-size: 0.75rem; color: #94a3b8; }
+.sh-refresh-btn {
+  padding: 7px 16px;
+  background: #0f172a; color: #f8fafc;
+  border: none; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+}
+.sh-refresh-btn:hover:not(:disabled) { background: #1e293b; }
+.sh-refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
