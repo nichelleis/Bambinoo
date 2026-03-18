@@ -3654,6 +3654,10 @@ def get_system_health():
                 app.logger.warning(f'[SystemHealth] safe_count({table}) failed: {count_err}')
                 return 0
 
+        # ML Engine — attempt live load if not already cached
+        predictor = _get_growth_predictor()
+        ml_status = 'Loaded' if predictor is not None else 'Not Loaded'
+
     except Exception as e:
         app.logger.error(f'[SystemHealth] Unexpected error: {e}', exc_info=True)
         return jsonify({"error": str(e)}), 500
