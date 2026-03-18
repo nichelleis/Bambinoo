@@ -168,6 +168,51 @@ export default function SystemHealth() {
             </div>
 
           </div>
+          {(cpuBar != null || memBar != null) && (
+            <>
+              <div className="sh-section-label">System Resources</div>
+              <div className="sh-resources-row">
+
+                {cpuBar != null && (
+                  <div className="sh-resource-card">
+                    <div className="sh-resource-header">
+                      <span className="sh-resource-name">CPU Usage</span>
+                      <span className="sh-resource-value">{cpuBar}%</span>
+                    </div>
+                    <div className="sh-bar-track">
+                      <div
+                        className={`sh-bar-fill ${barColor(cpuBar)}`}
+                        style={{ width: `${cpuBar}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {memBar != null && (
+                  <div className="sh-resource-card">
+                    <div className="sh-resource-header">
+                      <span className="sh-resource-name">Memory Usage</span>
+                      <span className="sh-resource-value">
+                        {memBar}%
+                        {data.mem_used_mb != null && data.mem_total_mb != null && (
+                          <span className="sh-resource-sub">
+                            {" "}({data.mem_used_mb} / {data.mem_total_mb} MB)
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="sh-bar-track">
+                      <div
+                        className={`sh-bar-fill ${barColor(memBar)}`}
+                        style={{ width: `${memBar}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
