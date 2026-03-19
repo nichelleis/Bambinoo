@@ -46,7 +46,12 @@ socketio = SocketIO(app, cors_allowed_origins=os.getenv("FRONTEND_URL"))
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'bambinoo.db')
+_db_url = os.getenv("DATABASE_URL")
+if _db_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = _db_url
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'bambinoo.db')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 

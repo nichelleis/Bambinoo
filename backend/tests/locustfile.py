@@ -79,25 +79,8 @@ class ParentUser(HttpUser):
     def view_vaccine_schedule(self):
         self.client.get("/vaccine", headers=self._auth(), name="GET /vaccine")
 
-    @task(1)
-    def add_appointment(self):
-        future_date = (datetime.now() + timedelta(days=random.randint(1, 30))).isoformat()
-        self.client.post("/add-appointment", headers=self._auth(), json={
-            "appointment_type": "General Checkup",
-            "doctor_name": "Dr. Silva",
-            "appointment_date": future_date
-        }, name="POST /add-appointment")
-
-    @task(1)
-    def toggle_milestone(self):
-        self.client.post("/milestones/toggle", headers=self._auth(), json={
-            "milestone_id": random.randint(1, 10),
-            "category": "motor",
-            "description": "Can sit without support",
-            "min_age": 4,
-            "max_age": 8
-        }, name="POST /milestones/toggle")
-
+ 
+  
  
 
 #simulates a doctor reviewing and updating patient records
@@ -163,27 +146,6 @@ class DoctorUser(HttpUser):
         self.client.get("/age-groups", headers=self._auth(), name="GET /age-groups")
 
 
-    @task(2)
-    def add_growth_record(self):
-        self.client.post(f"/children/{self.child_id}/growth",
-                         headers=self._auth(), json={
-                             "weight": round(random.uniform(5.0, 20.0), 1),
-                             "height": round(random.uniform(50.0, 110.0), 1),
-                             "head_circumference": round(random.uniform(30.0, 52.0), 1),
-                             "record_date": datetime.now().isoformat(),
-                             "notes": "Routine checkup"
-                         }, name="POST /children/:id/growth")
-
-    @task(1)
-    def add_prescription(self):
-        self.client.post(f"/children/{self.child_id}/health-records/prescriptions",
-                         headers=self._auth(), json={
-                             "medication_name": "Paracetamol",
-                             "medication_dosage": "5ml",
-                             "reason": "Fever management",
-                             "record_date": datetime.now().isoformat()
-                         }, name="POST /children/:id/health-records/prescriptions")
-
 
 
 #simulates a nurse handling registrations, vaccinations, and growth records 
@@ -242,24 +204,6 @@ class NurseUser(HttpUser):
         self.client.get(f"/who-standards/{gender}", headers=self._auth(),
                         name="GET /who-standards/:gender [nurse]")
 
-    @task(3)
-    def add_growth_record(self):
-        """Nurses frequently record growth measurements during visits"""
-        self.client.post(f"/children/{self.child_id}/growth",
-                         headers=self._auth(), json={
-                             "weight": round(random.uniform(5.0, 20.0), 1),
-                             "height": round(random.uniform(50.0, 110.0), 1),
-                             "head_circumference": round(random.uniform(30.0, 52.0), 1),
-                             "record_date": datetime.now().isoformat(),
-                             "notes": "Nurse routine measurement"
-                         }, name="POST /children/:id/growth [nurse]")
- 
-
-    @task(1)
-    def mark_alert_read(self):
-        self.client.post("/health-alerts/read-all", headers=self._auth(),
-                         name="POST /health-alerts/read-all [nurse]")
-
 
 
 #simulates an admin managing users, events, and monitoring system health
@@ -311,15 +255,4 @@ class AdminUser(HttpUser):
     def admin_profile(self):
         self.client.get("/admin-profile", headers=self._auth(),
                         name="GET /admin-profile")
-
-    @task(1)
-    def create_user(self):
-        uid = random.randint(1000, 9999)
-        self.client.post("/api/admin/create-user", headers=self._auth(), json={
-            "username": f"testuser_{uid}",
-            "password": "Test@1234",
-            "email": f"testuser_{uid}@example.com",
-            "role": random.choice(["doctor", "nurse"]),
-            "phone": "0771234567"
-        }, name="POST /api/admin/create-user")
 
