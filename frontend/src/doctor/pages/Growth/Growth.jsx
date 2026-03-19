@@ -130,10 +130,11 @@ export default function Growth({ selectedChild }) {
           <form className="growth-form" onSubmit={handleSubmit}>
             <div className="growth-row">
               <div className="growth-field">
-                <label>
+                <label htmlFor="data">
                   Date <span style={{ color: "var(--danger)" }}>*</span>
                 </label>
                 <input
+                  id="data"
                   type="date"
                   name="date"
                   value={form.date}
@@ -142,10 +143,11 @@ export default function Growth({ selectedChild }) {
                 />
               </div>
               <div className="growth-field">
-                <label>
+                <label htmlFor="weight">
                   Weight (kg) <span style={{ color: "var(--danger)" }}>*</span>
                 </label>
                 <input
+                  id="weight"
                   type="number"
                   step="0.1"
                   name="weight"
@@ -159,10 +161,11 @@ export default function Growth({ selectedChild }) {
 
             <div className="growth-row">
               <div className="growth-field">
-                <label>
+                <label htmlFor="height">
                   Height (cm) <span style={{ color: "var(--danger)" }}>*</span>
                 </label>
                 <input
+                  id="height"
                   type="number"
                   step="0.1"
                   name="height"
@@ -173,8 +176,9 @@ export default function Growth({ selectedChild }) {
                 />
               </div>
               <div className="growth-field">
-                <label>Head Circumference (cm)</label>
+                <label htmlFor="head">Head Circumference (cm)</label>
                 <input
+                  id="head"
                   type="number"
                   step="0.1"
                   name="head"
@@ -186,8 +190,9 @@ export default function Growth({ selectedChild }) {
             </div>
 
             <div className="growth-field">
-              <label>Notes</label>
+              <label htmlFor="notes">Notes</label>
               <textarea
+                id="notes"
                 name="notes"
                 placeholder="Any additional observations..."
                 value={form.notes}

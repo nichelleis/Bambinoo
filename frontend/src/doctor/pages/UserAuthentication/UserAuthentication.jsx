@@ -7,28 +7,31 @@ const UserAuthentication = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); // 'success' or 'error'
+  const [messageType, setMessageType] = useState("");
   const [showDeclineModal, setShowDeclineModal] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [currentDeclineId, setCurrentDeclineId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResult, setSearchResult] = useState(null);
-  const [activeTab, setActiveTab] = useState("registration"); // "registration" or "reports"
+  const [activeTab, setActiveTab] = useState("registration");
   const [reportRequests, setReportRequests] = useState([]);
   const [fetchingReports, setFetchingReports] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [reviewDescription, setReviewDescription] = useState("");
   const [collectionDate, setCollectionDate] = useState("");
-  const [reviewAction, setReviewAction] = useState(""); // "approve" or "reject"
+  const [reviewAction, setReviewAction] = useState("");
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/search_registration/${searchQuery}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `http://127.0.0.1:5000/search_registration/${searchQuery}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (response.ok) {
         const result = await response.json();
         setSearchResult(result);
@@ -46,7 +49,6 @@ const UserAuthentication = () => {
 
   const token = localStorage.getItem("token");
 
-  // Fetch pending registrations when component mounts
   const fetchPendingRegistrations = useCallback(async () => {
     setLoading(true);
     try {
@@ -54,16 +56,18 @@ const UserAuthentication = () => {
         throw new Error("Authentication token missing. Please log in.");
       }
 
-      const response = await fetch("http://127.0.0.1:5000/pending_registrations", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        "http://127.0.0.1:5000/pending_registrations",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) {
-        // try to extract error message from body
         let errText;
         try {
           const json = await response.json();
@@ -71,7 +75,10 @@ const UserAuthentication = () => {
         } catch {
           errText = await response.text();
         }
-        throw new Error(errText || `Failed to fetch pending registrations (${response.status})`);
+        throw new Error(
+          errText ||
+            `Failed to fetch pending registrations (${response.status})`,
+        );
       }
 
       const data = await response.json();
@@ -98,7 +105,7 @@ const UserAuthentication = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -109,7 +116,9 @@ const UserAuthentication = () => {
         } catch {
           errTxt = await response.text();
         }
-        throw new Error(errTxt || `Failed to approve registration (${response.status})`);
+        throw new Error(
+          errTxt || `Failed to approve registration (${response.status})`,
+        );
       }
 
       setMessage("Registration approved successfully!");
@@ -121,7 +130,6 @@ const UserAuthentication = () => {
       setMessageType("error");
     }
   };
-
 
   const handleDeclineClick = (id) => {
     setCurrentDeclineId(id);
@@ -144,7 +152,7 @@ const UserAuthentication = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ reason: declineReason.trim() }),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -155,7 +163,9 @@ const UserAuthentication = () => {
         } catch {
           errTxt = await response.text();
         }
-        throw new Error(errTxt || `Decline failed with status ${response.status}`);
+        throw new Error(
+          errTxt || `Decline failed with status ${response.status}`,
+        );
       }
 
       setMessage("Registration declined successfully!");
@@ -168,7 +178,6 @@ const UserAuthentication = () => {
       setMessage(error.message);
       setMessageType("error");
     }
-
   };
 
   const handleViewDetails = (record) => {
@@ -184,9 +193,12 @@ const UserAuthentication = () => {
   const fetchReportRequests = useCallback(async () => {
     setFetchingReports(true);
     try {
-      const response = await fetch("http://127.0.0.1:5000/admin/report-requests", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "http://127.0.0.1:5000/admin/report-requests",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setReportRequests(data);
@@ -239,7 +251,7 @@ const UserAuthentication = () => {
             description: reviewDescription,
             collection_date: collectionDate,
           }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -261,45 +273,60 @@ const UserAuthentication = () => {
     <div className="user-auth-container">
       <div className="user-auth-header">
         <h1>User Authentication & Access Management</h1>
-        <p>Approve or decline pending patient registrations and report requests</p>
+        <p>
+          Approve or decline pending patient registrations and report requests
+        </p>
       </div>
 
-      <div className="auth-tabs" style={{ display: 'flex', gap: '20px', marginBottom: '20px', borderBottom: '1px solid #ddd', paddingBottom: '10px' }}>
+      <div
+        className="auth-tabs"
+        style={{
+          display: "flex",
+          gap: "20px",
+          marginBottom: "20px",
+          borderBottom: "1px solid #ddd",
+          paddingBottom: "10px",
+        }}
+      >
         <button
-          className={`tab-btn ${activeTab === 'registration' ? 'active' : ''}`}
-          onClick={() => setActiveTab('registration')}
+          className={`tab-btn ${activeTab === "registration" ? "active" : ""}`}
+          onClick={() => setActiveTab("registration")}
           style={{
-            padding: '10px 20px',
-            border: 'none',
-            background: activeTab === 'registration' ? '#25a5b9' : 'transparent',
-            color: activeTab === 'registration' ? '#fff' : '#333',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontWeight: '600'
+            padding: "10px 20px",
+            border: "none",
+            background:
+              activeTab === "registration" ? "#25a5b9" : "transparent",
+            color: activeTab === "registration" ? "#fff" : "#333",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: "600",
           }}
         >
           Registration Requests
         </button>
         <button
-          className={`tab-btn ${activeTab === 'reports' ? 'active' : ''}`}
-          onClick={() => setActiveTab('reports')}
+          className={`tab-btn ${activeTab === "reports" ? "active" : ""}`}
+          onClick={() => setActiveTab("reports")}
           style={{
-            padding: '10px 20px',
-            border: 'none',
-            background: activeTab === 'reports' ? '#25a5b9' : 'transparent',
-            color: activeTab === 'reports' ? '#fff' : '#333',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontWeight: '600'
+            padding: "10px 20px",
+            border: "none",
+            background: activeTab === "reports" ? "#25a5b9" : "transparent",
+            color: activeTab === "reports" ? "#fff" : "#333",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: "600",
           }}
         >
           Report Requests
         </button>
       </div>
 
-      {activeTab === 'registration' ? (
+      {activeTab === "registration" ? (
         <>
-          <div className="search-section" style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+          <div
+            className="search-section"
+            style={{ marginBottom: "20px", display: "flex", gap: "10px" }}
+          >
             <input
               type="text"
               placeholder="Enter Registration Number..."
@@ -307,14 +334,16 @@ const UserAuthentication = () => {
               className="search-input"
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <button className="btn btn-search" onClick={handleSearch}>Search Request</button>
+            <button className="btn btn-search" onClick={handleSearch}>
+              Search Request
+            </button>
           </div>
 
           {message && (
             <div className={`message ${messageType}`}>
               {message}
               <button onClick={() => setMessage("")} className="message-close">
-                ×
+                x
               </button>
             </div>
           )}
@@ -348,7 +377,9 @@ const UserAuthentication = () => {
                       <td>{reg.mother_email}</td>
                       <td>{reg.mother_phone}</td>
                       <td>
-                        <span className={`status-badge ${reg.status.toLowerCase()}`}>
+                        <span
+                          className={`status-badge ${reg.status.toLowerCase()}`}
+                        >
                           {reg.status}
                         </span>
                       </td>
@@ -373,7 +404,7 @@ const UserAuthentication = () => {
             <div className={`message ${messageType}`}>
               {message}
               <button onClick={() => setMessage("")} className="message-close">
-                ×
+                x
               </button>
             </div>
           )}
@@ -404,37 +435,60 @@ const UserAuthentication = () => {
                       <td>{req.name}</td>
                       <td>{req.requested_by}</td>
                       <td>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "5px",
+                          }}
+                        >
                           {req.reports_requested.map((r, i) => (
-                            <span key={i} style={{ fontSize: '11px', background: '#eee', padding: '2px 5px', borderRadius: '3px' }}>{r}</span>
+                            <span
+                              key={i}
+                              style={{
+                                fontSize: "11px",
+                                background: "#eee",
+                                padding: "2px 5px",
+                                borderRadius: "3px",
+                              }}
+                            >
+                              {r}
+                            </span>
                           ))}
                         </div>
                       </td>
                       <td>
-                        <span className={`status-badge ${req.status.toLowerCase()}`}>
+                        <span
+                          className={`status-badge ${req.status.toLowerCase()}`}
+                        >
                           {req.status}
                         </span>
                       </td>
-                      <td className="actions-cell" style={{ display: 'flex', gap: '5px' }}>
-                        {req.status === 'Pending' ? (
+                      <td
+                        className="actions-cell"
+                        style={{ display: "flex", gap: "5px" }}
+                      >
+                        {req.status === "Pending" ? (
                           <>
                             <button
                               className="btn btn-approve"
                               onClick={() => handleReviewClick(req, "approve")}
-                              style={{ padding: '5px 10px', fontSize: '12px' }}
+                              style={{ padding: "5px 10px", fontSize: "12px" }}
                             >
                               Approve
                             </button>
                             <button
                               className="btn btn-decline"
                               onClick={() => handleReviewClick(req, "reject")}
-                              style={{ padding: '5px 10px', fontSize: '12px' }}
+                              style={{ padding: "5px 10px", fontSize: "12px" }}
                             >
                               Reject
                             </button>
                           </>
                         ) : (
-                          <span style={{ fontSize: '12px', color: '#666' }}>Reviewed</span>
+                          <span style={{ fontSize: "12px", color: "#666" }}>
+                            Reviewed
+                          </span>
                         )}
                       </td>
                     </tr>
@@ -446,12 +500,11 @@ const UserAuthentication = () => {
         </>
       )}
 
-      {/* Details Modal */}
       {showDetails && selectedRecord && (
         <div className="modal-overlay">
           <div className="modal-content">
             <button className="modal-close" onClick={handleCloseDetails}>
-              ×
+              x
             </button>
 
             <h2>Registration Details</h2>
@@ -475,7 +528,7 @@ const UserAuthentication = () => {
                 </div>
                 <div className="detail-item">
                   <label>Gender:</label>
-                  <span>{selectedRecord.gender || '-'}</span>
+                  <span>{selectedRecord.gender || "-"}</span>
                 </div>
                 <div className="detail-item">
                   <label>Nationality:</label>
@@ -574,7 +627,9 @@ const UserAuthentication = () => {
                 <div className="detail-item">
                   <label>Registration Date:</label>
                   <span>
-                    {new Date(selectedRecord.registration_date).toLocaleDateString()}
+                    {new Date(
+                      selectedRecord.registration_date,
+                    ).toLocaleDateString()}
                   </span>
                 </div>
                 <div className="detail-item">
@@ -590,27 +645,47 @@ const UserAuthentication = () => {
               <h3>Registration Details ({searchResult?.type || "PENDING"})</h3>
 
               <div className="details-content">
-                <p><strong>Child Name:</strong> {selectedRecord.child_name}</p>
-                <p><strong>Reg Number:</strong> {selectedRecord.registration_number}</p>
+                <p>
+                  <strong>Child Name:</strong> {selectedRecord.child_name}
+                </p>
+                <p>
+                  <strong>Reg Number:</strong>{" "}
+                  {selectedRecord.registration_number}
+                </p>
 
                 {searchResult?.type === "DECLINED" && (
-                  <p style={{ color: 'red' }}><strong>Reason for Rejection:</strong> {selectedRecord.reason}</p>
+                  <p style={{ color: "red" }}>
+                    <strong>Reason for Rejection:</strong>{" "}
+                    {selectedRecord.reason}
+                  </p>
                 )}
               </div>
 
               <div className="action-buttons">
                 {(searchResult?.type === "PENDING" || !searchResult) && (
                   <>
-                    <button className="btn btn-approve" onClick={() => handleApprove(selectedRecord.id)}>
+                    <button
+                      className="btn btn-approve"
+                      onClick={() => handleApprove(selectedRecord.id)}
+                    >
                       Approve Registration
                     </button>
-                    <button className="btn btn-decline" onClick={() => handleDeclineClick(selectedRecord.id)}>
+                    <button
+                      className="btn btn-decline"
+                      onClick={() => handleDeclineClick(selectedRecord.id)}
+                    >
                       Decline Registration
                     </button>
                   </>
                 )}
 
-                <button className="btn btn-cancel" onClick={() => { setShowDetails(false); setSearchResult(null); }}>
+                <button
+                  className="btn btn-cancel"
+                  onClick={() => {
+                    setShowDetails(false);
+                    setSearchResult(null);
+                  }}
+                >
                   Close
                 </button>
               </div>
@@ -621,25 +696,57 @@ const UserAuthentication = () => {
 
       {showReportModal && selectedReport && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
-            <button className="modal-close" onClick={() => setShowReportModal(false)}>
-              ×
+          <div className="modal-content" style={{ maxWidth: "500px" }}>
+            <button
+              className="modal-close"
+              onClick={() => setShowReportModal(false)}
+            >
+              x
             </button>
-            <h2 style={{ textTransform: 'capitalize' }}>{reviewAction} Report Request</h2>
-            
-            <div className="details-section" style={{ textAlign: 'left' }}>
-              <p><strong>Request ID:</strong> {selectedReport.report_request_id}</p>
-              <p><strong>Patient Name:</strong> {selectedReport.name}</p>
-              <p><strong>Requested Reports:</strong> {selectedReport.reports_requested.join(", ")}</p>
+            <h2 style={{ textTransform: "capitalize" }}>
+              {reviewAction} Report Request
+            </h2>
+
+            <div className="details-section" style={{ textAlign: "left" }}>
+              <p>
+                <strong>Request ID:</strong> {selectedReport.report_request_id}
+              </p>
+              <p>
+                <strong>Patient Name:</strong> {selectedReport.name}
+              </p>
+              <p>
+                <strong>Requested Reports:</strong>{" "}
+                {selectedReport.reports_requested.join(", ")}
+              </p>
             </div>
 
-            <div className="review-form" style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
+            <div
+              className="review-form"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "15px",
+                marginTop: "20px",
+              }}
+            >
               <div className="form-group">
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "5px",
+                    fontWeight: "bold",
+                  }}
+                >
                   Description / Note to parent:
                 </label>
                 <textarea
-                  style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', minHeight: '80px' }}
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    border: "1px solid #ccc",
+                    minHeight: "80px",
+                  }}
                   placeholder="Enter details about the approval/rejection..."
                   value={reviewDescription}
                   onChange={(e) => setReviewDescription(e.target.value)}
@@ -648,12 +755,23 @@ const UserAuthentication = () => {
 
               {reviewAction === "approve" && (
                 <div className="form-group">
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "5px",
+                      fontWeight: "bold",
+                    }}
+                  >
                     When can collect the report:
                   </label>
                   <input
                     type="text"
-                    style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      borderRadius: "5px",
+                      border: "1px solid #ccc",
+                    }}
                     placeholder="e.g. Next Monday after 10 AM"
                     value={collectionDate}
                     onChange={(e) => setCollectionDate(e.target.value)}
@@ -661,15 +779,23 @@ const UserAuthentication = () => {
                 </div>
               )}
 
-              <div className="modal-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button 
-                   className={`btn ${reviewAction === 'approve' ? 'btn-approve' : 'btn-decline'}`}
+              <div
+                className="modal-actions"
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  justifyContent: "flex-end",
+                  marginTop: "10px",
+                }}
+              >
+                <button
+                  className={`btn ${reviewAction === "approve" ? "btn-approve" : "btn-decline"}`}
                   onClick={submitReportReview}
                 >
                   Confirm {reviewAction}
                 </button>
-                <button 
-                  className="btn btn-cancel" 
+                <button
+                  className="btn btn-cancel"
                   onClick={() => setShowReportModal(false)}
                 >
                   Cancel
@@ -691,8 +817,15 @@ const UserAuthentication = () => {
               onChange={(e) => setDeclineReason(e.target.value)}
             />
             <div className="modal-actions">
-              <button className="btn btn-confirm" onClick={confirmDecline}>Submit</button>
-              <button className="btn btn-cancel" onClick={() => setShowDeclineModal(false)}>Cancel</button>
+              <button className="btn btn-confirm" onClick={confirmDecline}>
+                Submit
+              </button>
+              <button
+                className="btn btn-cancel"
+                onClick={() => setShowDeclineModal(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
