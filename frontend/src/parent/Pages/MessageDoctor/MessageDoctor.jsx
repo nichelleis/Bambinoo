@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import style from "../../assets/styleSheets/Messages.module.css";
+import style from "../../../assets/styleSheets/Messages.module.css";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:5000", {

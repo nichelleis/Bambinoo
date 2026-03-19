@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import style from "../../assets/styleSheets/ParentDashboard.module.css";
+import style from "../../../assets/styleSheets/ParentDashboard.module.css";
 
 const AVAILABLE_REPORTS = [
   "Growth Report",
@@ -63,7 +63,7 @@ function ReportRequest() {
       .then((r) => r.json())
       .then((data) => {
         setProfile(data);
-        setForm(prev => ({
+        setForm((prev) => ({
           ...prev,
           name: data?.child?.name || "",
           child_id_number: data?.child?.reg_number || "",
@@ -72,7 +72,6 @@ function ReportRequest() {
         }));
       })
       .catch(console.error);
-
   }, [token]);
 
   const loadRequests = useCallback(() => {
@@ -98,7 +97,9 @@ function ReportRequest() {
 
   const toggleReport = (report) => {
     setSelectedReports((prev) =>
-      prev.includes(report) ? prev.filter((r) => r !== report) : [...prev, report]
+      prev.includes(report)
+        ? prev.filter((r) => r !== report)
+        : [...prev, report],
     );
   };
 
@@ -145,12 +146,16 @@ function ReportRequest() {
   };
 
   const handleCancel = async (requestId) => {
-    if (!window.confirm("Are you sure you want to cancel this request?")) return;
+    if (!window.confirm("Are you sure you want to cancel this request?"))
+      return;
     try {
-      const res = await fetch(`http://localhost:5000/report-requests/cancel/${requestId}`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:5000/report-requests/cancel/${requestId}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.message || "Failed to cancel request");
@@ -161,7 +166,6 @@ function ReportRequest() {
       alert(err.message);
     }
   };
-
 
   return (
     <div className="container-fluid">
@@ -191,14 +195,18 @@ function ReportRequest() {
             flexShrink: 0,
           }}
         >
-          <i className="bi bi-file-earmark-text-fill" style={{ color: "#fff", fontSize: 22 }}></i>
+          <i
+            className="bi bi-file-earmark-text-fill"
+            style={{ color: "#fff", fontSize: 22 }}
+          ></i>
         </span>
         <div>
           <h4 className="mb-0" style={{ fontWeight: 700 }}>
             Report Request
           </h4>
           <p className="mb-0" style={{ color: "#6c757d", fontSize: 14 }}>
-            Submit a request for specific health reports and track your previous requests.
+            Submit a request for specific health reports and track your previous
+            requests.
           </p>
         </div>
       </div>
@@ -216,7 +224,10 @@ function ReportRequest() {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
+                <label
+                  className="form-label fw-semibold"
+                  style={{ fontSize: 13 }}
+                >
                   Who request
                 </label>
                 <input
@@ -231,7 +242,10 @@ function ReportRequest() {
                 />
               </div>
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
+                <label
+                  className="form-label fw-semibold"
+                  style={{ fontSize: 13 }}
+                >
                   Child Name
                 </label>
                 <input
@@ -246,7 +260,10 @@ function ReportRequest() {
               </div>
 
               <div className="mb-3">
-                <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
+                <label
+                  className="form-label fw-semibold"
+                  style={{ fontSize: 13 }}
+                >
                   Child Registration / ID
                 </label>
                 <input
@@ -262,7 +279,10 @@ function ReportRequest() {
 
               <div className="row g-3 mb-3">
                 <div className="col-6">
-                  <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
+                  <label
+                    className="form-label fw-semibold"
+                    style={{ fontSize: 13 }}
+                  >
                     Phone Number
                   </label>
                   <input
@@ -276,7 +296,10 @@ function ReportRequest() {
                   />
                 </div>
                 <div className="col-6">
-                  <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
+                  <label
+                    className="form-label fw-semibold"
+                    style={{ fontSize: 13 }}
+                  >
                     Email Address
                   </label>
                   <input
@@ -292,7 +315,10 @@ function ReportRequest() {
               </div>
 
               <div className="mb-4">
-                <label className="form-label fw-semibold" style={{ fontSize: 13 }}>
+                <label
+                  className="form-label fw-semibold"
+                  style={{ fontSize: 13 }}
+                >
                   Select Reports Needed
                 </label>
                 <div
@@ -330,7 +356,11 @@ function ReportRequest() {
                         type="checkbox"
                         checked={selectedReports.includes(report)}
                         onChange={() => toggleReport(report)}
-                        style={{ accentColor: "#25a5b9", width: 16, height: 16 }}
+                        style={{
+                          accentColor: "#25a5b9",
+                          width: 16,
+                          height: 16,
+                        }}
                       />
                       <i
                         className="bi bi-file-earmark-bar-graph"
@@ -399,7 +429,10 @@ function ReportRequest() {
 
             {loadingRequests ? (
               <div className="text-center py-4" style={{ color: "#aaa" }}>
-                <div className="spinner-border spinner-border-sm me-2" role="status"></div>
+                <div
+                  className="spinner-border spinner-border-sm me-2"
+                  role="status"
+                ></div>
                 Loading…
               </div>
             ) : requests.length === 0 ? (
@@ -414,10 +447,14 @@ function ReportRequest() {
                   className="bi bi-inbox"
                   style={{ fontSize: 40, display: "block", marginBottom: 10 }}
                 ></i>
-                <p style={{ fontSize: 14 }}>No requests have been submitted yet.</p>
+                <p style={{ fontSize: 14 }}>
+                  No requests have been submitted yet.
+                </p>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              >
                 {requests.map((req) => (
                   <div
                     key={req.id}
@@ -429,7 +466,8 @@ function ReportRequest() {
                       transition: "box-shadow 0.18s",
                     }}
                     onMouseEnter={(e) =>
-                      (e.currentTarget.style.boxShadow = "0 4px 16px rgba(37,165,185,0.12)")
+                      (e.currentTarget.style.boxShadow =
+                        "0 4px 16px rgba(37,165,185,0.12)")
                     }
                     onMouseLeave={(e) =>
                       (e.currentTarget.style.boxShadow = "none")
@@ -468,19 +506,25 @@ function ReportRequest() {
                           {new Date(req.created_at).toLocaleString()}
                         </span>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        {req.status === 'Pending' && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        {req.status === "Pending" && (
                           <button
                             onClick={() => handleCancel(req.id)}
                             style={{
-                              border: 'none',
-                              background: '#F8D7DA',
-                              color: '#721C24',
-                              padding: '2px 8px',
-                              borderRadius: '6px',
-                              fontSize: '11px',
-                              fontWeight: '600',
-                              cursor: 'pointer'
+                              border: "none",
+                              background: "#F8D7DA",
+                              color: "#721C24",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              fontSize: "11px",
+                              fontWeight: "600",
+                              cursor: "pointer",
                             }}
                           >
                             Cancel
@@ -490,7 +534,14 @@ function ReportRequest() {
                       </div>
                     </div>
 
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        gap: 6,
+                        marginBottom: 10,
+                      }}
+                    >
                       {req.reports_requested.map((r) => (
                         <span
                           key={r}
@@ -516,17 +567,44 @@ function ReportRequest() {
                           background: "#fff",
                           borderRadius: 8,
                           border: "1px solid #efefef",
-                          fontSize: 12
+                          fontSize: 12,
                         }}
                       >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                          <span style={{ fontWeight: 'bold', color: '#555' }}>Reviewer Note:</span>
-                          <span style={{ fontSize: 10, color: '#999' }}>By {req.reviewed_by} on {new Date(req.review_date).toLocaleDateString()}</span>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginBottom: 5,
+                          }}
+                        >
+                          <span style={{ fontWeight: "bold", color: "#555" }}>
+                            Reviewer Note:
+                          </span>
+                          <span style={{ fontSize: 10, color: "#999" }}>
+                            By {req.reviewed_by} on{" "}
+                            {new Date(req.review_date).toLocaleDateString()}
+                          </span>
                         </div>
-                        <p style={{ margin: 0, color: '#666', fontStyle: 'italic' }}>"{req.description}"</p>
+                        <p
+                          style={{
+                            margin: 0,
+                            color: "#666",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          "{req.description}"
+                        </p>
 
                         {req.status === "Approved" && req.collection_date && (
-                          <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid #f5f5f5', color: '#25a5b9', fontWeight: '600' }}>
+                          <div
+                            style={{
+                              marginTop: 8,
+                              paddingTop: 8,
+                              borderTop: "1px solid #f5f5f5",
+                              color: "#25a5b9",
+                              fontWeight: "600",
+                            }}
+                          >
                             <i className="bi bi-calendar-check me-1"></i>
                             Collection: {req.collection_date}
                           </div>
@@ -577,12 +655,18 @@ function ReportRequest() {
                 margin: "0 auto 16px",
               }}
             >
-              <i className="bi bi-check-lg" style={{ color: "#fff", fontSize: 30 }}></i>
+              <i
+                className="bi bi-check-lg"
+                style={{ color: "#fff", fontSize: 30 }}
+              ></i>
             </div>
 
-            <h5 style={{ fontWeight: 700, marginBottom: 8 }}>Request Submitted!</h5>
+            <h5 style={{ fontWeight: 700, marginBottom: 8 }}>
+              Request Submitted!
+            </h5>
             <p style={{ color: "#6c757d", fontSize: 14, marginBottom: 20 }}>
-              Your report request has been received and is currently being processed.
+              Your report request has been received and is currently being
+              processed.
             </p>
 
             <div

@@ -1,11 +1,11 @@
 import "../assets/styleSheets/AdminLayout.css";
 import { Routes, Route, NavLink, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import AdminDashboard from "../admin/pages/AdminDashboard";
-import ManageUsers from "../admin/pages/ManageUsers";
-import EventManagement from "../admin/pages/EventManagement";
-import Profile from "../admin/pages/Profile";
-import SystemHealth from "../admin/pages/SystemHealth";
+import AdminDashboard from "../admin/pages/AdminDashboard/AdminDashboard";
+import ManageUsers from "../admin/pages/ManageUsers/ManageUsers";
+import EventManagement from "../admin/pages/EventManagement/EventManagement";
+import Profile from "../admin/pages/Profile/Profile";
+import SystemHealth from "../admin/pages/SystemHealth/SystemHealth";
 
 export default function AdminLayout() {
   const navigate = useNavigate();

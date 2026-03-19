@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Plotly from "plotly.js-dist";
-import styles from "../../assets/styleSheets/Analytics.module.css";
+import styles from "../../../assets/styleSheets/Analytics.module.css";
 
 function Analytics() {
   const [childData, setChildData] = useState({

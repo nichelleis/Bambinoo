@@ -1,10 +1,8 @@
-import DashboardHeader from "../Components/DashBoardHeader";
-import DashboardNav from "../Components/DashboardNav";
-import Overview from "../Components/OverviewComponent";
-import UpcomingEvent from "../Components/UpcomingEventComponent";
-import DevelopmentMilestonesCard from "../Components/MilestoneSummary";
-import ImmunizationSummary from "../Components/ImmunizationSummary";
-import HealthNote from "../Components/HealthNote";
+import Overview from "../../Components/OverviewComponent";
+import UpcomingEvent from "../../Components/UpcomingEventComponent";
+import DevelopmentMilestonesCard from "../../Components/MilestoneSummary";
+import ImmunizationSummary from "../../Components/ImmunizationSummary";
+import HealthNote from "../../Components/HealthNote";
 
 function Home() {
   return (

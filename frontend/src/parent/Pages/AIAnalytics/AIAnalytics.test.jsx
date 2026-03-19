@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AIAnalytics from "./AIAnalytics";
 
-vi.mock("../../components/GrowthPredictionChart", () => ({
+vi.mock("../../../components/GrowthPredictionChart", () => ({
   default: () => <div data-testid="growth-chart">Mock Growth Chart</div>,
 }));
 

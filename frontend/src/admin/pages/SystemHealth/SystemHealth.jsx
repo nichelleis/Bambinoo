@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import "../../assets/styleSheets/SystemHealth.css";
+import "../../../assets/styleSheets/SystemHealth.css";
 
 const REFRESH_INTERVAL = 60_000;
 

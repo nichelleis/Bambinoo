@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import style from "../../assets/styleSheets/ParentDashboard.module.css";
+import style from "../../../assets/styleSheets/ParentDashboard.module.css";
 
 function calculateAge(dobString) {
   const dob = new Date(dobString);

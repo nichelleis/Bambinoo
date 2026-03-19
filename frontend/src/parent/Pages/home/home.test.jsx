@@ -2,20 +2,19 @@ import { render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 import Home from "./home";
 
-// Mock all child components
-vi.mock("../Components/OverviewComponent", () => ({
+vi.mock("../../Components/OverviewComponent", () => ({
   default: () => <div>Overview</div>,
 }));
-vi.mock("../Components/UpcomingEventComponent", () => ({
+vi.mock("../../Components/UpcomingEventComponent", () => ({
   default: () => <div>UpcomingEvent</div>,
 }));
-vi.mock("../Components/MilestoneSummary", () => ({
+vi.mock("../../Components/MilestoneSummary", () => ({
   default: () => <div>Milestones</div>,
 }));
-vi.mock("../Components/ImmunizationSummary", () => ({
+vi.mock("../../Components/ImmunizationSummary", () => ({
   default: () => <div>Immunization</div>,
 }));
-vi.mock("../Components/HealthNote", () => ({
+vi.mock("../../Components/HealthNote", () => ({
   default: () => <div>HealthNote</div>,
 }));
 

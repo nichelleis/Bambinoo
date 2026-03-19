@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import GrowthPredictionChart from '../../components/GrowthPredictionChart';
+import { useState } from "react";
+import GrowthPredictionChart from "../../../components/GrowthPredictionChart";
 
 const AIAnalytics = () => {
-  const [activeTab, setActiveTab] = useState('growth');
+  const [activeTab, setActiveTab] = useState("growth");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -16,11 +16,11 @@ const AIAnalytics = () => {
         return;
       }
 
-      const res = await fetch('http://127.0.0.1:5000/generate-plan', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
+      const res = await fetch("http://127.0.0.1:5000/generate-plan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
       const data = await res.json();
@@ -33,8 +33,8 @@ const AIAnalytics = () => {
   };
 
   return (
-  <>
-    <style>{`
+    <>
+      <style>{`
       .pai-page { padding: 24px; font-family: 'Nunito', sans-serif; background: #f8f9fe; min-height: 100%; }
 
       .pai-header {
@@ -99,53 +99,81 @@ const AIAnalytics = () => {
       .pai-result .tips-card { background: #fffbeb; border: 1px solid #fcd34d; padding: 20px; border-radius: 12px; margin-top: 25px; }
     `}</style>
 
-    <div className="pai-page">
-
-      <div className="pai-header">
-        <div className="pai-header-content">
-          <div className="pai-header-icon"><i className="bi bi-robot" /></div>
-          <div className="pai-header-text">
-            <h1>AI Analytics</h1>
-            <p>Growth predictions and personalised nutrition — powered by AI</p>
+      <div className="pai-page">
+        <div className="pai-header">
+          <div className="pai-header-content">
+            <div className="pai-header-icon">
+              <i className="bi bi-robot" />
+            </div>
+            <div className="pai-header-text">
+              <h1>AI Analytics</h1>
+              <p>
+                Growth predictions and personalised nutrition — powered by AI
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="pai-tabs">
-        <button className={`pai-tab${activeTab === 'growth' ? ' active' : ''}`} onClick={() => setActiveTab('growth')}>
-          <i className="bi bi-graph-up-arrow" /> Growth Prediction
-        </button>
-        <button className={`pai-tab${activeTab === 'nutrition' ? ' active' : ''}`} onClick={() => setActiveTab('nutrition')}>
-          <i className="bi bi-egg-fried" /> Nutrition Plan
-        </button>
-      </div>
-
-      {activeTab === 'growth' && (
-        <div className="pai-card">
-          <GrowthPredictionChart />
+        <div className="pai-tabs">
+          <button
+            className={`pai-tab${activeTab === "growth" ? " active" : ""}`}
+            onClick={() => setActiveTab("growth")}
+          >
+            <i className="bi bi-graph-up-arrow" /> Growth Prediction
+          </button>
+          <button
+            className={`pai-tab${activeTab === "nutrition" ? " active" : ""}`}
+            onClick={() => setActiveTab("nutrition")}
+          >
+            <i className="bi bi-egg-fried" /> Nutrition Plan
+          </button>
         </div>
-      )}
 
-      {activeTab === 'nutrition' && (
-        <div className="pai-card">
-          <h2 className="pai-nutrition-title">Nutrition Plan</h2>
-          <p className="pai-nutrition-subtitle">Personalised for your child's weight and age</p>
-          <div className="pai-generate-area">
-            <button className="pai-generate-btn" onClick={handleGenerate} disabled={loading}>
-              {loading
-                ? <><span className="pai-spinner-inline" /> Analyzing…</>
-                : <><i className="bi bi-stars" /> Generate Plan</>
-              }
-            </button>
+        {activeTab === "growth" && (
+          <div className="pai-card">
+            <GrowthPredictionChart />
           </div>
-          {loading && <p className="pai-loading-note">Generating your personalised nutrition plan…</p>}
-          {result && <div className="pai-result" dangerouslySetInnerHTML={{ __html: result }} />}
-        </div>
-      )}
+        )}
 
-    </div>
-  </>
-);
+        {activeTab === "nutrition" && (
+          <div className="pai-card">
+            <h2 className="pai-nutrition-title">Nutrition Plan</h2>
+            <p className="pai-nutrition-subtitle">
+              Personalised for your child's weight and age
+            </p>
+            <div className="pai-generate-area">
+              <button
+                className="pai-generate-btn"
+                onClick={handleGenerate}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="pai-spinner-inline" /> Analyzing…
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-stars" /> Generate Plan
+                  </>
+                )}
+              </button>
+            </div>
+            {loading && (
+              <p className="pai-loading-note">
+                Generating your personalised nutrition plan…
+              </p>
+            )}
+            {result && (
+              <div
+                className="pai-result"
+                dangerouslySetInnerHTML={{ __html: result }}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  );
 };
 
 export default AIAnalytics;

@@ -3,14 +3,14 @@ import { Routes, Route } from "react-router-dom";
 import DashboardHeader from "../parent/Components/DashBoardHeader";
 import SideNav from "../parent/Components/DashboardNav";
 
-import Home from "../parent/Pages/home";
-import Analytics from "../parent/Pages/Analytics";
-import AIAnalytics from "../parent/Pages/AIAnalytics";
-import Milestones from "../parent/Pages/MileStones";
-import MessageDoctor from "../parent/Pages/MessageDoctor";
-import Education from "../parent/Pages/Education";
-import Profile from "../parent/Pages/Profile";
-import ReportRequest from "../parent/Pages/ReportRequest";
+import Home from "../parent/Pages/home/home";
+import Analytics from "../parent/Pages/Analytics/Analytics";
+import AIAnalytics from "../parent/Pages/AIAnalytics/AIAnalytics";
+import Milestones from "../parent/Pages/MileStones/MileStones";
+import MessageDoctor from "../parent/Pages/MessageDoctor/MessageDoctor";
+import Education from "../parent/Pages/Education/Education";
+import Profile from "../parent/Pages/Profile/Profile";
+import ReportRequest from "../parent/Pages/ReportRequest/ReportRequest";
 
 function ParentLayout() {
   return (

@@ -1,4 +1,4 @@
-import style from "../../assets/styleSheets/ParentDashboard.module.css";
+import style from "../../../assets/styleSheets/ParentDashboard.module.css";
 import { useEffect, useState } from "react";
 
 function Milestones() {
