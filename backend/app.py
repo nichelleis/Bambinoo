@@ -1,4 +1,4 @@
-import google.generativeai as genai
+import anthropic
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta,datetime,date, UTC
@@ -1327,14 +1327,24 @@ def get_vaccination_data():
         return jsonify({"message": "Server Error"}), 500
 
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-
-MODEL_NAME = 'models/gemini-flash-latest'
+_anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+MODEL_NAME = 'claude-haiku-4-5-20251001' 
 
 
 def clean_ai_response(text):
     return text.replace("```html", "").replace("```", "")
+
+
+
+ 
+def _ai_generate(prompt: str) -> str:
+    msg = _anthropic_client.messages.create(
+        model=MODEL_NAME,
+        max_tokens=4096,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return msg.content[0].text
+ 
 
 
 # MEAL PLAN API 
@@ -1459,9 +1469,7 @@ def generate_plan():
         """
         
         # Specific AI call 
-        model = genai.GenerativeModel(MODEL_NAME)
-        response = model.generate_content(prompt)
-        html_content = clean_ai_response(response.text)
+        html_content = clean_ai_response(_ai_generate(prompt))
         
         # Send the clean HTML back to React as JSON
         return jsonify({"success": True, "html": html_content})
@@ -1470,9 +1478,7 @@ def generate_plan():
         return jsonify({"success": False, "error": str(e)}), 500
         
         # Specific AI call
-        model = genai.GenerativeModel(MODEL_NAME)
-        response = model.generate_content(prompt)
-        html_content = clean_ai_response(response.text)
+        html_content = clean_ai_response(_ai_generate(prompt))
         
         # Send the clean HTML back to React as JSON
         return jsonify({"success": True, "html": html_content})
@@ -1550,9 +1556,7 @@ def get_resources():
     """
 
         
-        model = genai.GenerativeModel(MODEL_NAME)
-        response = model.generate_content(prompt)
-        html_content = clean_ai_response(response.text)
+        html_content = clean_ai_response(_ai_generate(prompt))
 
         
         return jsonify({"success": True, "html": html_content})
@@ -2802,9 +2806,7 @@ Return EXACTLY this JSON structure (base all fields on the real data above):
   "literatureInsights": [{{"topic":"...","finding":"...","relevance":"...","citation":"...","action":"..."}}]
 }}
 """
-        model    = genai.GenerativeModel(MODEL_NAME)
-        response = model.generate_content(prompt)
-        raw      = clean_ai_response(response.text).strip()
+        raw      = clean_ai_response(_ai_generate(prompt)).strip()
 
         try:
             data = _json.loads(raw)
