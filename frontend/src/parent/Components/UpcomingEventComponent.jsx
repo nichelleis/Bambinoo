@@ -18,20 +18,26 @@ function UpcomingEvent() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://127.0.0.1:5000/vaccines-status", {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/vaccines-status",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
       .then((res) => res.json())
       .then((data) => setVaccines(data))
       .catch((err) => console.error(err));
 
-    fetch("http://127.0.0.1:5000/upcoming-appointments", {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/upcoming-appointments",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
       .then((res) => res.json())
       .then((data) => setAppointments(data))
       .catch((err) => console.error(err));
@@ -67,8 +73,8 @@ function UpcomingEvent() {
     };
 
     const url = isEditing
-      ? `http://127.0.0.1:5000/update-appointment/${editingId}`
-      : "http://127.0.0.1:5000/add-appointment";
+      ? `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/update-appointment/${editingId}`
+      : "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/add-appointment";
 
     const method = isEditing ? "PUT" : "POST";
 
@@ -84,7 +90,7 @@ function UpcomingEvent() {
       .then((data) => {
         if (isEditing) {
           setAppointments(
-            appointments.map((a) => (a.id === editingId ? data : a))
+            appointments.map((a) => (a.id === editingId ? data : a)),
           );
         } else {
           setAppointments([...appointments, data]);
@@ -111,9 +117,12 @@ function UpcomingEvent() {
   const handleDelete = (id) => {
     if (!window.confirm("Delete this appointment?")) return;
 
-    fetch(`http://127.0.0.1:5000/delete-appointment/${id}`, {
-      method: "DELETE",
-    }).then(() => setAppointments(appointments.filter((a) => a.id !== id)));
+    fetch(
+      `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/delete-appointment/${id}`,
+      {
+        method: "DELETE",
+      },
+    ).then(() => setAppointments(appointments.filter((a) => a.id !== id)));
   };
 
   const resetModal = () => {

@@ -8,11 +8,14 @@ function DevelopmentMilestonesCard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://127.0.0.1:5000/milestone-status", {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/milestone-status",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
       .then((res) => res.json())
       .then((data) => setMilestones(data))
       .catch((err) => console.error(err));

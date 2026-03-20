@@ -19,11 +19,14 @@ const NurseDashboard = () => {
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://127.0.0.1:5000/verify-token", {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await axios.get(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/verify-token",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (res.data.valid) {
         setNurseName(res.data.user.username);

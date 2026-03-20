@@ -1,12 +1,14 @@
 import "./NurseGrowth.css";
 import React, { useState, useEffect } from "react";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com";
 
 function formatDate(dateStr) {
   if (!dateStr) return "N/A";
   return new Date(dateStr).toLocaleDateString("en-GB", {
-    day: "numeric", month: "short", year: "numeric",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
 }
 
@@ -16,7 +18,7 @@ function GrowthRow({ record, isNew }) {
       <td>{formatDate(record.record_date)}</td>
       <td>{record.weight ? `${record.weight} kg` : "N/A"}</td>
       <td>{record.height ? `${record.height} cm` : "N/A"}</td>
-      <td>{record.head   ? `${record.head} cm`   : "N/A"}</td>
+      <td>{record.head ? `${record.head} cm` : "N/A"}</td>
       <td className="ng-notes-cell">{record.notes || "—"}</td>
     </tr>
   );
@@ -24,9 +26,9 @@ function GrowthRow({ record, isNew }) {
 
 export default function NurseGrowth({ selectedChild }) {
   const [history, setHistory] = useState([]);
-  const [newId, setNewId]     = useState(null);
-  const [saving, setSaving]   = useState(false);
-  const [error, setError]     = useState("");
+  const [newId, setNewId] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const emptyForm = { date: "", weight: "", height: "", head: "", notes: "" };
@@ -42,8 +44,8 @@ export default function NurseGrowth({ selectedChild }) {
 
     const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
     fetch(`${API_BASE}/children/${numericId}/growth`)
-      .then(r => r.json())
-      .then(data => setHistory(Array.isArray(data) ? data : []))
+      .then((r) => r.json())
+      .then((data) => setHistory(Array.isArray(data) ? data : []))
       .catch(() => setHistory([]));
   }, [selectedChild]);
 
@@ -64,12 +66,13 @@ export default function NurseGrowth({ selectedChild }) {
   }
 
   function handleChange(e) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError(""); setSuccess("");
+    setError("");
+    setSuccess("");
     setSaving(true);
 
     const numericId = parseInt(String(selectedChild.id).replace("CH", ""), 10);
@@ -89,15 +92,15 @@ export default function NurseGrowth({ selectedChild }) {
       }
 
       const newRecord = {
-        id:          result.id,
+        id: result.id,
         record_date: form.date,
-        weight:      form.weight,
-        height:      form.height,
-        head:        form.head,
-        notes:       form.notes,
+        weight: form.weight,
+        height: form.height,
+        head: form.head,
+        notes: form.notes,
       };
 
-      setHistory(prev => [newRecord, ...prev]);
+      setHistory((prev) => [newRecord, ...prev]);
       setNewId(newRecord.id ?? 0);
       setTimeout(() => setNewId(null), 3000);
 
@@ -113,7 +116,6 @@ export default function NurseGrowth({ selectedChild }) {
 
   return (
     <div className="ng-page">
-
       {/* ── Header ── */}
       <div className="ng-header">
         <div className="ng-header-left">
@@ -121,13 +123,14 @@ export default function NurseGrowth({ selectedChild }) {
             <i className="ri-seedling-line" />
             Growth Monitoring
           </h2>
-          <p>Recording for: <strong>{selectedChild.name}</strong></p>
+          <p>
+            Recording for: <strong>{selectedChild.name}</strong>
+          </p>
         </div>
         <div className="ng-role-badge">GROWTH · NURSE</div>
       </div>
 
       <div className="ng-grid">
-
         {/* ── Form card ── */}
         <div className="ng-card">
           <h4 className="ng-card-title">
@@ -136,10 +139,11 @@ export default function NurseGrowth({ selectedChild }) {
           <div className="ng-divider" />
 
           <form className="ng-form" onSubmit={handleSubmit}>
-
             <div className="ng-form-row">
               <div className="ng-field">
-                <label>Date <span className="ng-required">*</span></label>
+                <label>
+                  Date <span className="ng-required">*</span>
+                </label>
                 <input
                   type="date"
                   name="date"
@@ -149,7 +153,9 @@ export default function NurseGrowth({ selectedChild }) {
                 />
               </div>
               <div className="ng-field">
-                <label>Weight (kg) <span className="ng-required">*</span></label>
+                <label>
+                  Weight (kg) <span className="ng-required">*</span>
+                </label>
                 <input
                   type="number"
                   step="0.1"
@@ -164,7 +170,9 @@ export default function NurseGrowth({ selectedChild }) {
 
             <div className="ng-form-row">
               <div className="ng-field">
-                <label>Height (cm) <span className="ng-required">*</span></label>
+                <label>
+                  Height (cm) <span className="ng-required">*</span>
+                </label>
                 <input
                   type="number"
                   step="0.1"
@@ -198,7 +206,7 @@ export default function NurseGrowth({ selectedChild }) {
               />
             </div>
 
-            {error   && <p className="ng-error">{error}</p>}
+            {error && <p className="ng-error">{error}</p>}
             {success && <p className="ng-success">{success}</p>}
 
             <button type="submit" className="ng-save-btn" disabled={saving}>
@@ -241,7 +249,6 @@ export default function NurseGrowth({ selectedChild }) {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );

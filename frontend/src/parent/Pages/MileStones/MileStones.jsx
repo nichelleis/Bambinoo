@@ -7,7 +7,7 @@ function Milestones() {
   const [milestones, setMilestones] = useState({});
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/age-groups")
+    fetch("https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/age-groups")
       .then((res) => res.json())
       .then((data) => {
         const mapped = data.map((group) => ({
@@ -22,12 +22,15 @@ function Milestones() {
   const fetchMilestones = (group) => {
     const token = localStorage.getItem("token");
 
-    fetch(`http://127.0.0.1:5000/milestones?age_group=${group}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
+    fetch(
+      `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/milestones?age_group=${group}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
       .then((res) => res.json())
       .then((data) => setMilestones(data))
       .catch((err) => console.error(err));
@@ -38,17 +41,20 @@ function Milestones() {
   const toggleMilestone = (milestone, category) => {
     const token = localStorage.getItem("token");
 
-    fetch("http://127.0.0.1:5000/milestones/toggle", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/milestones/toggle",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          milestone_id: milestone.id,
+          category: category,
+        }),
       },
-      body: JSON.stringify({
-        milestone_id: milestone.id,
-        category: category,
-      }),
-    })
+    )
       .then(() => {
         fetchMilestones(selectedGroup);
       })

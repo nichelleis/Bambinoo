@@ -7,7 +7,9 @@ export default function Profile() {
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/admin-profile");
+        const response = await fetch(
+          "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/admin-profile",
+        );
         const data = await response.json();
 
         if (response.ok && data.username) {

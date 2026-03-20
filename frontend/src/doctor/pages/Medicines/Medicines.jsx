@@ -42,10 +42,10 @@ export default function Medicines({ selectedChild }) {
   // Pull prescriptions from real data
   const allNotes = selectedChild.healthNotes || [];
   const prescriptionHistory = allNotes.filter(
-    (n) => n.record_type === "Prescription"
+    (n) => n.record_type === "Prescription",
   );
   const longTermMedicines = prescriptionHistory.filter(
-    (n) => n.notes && n.notes.toLowerCase().includes("long-term")
+    (n) => n.notes && n.notes.toLowerCase().includes("long-term"),
   );
 
   const handleChange = (e) => {
@@ -67,12 +67,12 @@ export default function Medicines({ selectedChild }) {
         : formData.notes;
 
       const res = await fetch(
-        `http://localhost:5000/children/${numericId}/medicines`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/children/${numericId}/medicines`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...formData, notes: notesWithFlag }),
-        }
+        },
       );
 
       const result = await res.json();
@@ -214,7 +214,12 @@ export default function Medicines({ selectedChild }) {
           />
 
           {message && (
-            <p style={{ color: message.startsWith("✓") ? "green" : "red", fontSize: "0.85rem" }}>
+            <p
+              style={{
+                color: message.startsWith("✓") ? "green" : "red",
+                fontSize: "0.85rem",
+              }}
+            >
               {message}
             </p>
           )}
@@ -234,14 +239,16 @@ export default function Medicines({ selectedChild }) {
                 <div>
                   <strong>{item.medication_name}</strong>
                   <p>
-                    Dosage: {item.medication_dosage || "N/A"} • {item.reason || "N/A"}
+                    Dosage: {item.medication_dosage || "N/A"} •{" "}
+                    {item.reason || "N/A"}
                   </p>
                   <p>Recorded: {formatDate(item.record_date)}</p>
                   {item.notes && <small>{item.notes}</small>}
                 </div>
-                {item.notes && item.notes.toLowerCase().includes("long-term") && (
-                  <span className="pill warning">Long-term</span>
-                )}
+                {item.notes &&
+                  item.notes.toLowerCase().includes("long-term") && (
+                    <span className="pill warning">Long-term</span>
+                  )}
               </div>
             ))
           )}

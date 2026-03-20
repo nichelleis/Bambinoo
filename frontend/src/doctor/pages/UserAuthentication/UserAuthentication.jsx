@@ -27,7 +27,7 @@ const UserAuthentication = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/search_registration/${searchQuery}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/search_registration/${searchQuery}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -57,7 +57,7 @@ const UserAuthentication = () => {
       }
 
       const response = await fetch(
-        "http://127.0.0.1:5000/pending_registrations",
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/pending_registrations",
         {
           method: "GET",
           headers: {
@@ -98,7 +98,7 @@ const UserAuthentication = () => {
   const handleApprove = async (registrationId) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/pending_registrations/approve/${registrationId}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/pending_registrations/approve/${registrationId}`,
         {
           method: "POST",
           headers: {
@@ -144,7 +144,7 @@ const UserAuthentication = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/pending_registrations/decline/${currentDeclineId}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/pending_registrations/decline/${currentDeclineId}`,
         {
           method: "POST",
           headers: {
@@ -194,7 +194,7 @@ const UserAuthentication = () => {
     setFetchingReports(true);
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/admin/report-requests",
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/admin/report-requests",
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -239,7 +239,7 @@ const UserAuthentication = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/admin/report-requests/review/${selectedReport.id}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/admin/report-requests/review/${selectedReport.id}`,
         {
           method: "POST",
           headers: {

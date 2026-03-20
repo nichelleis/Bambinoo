@@ -18,7 +18,8 @@ export default function EventManagement() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const baseUrl = "http://127.0.0.1:5000/api/admin";
+      const baseUrl =
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin";
 
       const [userRes, eventRes] = await Promise.all([
         fetch(`${baseUrl}/users`, {
@@ -46,11 +47,14 @@ export default function EventManagement() {
   const handleEventSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/admin/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/events",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        },
+      );
       if (response.ok) {
         setFormData({
           title: "",
@@ -71,7 +75,7 @@ export default function EventManagement() {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/admin/events/${eventId}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/events/${eventId}`,
         { method: "DELETE" },
       );
       if (response.ok) {

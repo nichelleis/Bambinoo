@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import "./DoctorProfile.css";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com";
 const uid = () => Math.random().toString(36).slice(2, 8);
 
 const SPECIALTIES = [

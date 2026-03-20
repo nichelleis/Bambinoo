@@ -10,7 +10,7 @@ const ResetPassword = () => {
 
   const handleReset = async () => {
     const response = await fetch(
-      `http://127.0.0.1:5000/reset-password/${reset_id}`,
+      `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/reset-password/${reset_id}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

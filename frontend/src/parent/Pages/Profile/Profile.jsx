@@ -34,7 +34,7 @@ function Profile() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/profile", {
+    fetch("https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/profile", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

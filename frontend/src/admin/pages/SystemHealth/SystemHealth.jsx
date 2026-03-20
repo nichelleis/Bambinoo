@@ -25,7 +25,7 @@ export default function SystemHealth() {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          "http://127.0.0.1:5000/api/admin/system-health",
+          "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/system-health",
           {
             headers: {
               Authorization: `Bearer ${token}`,

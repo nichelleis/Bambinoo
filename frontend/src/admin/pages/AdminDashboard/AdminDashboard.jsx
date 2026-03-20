@@ -34,7 +34,7 @@ export default function AdminDashboard() {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          "http://localhost:5000/api/admin/dashboard-stats",
+          "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/dashboard-stats",
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -15,12 +15,12 @@ function ImmunizationSummary() {
   const fetchCompletedVaccines = async () => {
     const token = localStorage.getItem("token");
     const completedRes = await fetch(
-      "http://127.0.0.1:5000/completed-vaccines",
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/completed-vaccines",
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
     const completedData = await completedRes.json();
 
@@ -28,7 +28,9 @@ function ImmunizationSummary() {
   };
 
   const fetchTotalExpected = async () => {
-    const res = await fetch("http://127.0.0.1:5000/total-vaccines-count");
+    const res = await fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/total-vaccines-count",
+    );
     const data = await res.json();
     setTotalExpected(data.total);
   };

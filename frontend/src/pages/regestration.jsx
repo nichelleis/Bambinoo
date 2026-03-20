@@ -1,50 +1,49 @@
-import React, { useState } from 'react';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import style from '../assets/styleSheets/Registration.module.css';
+import React, { useState } from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import style from "../assets/styleSheets/Registration.module.css";
 
 const Registration = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [registrationNumber, setRegistrationNumber] = useState('');
+  const [registrationNumber, setRegistrationNumber] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [confirmCorrect, setConfirmCorrect] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [popupMessage, setPopupMessage] = useState('');
-
+  const [popupMessage, setPopupMessage] = useState("");
 
   const [formData, setFormData] = useState({
-    childName: '',
-    childDOB: '',
-    gender: '',
-    nationality: '',
-    childNumber: '',
-    language: '',
-    motherName: '',
-    motherDOB: '',
-    motherEmail: '',
-    motherPhone: '',
-    birthLocation: '',
-    birthHospital: '',
-    deliveryType: '',
-    surgery: '',
-    birthWeight: '',
-    birthLength: '',
-    headCircumference: '',
-    personnelType: '',
-    personnelName: '',
-    livingAddress: '',
-    registrationDate: new Date().toISOString().split('T')[0]
+    childName: "",
+    childDOB: "",
+    gender: "",
+    nationality: "",
+    childNumber: "",
+    language: "",
+    motherName: "",
+    motherDOB: "",
+    motherEmail: "",
+    motherPhone: "",
+    birthLocation: "",
+    birthHospital: "",
+    deliveryType: "",
+    surgery: "",
+    birthWeight: "",
+    birthLength: "",
+    headCircumference: "",
+    personnelType: "",
+    personnelName: "",
+    livingAddress: "",
+    registrationDate: new Date().toISOString().split("T")[0],
   });
 
   // account credentials entered by user
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const generateRegistrationNumber = () => {
@@ -61,43 +60,47 @@ const Registration = () => {
 
       case 1:
         return (
-          formData.childName.trim() !== '' &&
-          formData.childDOB.trim() !== '' &&
-          formData.gender.trim() !== '' &&
-          formData.nationality.trim() !== '' &&
-          formData.childNumber.trim() !== '' &&
-          formData.language.trim() !== ''
+          formData.childName.trim() !== "" &&
+          formData.childDOB.trim() !== "" &&
+          formData.gender.trim() !== "" &&
+          formData.nationality.trim() !== "" &&
+          formData.childNumber.trim() !== "" &&
+          formData.language.trim() !== ""
         );
 
       case 2:
         return (
-          formData.motherName.trim() !== '' &&
-          formData.motherDOB.trim() !== '' &&
-          formData.motherEmail.trim() !== '' &&
-          formData.motherPhone.trim() !== ''
+          formData.motherName.trim() !== "" &&
+          formData.motherDOB.trim() !== "" &&
+          formData.motherEmail.trim() !== "" &&
+          formData.motherPhone.trim() !== ""
         );
 
       case 3:
         return (
-          formData.birthLocation.trim() !== '' &&
-          formData.birthHospital.trim() !== '' &&
-          formData.deliveryType.trim() !== '' &&
-          formData.surgery.trim() !== '' &&
-          formData.birthWeight.trim() !== '' &&
-          formData.birthLength.trim() !== '' &&
-          formData.headCircumference.trim() !== ''
+          formData.birthLocation.trim() !== "" &&
+          formData.birthHospital.trim() !== "" &&
+          formData.deliveryType.trim() !== "" &&
+          formData.surgery.trim() !== "" &&
+          formData.birthWeight.trim() !== "" &&
+          formData.birthLength.trim() !== "" &&
+          formData.headCircumference.trim() !== ""
         );
 
       case 4:
-        return formData.personnelType.trim() !== '' && formData.personnelName.trim() !== '';
+        return (
+          formData.personnelType.trim() !== "" &&
+          formData.personnelName.trim() !== ""
+        );
 
       case 5:
-        return formData.livingAddress.trim() !== '';
+        return formData.livingAddress.trim() !== "";
 
       case 6:
         // account credentials step: username/password validations
         return (
-          username && username.length >= 4 &&
+          username &&
+          username.length >= 4 &&
           /^[a-zA-Z0-9]+$/.test(username) &&
           password &&
           confirmPassword &&
@@ -117,35 +120,43 @@ const Registration = () => {
     if (!isStepValid()) {
       let missingFields = [];
       if (currentStep === 1) {
-        if (!formData.childName.trim()) missingFields.push('Child Name');
-        if (!formData.childDOB.trim()) missingFields.push('Date of Birth');
-        if (!formData.gender.trim()) missingFields.push('Gender');
-        if (!formData.nationality.trim()) missingFields.push('Nationality');
-        if (!formData.childNumber.trim()) missingFields.push('Child Number');
-        if (!formData.language.trim()) missingFields.push('Language');
+        if (!formData.childName.trim()) missingFields.push("Child Name");
+        if (!formData.childDOB.trim()) missingFields.push("Date of Birth");
+        if (!formData.gender.trim()) missingFields.push("Gender");
+        if (!formData.nationality.trim()) missingFields.push("Nationality");
+        if (!formData.childNumber.trim()) missingFields.push("Child Number");
+        if (!formData.language.trim()) missingFields.push("Language");
       } else if (currentStep === 2) {
-        if (!formData.motherName.trim()) missingFields.push('Mother Name');
-        if (!formData.motherDOB.trim()) missingFields.push('Mother Date of Birth');
-        if (!formData.motherEmail.trim()) missingFields.push('Mother Email');
-        if (!formData.motherPhone.trim()) missingFields.push('Mother Phone');
+        if (!formData.motherName.trim()) missingFields.push("Mother Name");
+        if (!formData.motherDOB.trim())
+          missingFields.push("Mother Date of Birth");
+        if (!formData.motherEmail.trim()) missingFields.push("Mother Email");
+        if (!formData.motherPhone.trim()) missingFields.push("Mother Phone");
       } else if (currentStep === 3) {
-        if (!formData.birthLocation.trim()) missingFields.push('Birth Location');
-        if (!formData.birthHospital.trim()) missingFields.push('Birth Hospital');
-        if (!formData.deliveryType.trim()) missingFields.push('Delivery Type');
-        if (!formData.surgery.trim()) missingFields.push('Surgery');
-        if (!formData.birthWeight.trim()) missingFields.push('Birth Weight');
-        if (!formData.birthLength.trim()) missingFields.push('Birth Length');
-        if (!formData.headCircumference.trim()) missingFields.push('Head Circumference');
+        if (!formData.birthLocation.trim())
+          missingFields.push("Birth Location");
+        if (!formData.birthHospital.trim())
+          missingFields.push("Birth Hospital");
+        if (!formData.deliveryType.trim()) missingFields.push("Delivery Type");
+        if (!formData.surgery.trim()) missingFields.push("Surgery");
+        if (!formData.birthWeight.trim()) missingFields.push("Birth Weight");
+        if (!formData.birthLength.trim()) missingFields.push("Birth Length");
+        if (!formData.headCircumference.trim())
+          missingFields.push("Head Circumference");
       } else if (currentStep === 4) {
-        if (!formData.personnelType.trim()) missingFields.push('Personnel Type');
-        if (!formData.personnelName.trim()) missingFields.push('Personnel Name');
+        if (!formData.personnelType.trim())
+          missingFields.push("Personnel Type");
+        if (!formData.personnelName.trim())
+          missingFields.push("Personnel Name");
       } else if (currentStep === 5) {
-        if (!formData.livingAddress.trim()) missingFields.push('Living Address');
+        if (!formData.livingAddress.trim())
+          missingFields.push("Living Address");
       }
-      
-      const message = missingFields.length > 0 
-        ? `Please fill the following required fields: ${missingFields.join(', ')}`
-        : 'Please fill all required fields before continuing.';
+
+      const message =
+        missingFields.length > 0
+          ? `Please fill the following required fields: ${missingFields.join(", ")}`
+          : "Please fill all required fields before continuing.";
       setPopupMessage(message);
       setShowPopup(true);
       return;
@@ -154,7 +165,7 @@ const Registration = () => {
     if (currentStep < 7) {
       setCurrentStep(currentStep + 1);
       updateProgressBar(currentStep + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -162,13 +173,14 @@ const Registration = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
       updateProgressBar(currentStep - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const updateProgressBar = (step) => {
     const progressPercentage = (step / 7) * 100;
-    document.getElementById('progressFill').style.width = `${progressPercentage}%`;
+    document.getElementById("progressFill").style.width =
+      `${progressPercentage}%`;
   };
 
   const submitForm = async () => {
@@ -180,17 +192,21 @@ const Registration = () => {
       username,
       password,
       ...formData,
-      status: "PENDING"
+      status: "PENDING",
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/pending_registration", { // change the fetch link to the databse
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/pending_registration",
+        {
+          // change the fetch link to the databse
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload)
-      });
+      );
 
       const result = await response.json();
 
@@ -201,11 +217,12 @@ const Registration = () => {
       setRegistrationNumber(regNumber);
       setIsSubmitted(true);
 
-      setPopupMessage("Registration Successful! Your account details have been sent securely.");
+      setPopupMessage(
+        "Registration Successful! Your account details have been sent securely.",
+      );
       setShowPopup(true);
 
       window.scrollTo({ top: 0, behavior: "smooth" });
-
     } catch (error) {
       setPopupMessage(error.message);
       setShowPopup(true);
@@ -217,138 +234,197 @@ const Registration = () => {
     setIsSubmitted(false);
     setAgreeTerms(false);
     setConfirmCorrect(false);
-    setRegistrationNumber('');
+    setRegistrationNumber("");
     setFormData({
-      childName: '',
-      childDOB: '',
-      gender: '',
-      nationality: '',
-      childNumber: '',
-      language: '',
-      motherName: '',
-      motherDOB: '',
-      motherEmail: '',
-      motherPhone: '',
-      birthLocation: '',
-      birthHospital: '',
-      deliveryType: '',
-      surgery: '',
-      birthWeight: '',
-      birthLength: '',
-      headCircumference: '',
-      personnelType: '',
-      personnelName: '',
-      livingAddress: '',
-      registrationDate: new Date().toISOString().split('T')[0]
+      childName: "",
+      childDOB: "",
+      gender: "",
+      nationality: "",
+      childNumber: "",
+      language: "",
+      motherName: "",
+      motherDOB: "",
+      motherEmail: "",
+      motherPhone: "",
+      birthLocation: "",
+      birthHospital: "",
+      deliveryType: "",
+      surgery: "",
+      birthWeight: "",
+      birthLength: "",
+      headCircumference: "",
+      personnelType: "",
+      personnelName: "",
+      livingAddress: "",
+      registrationDate: new Date().toISOString().split("T")[0],
     });
-    setUsername('');
-    setPassword('');
-    setConfirmPassword('');
+    setUsername("");
+    setPassword("");
+    setConfirmPassword("");
     updateProgressBar(0);
   };
 
   const downloadReviewPDF = () => {
-  try {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    
-    // Ensure we have an ID to show
-    const displayID = registrationNumber || "PENDING-REGISTRATION";
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
 
-    // --- Header Section ---
-    doc.setFontSize(22);
-    doc.setTextColor(102, 126, 234); // Matches your CSS #667eea
-    doc.text('Bambinooo Registry', 14, 20);
+      // Ensure we have an ID to show
+      const displayID = registrationNumber || "PENDING-REGISTRATION";
 
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text('Child Health & Development Registry Official Record', 14, 27);
+      // --- Header Section ---
+      doc.setFontSize(22);
+      doc.setTextColor(102, 126, 234); // Matches your CSS #667eea
+      doc.text("Bambinooo Registry", 14, 20);
 
-    // Registration Number Badge (Top Right)
-    doc.setFillColor(248, 250, 252);
-    doc.rect(pageWidth - 95, 12, 81, 18, 'F');
-    doc.setDrawColor(102, 126, 234);
-    doc.rect(pageWidth - 95, 12, 81, 18, 'S');
-    
-    doc.setFontSize(8);
-    doc.setTextColor(71, 85, 105);
-    doc.text('REGISTRATION NUMBER', pageWidth - 90, 18);
-    doc.setFontSize(11);
-    doc.setTextColor(0);
-    doc.text(displayID, pageWidth - 90, 25);
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text("Child Health & Development Registry Official Record", 14, 27);
 
-    doc.setDrawColor(226, 232, 240);
-    doc.line(14, 32, pageWidth - 14, 32);
+      // Registration Number Badge (Top Right)
+      doc.setFillColor(248, 250, 252);
+      doc.rect(pageWidth - 95, 12, 81, 18, "F");
+      doc.setDrawColor(102, 126, 234);
+      doc.rect(pageWidth - 95, 12, 81, 18, "S");
 
-    // --- Data Preparation (Including ALL Form Data) ---
-    const tableData = [
-      // Section 1: Child Info
-      [{ content: '1. CHILD INFORMATION', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
-      ['Full Name', formData.childName],
-      ['Date of Birth', formData.childDOB],
-      ['Gender', formData.gender],
-      ['Nationality', formData.nationality],
-      ['Family Position', `${formData.childNumber} Baby`],
-      ['Preferred Language', formData.language],
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105);
+      doc.text("REGISTRATION NUMBER", pageWidth - 90, 18);
+      doc.setFontSize(11);
+      doc.setTextColor(0);
+      doc.text(displayID, pageWidth - 90, 25);
 
-      // Section 2: Mother Info
-      [{ content: '2. MOTHER DETAILS', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
-      ['Mother Name', formData.motherName],
-      ['Mother DOB', formData.motherDOB],
-      ['Contact Phone', formData.motherPhone],
-      ['Email Address', formData.motherEmail],
+      doc.setDrawColor(226, 232, 240);
+      doc.line(14, 32, pageWidth - 14, 32);
 
-      // Section 3: Birth & Medical Data
-      [{ content: '3. BIRTH & MEDICAL DATA', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
-      ['Hospital', formData.birthHospital],
-      ['Birth Location', formData.birthLocation],
-      ['Delivery Type', formData.deliveryType],
-      ['Surgery Performed', formData.surgery],
-      ['Birth Weight', `${formData.birthWeight} kg`],
-      ['Birth Length', `${formData.birthLength} cm`],
-      ['Head Circumference', `${formData.headCircumference} cm`],
+      // --- Data Preparation (Including ALL Form Data) ---
+      const tableData = [
+        // Section 1: Child Info
+        [
+          {
+            content: "1. CHILD INFORMATION",
+            colSpan: 2,
+            styles: {
+              fillColor: [102, 126, 234],
+              textColor: 255,
+              fontStyle: "bold",
+            },
+          },
+        ],
+        ["Full Name", formData.childName],
+        ["Date of Birth", formData.childDOB],
+        ["Gender", formData.gender],
+        ["Nationality", formData.nationality],
+        ["Family Position", `${formData.childNumber} Baby`],
+        ["Preferred Language", formData.language],
 
-      // Section 4: Assigned Personnel
-      [{ content: '4. HEALTHCARE PERSONNEL', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
-      ['Provider Type', formData.personnelType],
-      ['Provider Name', formData.personnelName],
+        // Section 2: Mother Info
+        [
+          {
+            content: "2. MOTHER DETAILS",
+            colSpan: 2,
+            styles: {
+              fillColor: [102, 126, 234],
+              textColor: 255,
+              fontStyle: "bold",
+            },
+          },
+        ],
+        ["Mother Name", formData.motherName],
+        ["Mother DOB", formData.motherDOB],
+        ["Contact Phone", formData.motherPhone],
+        ["Email Address", formData.motherEmail],
 
-      // Section 5: Account & Logistics
-      [{ content: '5. REGISTRATION LOGS', colSpan: 2, styles: { fillColor: [102, 126, 234], textColor: 255, fontStyle: 'bold' } }],
-      ['Account Username', username],
-      ['Home Address', formData.livingAddress],
-      ['Registration Date', formData.registrationDate],
-    ];
+        // Section 3: Birth & Medical Data
+        [
+          {
+            content: "3. BIRTH & MEDICAL DATA",
+            colSpan: 2,
+            styles: {
+              fillColor: [102, 126, 234],
+              textColor: 255,
+              fontStyle: "bold",
+            },
+          },
+        ],
+        ["Hospital", formData.birthHospital],
+        ["Birth Location", formData.birthLocation],
+        ["Delivery Type", formData.deliveryType],
+        ["Surgery Performed", formData.surgery],
+        ["Birth Weight", `${formData.birthWeight} kg`],
+        ["Birth Length", `${formData.birthLength} cm`],
+        ["Head Circumference", `${formData.headCircumference} cm`],
 
-    // --- Execute Table Generation ---
-    // Use autoTable(doc, ...) instead of doc.autoTable to avoid the "not a function" error
-    autoTable(doc, {
-      startY: 40,
-      body: tableData,
-      theme: 'striped',
-      styles: { fontSize: 10, cellPadding: 5 },
-      columnStyles: {
-        0: { cellWidth: 55, fontStyle: 'bold', fillColor: [248, 250, 252] },
-        1: { cellWidth: 'auto' }
-      },
-      margin: { left: 14, right: 14 }
-    });
+        // Section 4: Assigned Personnel
+        [
+          {
+            content: "4. HEALTHCARE PERSONNEL",
+            colSpan: 2,
+            styles: {
+              fillColor: [102, 126, 234],
+              textColor: 255,
+              fontStyle: "bold",
+            },
+          },
+        ],
+        ["Provider Type", formData.personnelType],
+        ["Provider Name", formData.personnelName],
 
-    // --- Footer ---
-    const finalY = doc.lastAutoTable.finalY || 150;
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text(`Official Document - Generated on: ${new Date().toLocaleString()}`, 14, finalY + 15);
-    doc.text('This is a secure system record from the Bambinooo Registry.', 14, finalY + 20);
+        // Section 5: Account & Logistics
+        [
+          {
+            content: "5. REGISTRATION LOGS",
+            colSpan: 2,
+            styles: {
+              fillColor: [102, 126, 234],
+              textColor: 255,
+              fontStyle: "bold",
+            },
+          },
+        ],
+        ["Account Username", username],
+        ["Home Address", formData.livingAddress],
+        ["Registration Date", formData.registrationDate],
+      ];
 
-    doc.save(`Bambinooo_Record_${displayID}.pdf`);
+      // --- Execute Table Generation ---
+      // Use autoTable(doc, ...) instead of doc.autoTable to avoid the "not a function" error
+      autoTable(doc, {
+        startY: 40,
+        body: tableData,
+        theme: "striped",
+        styles: { fontSize: 10, cellPadding: 5 },
+        columnStyles: {
+          0: { cellWidth: 55, fontStyle: "bold", fillColor: [248, 250, 252] },
+          1: { cellWidth: "auto" },
+        },
+        margin: { left: 14, right: 14 },
+      });
 
-  } catch (error) {
-    console.error("PDF Generation Error:", error);
-    setPopupMessage("Error generating PDF. Please ensure all data is filled.");
-    setShowPopup(true);
-  }
-};
+      // --- Footer ---
+      const finalY = doc.lastAutoTable.finalY || 150;
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(
+        `Official Document - Generated on: ${new Date().toLocaleString()}`,
+        14,
+        finalY + 15,
+      );
+      doc.text(
+        "This is a secure system record from the Bambinooo Registry.",
+        14,
+        finalY + 20,
+      );
+
+      doc.save(`Bambinooo_Record_${displayID}.pdf`);
+    } catch (error) {
+      console.error("PDF Generation Error:", error);
+      setPopupMessage(
+        "Error generating PDF. Please ensure all data is filled.",
+      );
+      setShowPopup(true);
+    }
+  };
 
   return (
     <div className={style.container}>
@@ -356,7 +432,9 @@ const Registration = () => {
         <>
           <div className={style.logoSection}>
             <div className={style.logoText}>Welcome to Bambinooo</div>
-            <div className={style.subtitle}>Child Health & Development Registry</div>
+            <div className={style.subtitle}>
+              Child Health & Development Registry
+            </div>
           </div>
 
           <div className={style.progressBar}>
@@ -364,35 +442,51 @@ const Registration = () => {
               <div className={style.progressLine}>
                 <div className={style.progressLineFill} id="progressFill"></div>
               </div>
-              <div className={`${style.step} ${currentStep === 0 ? style.active : ''} ${currentStep > 0 ? style.completed : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 0 ? style.active : ""} ${currentStep > 0 ? style.completed : ""}`}
+              >
                 <div className={style.stepNumber}>1</div>
                 <div className={style.stepLabel}>Agreement</div>
               </div>
-              <div className={`${style.step} ${currentStep === 1 ? style.active : ''} ${currentStep > 1 ? style.completed : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 1 ? style.active : ""} ${currentStep > 1 ? style.completed : ""}`}
+              >
                 <div className={style.stepNumber}>2</div>
                 <div className={style.stepLabel}>Child Info</div>
               </div>
-              <div className={`${style.step} ${currentStep === 2 ? style.active : ''} ${currentStep > 2 ? style.completed : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 2 ? style.active : ""} ${currentStep > 2 ? style.completed : ""}`}
+              >
                 <div className={style.stepNumber}>3</div>
                 <div className={style.stepLabel}>Mother Info</div>
               </div>
-              <div className={`${style.step} ${currentStep === 3 ? style.active : ''} ${currentStep > 3 ? style.completed : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 3 ? style.active : ""} ${currentStep > 3 ? style.completed : ""}`}
+              >
                 <div className={style.stepNumber}>4</div>
                 <div className={style.stepLabel}>Birth Details</div>
               </div>
-              <div className={`${style.step} ${currentStep === 4 ? style.active : ''} ${currentStep > 4 ? style.completed : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 4 ? style.active : ""} ${currentStep > 4 ? style.completed : ""}`}
+              >
                 <div className={style.stepNumber}>5</div>
                 <div className={style.stepLabel}>Medical</div>
               </div>
-              <div className={`${style.step} ${currentStep === 5 ? style.active : ''} ${currentStep > 5 ? style.completed : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 5 ? style.active : ""} ${currentStep > 5 ? style.completed : ""}`}
+              >
                 <div className={style.stepNumber}>6</div>
                 <div className={style.stepLabel}>Address</div>
               </div>
-              <div className={`${style.step} ${currentStep === 6 ? style.active : ''} ${currentStep > 6 ? style.completed : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 6 ? style.active : ""} ${currentStep > 6 ? style.completed : ""}`}
+              >
                 <div className={style.stepNumber}>7</div>
                 <div className={style.stepLabel}>Account</div>
               </div>
-              <div className={`${style.step} ${currentStep === 7 ? style.active : ''}`}>
+              <div
+                className={`${style.step} ${currentStep === 7 ? style.active : ""}`}
+              >
                 <div className={style.stepNumber}>8</div>
                 <div className={style.stepLabel}>Review</div>
               </div>
@@ -402,7 +496,10 @@ const Registration = () => {
       )}
 
       <div className={style.card}>
-        <div className={`${style.section} ${currentStep === 0 && !isSubmitted ? style.active : ''}`} id="section0">
+        <div
+          className={`${style.section} ${currentStep === 0 && !isSubmitted ? style.active : ""}`}
+          id="section0"
+        >
           <h2 className={style.sectionTitle}>Terms & Conditions</h2>
           <p className={style.sectionDescription}>
             Please review and accept our terms before proceeding
@@ -411,11 +508,24 @@ const Registration = () => {
           <div className={style.checkboxContainer}>
             <div className={style.termsTitle}>Registration Agreement</div>
             <ul className={style.termsList}>
-              <li>I confirm that all information provided is accurate and complete</li>
-              <li>I consent to the collection and processing of this medical data</li>
-              <li>I understand this information will be shared with assigned medical personnel</li>
-              <li>I agree to notify the hospital of any changes to the provided information</li>
-              <li>I consent to the use of this data for medical treatment and record keeping</li>
+              <li>
+                I confirm that all information provided is accurate and complete
+              </li>
+              <li>
+                I consent to the collection and processing of this medical data
+              </li>
+              <li>
+                I understand this information will be shared with assigned
+                medical personnel
+              </li>
+              <li>
+                I agree to notify the hospital of any changes to the provided
+                information
+              </li>
+              <li>
+                I consent to the use of this data for medical treatment and
+                record keeping
+              </li>
             </ul>
 
             <div className={style.checkboxWrapper}>
@@ -442,14 +552,19 @@ const Registration = () => {
           </div>
         </div>
 
-        <div className={`${style.section} ${currentStep === 1 && !isSubmitted ? style.active : ''}`} id="section1">
+        <div
+          className={`${style.section} ${currentStep === 1 && !isSubmitted ? style.active : ""}`}
+          id="section1"
+        >
           <h2 className={style.sectionTitle}>Child Information</h2>
           <p className={style.sectionDescription}>
             Please provide basic information about the child
           </p>
 
           <div className={style.formGroup}>
-            <label>Child's Full Name <span className={style.required}>*</span></label>
+            <label>
+              Child's Full Name <span className={style.required}>*</span>
+            </label>
             <input
               type="text"
               name="childName"
@@ -462,7 +577,9 @@ const Registration = () => {
 
           <div className={style.formRow}>
             <div className={style.formGroup}>
-              <label>Date of Birth <span className={style.required}>*</span></label>
+              <label>
+                Date of Birth <span className={style.required}>*</span>
+              </label>
               <input
                 type="date"
                 name="childDOB"
@@ -472,7 +589,9 @@ const Registration = () => {
               />
             </div>
             <div className={style.formGroup}>
-              <label>Gender <span className={style.required}>*</span></label>
+              <label>
+                Gender <span className={style.required}>*</span>
+              </label>
               <select
                 name="gender"
                 value={formData.gender}
@@ -488,7 +607,9 @@ const Registration = () => {
 
           <div className={style.formRow}>
             <div className={style.formGroup}>
-              <label>Nationality <span className={style.required}>*</span></label>
+              <label>
+                Nationality <span className={style.required}>*</span>
+              </label>
               <input
                 type="text"
                 name="nationality"
@@ -499,7 +620,9 @@ const Registration = () => {
               />
             </div>
             <div className={style.formGroup}>
-              <label>Child Number in Family <span className={style.required}>*</span></label>
+              <label>
+                Child Number in Family <span className={style.required}>*</span>
+              </label>
               <select
                 name="childNumber"
                 value={formData.childNumber}
@@ -518,7 +641,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Preferred Language <span className={style.required}>*</span></label>
+            <label>
+              Preferred Language <span className={style.required}>*</span>
+            </label>
             <select
               name="language"
               value={formData.language}
@@ -533,23 +658,34 @@ const Registration = () => {
           </div>
 
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+            <button
+              className={`${style.btn} ${style.btnSecondary}`}
+              onClick={prevSection}
+            >
               Back
             </button>
-            <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={nextSection}
+            >
               Continue
             </button>
           </div>
         </div>
 
-        <div className={`${style.section} ${currentStep === 2 && !isSubmitted ? style.active : ''}`} id="section2">
+        <div
+          className={`${style.section} ${currentStep === 2 && !isSubmitted ? style.active : ""}`}
+          id="section2"
+        >
           <h2 className={style.sectionTitle}>Mother Information</h2>
           <p className={style.sectionDescription}>
             Please provide information about the mother
           </p>
 
           <div className={style.formGroup}>
-            <label>Mother's Full Name <span className={style.required}>*</span></label>
+            <label>
+              Mother's Full Name <span className={style.required}>*</span>
+            </label>
             <input
               type="text"
               name="motherName"
@@ -561,7 +697,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Mother's Date of Birth <span className={style.required}>*</span></label>
+            <label>
+              Mother's Date of Birth <span className={style.required}>*</span>
+            </label>
             <input
               type="date"
               name="motherDOB"
@@ -572,7 +710,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Email Address <span className={style.required}>*</span></label>
+            <label>
+              Email Address <span className={style.required}>*</span>
+            </label>
             <input
               type="email"
               name="motherEmail"
@@ -584,7 +724,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Phone Number <span className={style.required}>*</span></label>
+            <label>
+              Phone Number <span className={style.required}>*</span>
+            </label>
             <input
               type="tel"
               name="motherPhone"
@@ -597,16 +739,25 @@ const Registration = () => {
           </div>
 
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+            <button
+              className={`${style.btn} ${style.btnSecondary}`}
+              onClick={prevSection}
+            >
               Back
             </button>
-            <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={nextSection}
+            >
               Continue
             </button>
           </div>
         </div>
 
-        <div className={`${style.section} ${currentStep === 3 && !isSubmitted ? style.active : ''}`} id="section3">
+        <div
+          className={`${style.section} ${currentStep === 3 && !isSubmitted ? style.active : ""}`}
+          id="section3"
+        >
           <h2 className={style.sectionTitle}>Birth Details</h2>
           <p className={style.sectionDescription}>
             Please provide details about the birth
@@ -614,7 +765,9 @@ const Registration = () => {
 
           <div className={style.formRow}>
             <div className={style.formGroup}>
-              <label>Birth Location <span className={style.required}>*</span></label>
+              <label>
+                Birth Location <span className={style.required}>*</span>
+              </label>
               <input
                 type="text"
                 name="birthLocation"
@@ -625,7 +778,9 @@ const Registration = () => {
               />
             </div>
             <div className={style.formGroup}>
-              <label>Birth Hospital/Home <span className={style.required}>*</span></label>
+              <label>
+                Birth Hospital/Home <span className={style.required}>*</span>
+              </label>
               <input
                 type="text"
                 name="birthHospital"
@@ -638,7 +793,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Type of Delivery <span className={style.required}>*</span></label>
+            <label>
+              Type of Delivery <span className={style.required}>*</span>
+            </label>
             <select
               name="deliveryType"
               value={formData.deliveryType}
@@ -648,13 +805,18 @@ const Registration = () => {
               <option value="">Select delivery type</option>
               <option value="Normal Vaginal">Normal Vaginal Delivery</option>
               <option value="Cesarean">Cesarean Section (C-Section)</option>
-              <option value="Assisted Vaginal">Assisted Vaginal (Forceps/Vacuum)</option>
+              <option value="Assisted Vaginal">
+                Assisted Vaginal (Forceps/Vacuum)
+              </option>
               <option value="Water Birth">Water Birth</option>
             </select>
           </div>
 
           <div className={style.formGroup}>
-            <label>Was surgery performed during delivery? <span className={style.required}>*</span></label>
+            <label>
+              Was surgery performed during delivery?{" "}
+              <span className={style.required}>*</span>
+            </label>
             <div className={style.radioGroup}>
               <div className={style.radioOption}>
                 <input
@@ -662,7 +824,7 @@ const Registration = () => {
                   id="surgeryYes"
                   name="surgery"
                   value="Yes"
-                  checked={formData.surgery === 'Yes'}
+                  checked={formData.surgery === "Yes"}
                   onChange={handleInputChange}
                   required
                 />
@@ -674,7 +836,7 @@ const Registration = () => {
                   id="surgeryNo"
                   name="surgery"
                   value="No"
-                  checked={formData.surgery === 'No'}
+                  checked={formData.surgery === "No"}
                   onChange={handleInputChange}
                   required
                 />
@@ -685,7 +847,9 @@ const Registration = () => {
 
           <div className={style.formRow}>
             <div className={style.formGroup}>
-              <label>Birth Weight (kg) <span className={style.required}>*</span></label>
+              <label>
+                Birth Weight (kg) <span className={style.required}>*</span>
+              </label>
               <input
                 type="number"
                 name="birthWeight"
@@ -697,7 +861,9 @@ const Registration = () => {
               />
             </div>
             <div className={style.formGroup}>
-              <label>Birth Length (cm) <span className={style.required}>*</span></label>
+              <label>
+                Birth Length (cm) <span className={style.required}>*</span>
+              </label>
               <input
                 type="number"
                 name="birthLength"
@@ -711,7 +877,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Head Circumference (cm) <span className={style.required}>*</span></label>
+            <label>
+              Head Circumference (cm) <span className={style.required}>*</span>
+            </label>
             <input
               type="number"
               name="headCircumference"
@@ -724,23 +892,34 @@ const Registration = () => {
           </div>
 
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+            <button
+              className={`${style.btn} ${style.btnSecondary}`}
+              onClick={prevSection}
+            >
               Back
             </button>
-            <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={nextSection}
+            >
               Continue
             </button>
           </div>
         </div>
 
-        <div className={`${style.section} ${currentStep === 4 && !isSubmitted ? style.active : ''}`} id="section4">
+        <div
+          className={`${style.section} ${currentStep === 4 && !isSubmitted ? style.active : ""}`}
+          id="section4"
+        >
           <h2 className={style.sectionTitle}>Medical Personnel</h2>
           <p className={style.sectionDescription}>
             Who will be the assigned healthcare provider?
           </p>
 
           <div className={style.formGroup}>
-            <label>Personnel Type <span className={style.required}>*</span></label>
+            <label>
+              Personnel Type <span className={style.required}>*</span>
+            </label>
             <select
               name="personnelType"
               value={formData.personnelType}
@@ -755,7 +934,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Personnel Name <span className={style.required}>*</span></label>
+            <label>
+              Personnel Name <span className={style.required}>*</span>
+            </label>
             <input
               type="text"
               name="personnelName"
@@ -767,21 +948,32 @@ const Registration = () => {
           </div>
 
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+            <button
+              className={`${style.btn} ${style.btnSecondary}`}
+              onClick={prevSection}
+            >
               Back
             </button>
-            <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={nextSection}
+            >
               Continue
             </button>
           </div>
         </div>
 
-        <div className={`${style.section} ${currentStep === 5 && !isSubmitted ? style.active : ''}`} id="section5">
+        <div
+          className={`${style.section} ${currentStep === 5 && !isSubmitted ? style.active : ""}`}
+          id="section5"
+        >
           <h2 className={style.sectionTitle}>Contact Information</h2>
           <p className={style.sectionDescription}>Where can we reach you?</p>
 
           <div className={style.formGroup}>
-            <label>Patient Living Address <span className={style.required}>*</span></label>
+            <label>
+              Patient Living Address <span className={style.required}>*</span>
+            </label>
             <textarea
               name="livingAddress"
               value={formData.livingAddress}
@@ -792,7 +984,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Registration Date <span className={style.required}>*</span></label>
+            <label>
+              Registration Date <span className={style.required}>*</span>
+            </label>
             <input
               type="date"
               name="registrationDate"
@@ -802,23 +996,34 @@ const Registration = () => {
           </div>
 
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+            <button
+              className={`${style.btn} ${style.btnSecondary}`}
+              onClick={prevSection}
+            >
               Back
             </button>
-            <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={nextSection}
+            >
               Continue
             </button>
           </div>
         </div>
 
-        <div className={`${style.section} ${currentStep === 6 && !isSubmitted ? style.active : ''}`} id="section6">
+        <div
+          className={`${style.section} ${currentStep === 6 && !isSubmitted ? style.active : ""}`}
+          id="section6"
+        >
           <h2 className={style.sectionTitle}>Account Credentials</h2>
           <p className={style.sectionDescription}>
             Choose a username and password you will use to log in later.
           </p>
 
           <div className={style.formGroup}>
-            <label>Username <span className={style.required}>*</span></label>
+            <label>
+              Username <span className={style.required}>*</span>
+            </label>
             <input
               type="text"
               value={username}
@@ -829,7 +1034,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Password <span className={style.required}>*</span></label>
+            <label>
+              Password <span className={style.required}>*</span>
+            </label>
             <input
               type="password"
               value={password}
@@ -840,7 +1047,9 @@ const Registration = () => {
           </div>
 
           <div className={style.formGroup}>
-            <label>Confirm Password <span className={style.required}>*</span></label>
+            <label>
+              Confirm Password <span className={style.required}>*</span>
+            </label>
             <input
               type="password"
               value={confirmPassword}
@@ -851,13 +1060,17 @@ const Registration = () => {
 
           <div className={style.validationMessage}>
             {username && username.length < 4 && (
-              <p className={style.error}>Username must be at least 4 characters</p>
+              <p className={style.error}>
+                Username must be at least 4 characters
+              </p>
             )}
             {username && !/^[a-zA-Z0-9]+$/.test(username) && (
               <p className={style.error}>Username must be alphanumeric only</p>
             )}
             {password && password.length < 8 && (
-              <p className={style.error}>Password must be at least 8 characters</p>
+              <p className={style.error}>
+                Password must be at least 8 characters
+              </p>
             )}
             {password && confirmPassword && password !== confirmPassword && (
               <p className={style.error}>Passwords do not match</p>
@@ -865,16 +1078,25 @@ const Registration = () => {
           </div>
 
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+            <button
+              className={`${style.btn} ${style.btnSecondary}`}
+              onClick={prevSection}
+            >
               Back
             </button>
-            <button className={`${style.btn} ${style.btnPrimary}`} onClick={nextSection}>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={nextSection}
+            >
               Continue
             </button>
           </div>
         </div>
 
-        <div className={`${style.section} ${currentStep === 7 && !isSubmitted ? style.active : ''}`} id="section7">
+        <div
+          className={`${style.section} ${currentStep === 7 && !isSubmitted ? style.active : ""}`}
+          id="section7"
+        >
           <h2 className={style.sectionTitle}>Review Your Information</h2>
           <p className={style.sectionDescription}>
             Please review all the information carefully before submitting
@@ -942,7 +1164,8 @@ const Registration = () => {
                   <strong>Birth Length:</strong> {formData.birthLength} cm
                 </div>
                 <div className={style.reviewItem}>
-                  <strong>Head Circumference:</strong> {formData.headCircumference} cm
+                  <strong>Head Circumference:</strong>{" "}
+                  {formData.headCircumference} cm
                 </div>
               </div>
             </div>
@@ -966,18 +1189,30 @@ const Registration = () => {
                   <strong>Living Address:</strong> {formData.livingAddress}
                 </div>
                 <div className={style.reviewItem}>
-                  <strong>Registration Date:</strong> {formData.registrationDate}
+                  <strong>Registration Date:</strong>{" "}
+                  {formData.registrationDate}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={style.checkboxContainer} style={{ marginTop: '24px' }}>
-            <div className={style.termsTitle} style={{ color: '#e53e3e' }}>
+          <div
+            className={style.checkboxContainer}
+            style={{ marginTop: "24px" }}
+          >
+            <div className={style.termsTitle} style={{ color: "#e53e3e" }}>
               ⚠️ Important Notice
             </div>
-            <p style={{ color: '#4a5568', fontSize: '14px', marginBottom: '16px', lineHeight: '1.6' }}>
-              Once you submit this registration, <strong>you will not be able to edit any information</strong>.
+            <p
+              style={{
+                color: "#4a5568",
+                fontSize: "14px",
+                marginBottom: "16px",
+                lineHeight: "1.6",
+              }}
+            >
+              Once you submit this registration,{" "}
+              <strong>you will not be able to edit any information</strong>.
               Please ensure all details are correct before proceeding.
             </p>
 
@@ -989,13 +1224,17 @@ const Registration = () => {
                 onChange={(e) => setConfirmCorrect(e.target.checked)}
               />
               <label htmlFor="confirmCorrect">
-                I confirm that all the information provided is correct and I understand that I cannot edit it after submission
+                I confirm that all the information provided is correct and I
+                understand that I cannot edit it after submission
               </label>
             </div>
           </div>
 
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnSecondary}`} onClick={prevSection}>
+            <button
+              className={`${style.btn} ${style.btnSecondary}`}
+              onClick={prevSection}
+            >
               Back to Edit
             </button>
             <button
@@ -1008,7 +1247,10 @@ const Registration = () => {
           </div>
         </div>
 
-        <div className={`${style.successScreen} ${isSubmitted ? style.active : ''}`} id="successScreen">
+        <div
+          className={`${style.successScreen} ${isSubmitted ? style.active : ""}`}
+          id="successScreen"
+        >
           <div className={style.successIcon}>
             <svg viewBox="0 0 52 52">
               <polyline points="14 27 22 35 38 19" />
@@ -1016,56 +1258,61 @@ const Registration = () => {
           </div>
           <h2 className={style.successTitle}>Registration Submitted!</h2>
           <p className={style.successMessage}>
-            Your registration form has been successfully submitted and processed.
+            Your registration form has been successfully submitted and
+            processed.
           </p>
 
           <div className={style.registrationDetails}>
             <div className={style.regNumberContainer}>
-              <p className={style.regNumberLabel}>Your Unique Registration Number:</p>
+              <p className={style.regNumberLabel}>
+                Your Unique Registration Number:
+              </p>
               <p className={style.regNumber}>{registrationNumber}</p>
             </div>
             <p className={style.regNote}>
-              Please save this registration number for your records. You will need it for future
-              reference and accessing your child's health records in the CHDR system.
+              Please save this registration number for your records. You will
+              need it for future reference and accessing your child's health
+              records in the CHDR system.
             </p>
           </div>
 
           <p className={style.downloadNote}>
-            Please download your registration details as a PDF before refreshing this page.
+            Please download your registration details as a PDF before refreshing
+            this page.
           </p>
           <div className={style.btnGroup}>
-            <button className={`${style.btn} ${style.btnPrimary}`} onClick={downloadReviewPDF}>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={downloadReviewPDF}
+            >
               Download PDF
             </button>
           </div>
 
           <button
             className={`${style.btn} ${style.btnPrimary}`}
-            style={{ marginTop: '24px' }}
+            style={{ marginTop: "24px" }}
             onClick={resetForm}
           >
             Register Another Child
           </button>
         </div>
       </div>
-      {
-        showPopup && (
-          <div className={style.popupOverlay}>
-            <div className={style.popupBox}>
-              <h3 className={style.popupTitle}>⚠ Required Fields</h3>
-              <p className={style.popupMessage}>{popupMessage}</p>
-              <button
-                className={`${style.btn} ${style.btnPrimary}`}
-                onClick={() => setShowPopup(false)}
-              >
-                OK
-              </button>
-            </div>
+      {showPopup && (
+        <div className={style.popupOverlay}>
+          <div className={style.popupBox}>
+            <h3 className={style.popupTitle}>⚠ Required Fields</h3>
+            <p className={style.popupMessage}>{popupMessage}</p>
+            <button
+              className={`${style.btn} ${style.btnPrimary}`}
+              onClick={() => setShowPopup(false)}
+            >
+              OK
+            </button>
           </div>
-        )
-      }
-
-    </div >
+        </div>
+      )}
+    </div>
   );
 };
 

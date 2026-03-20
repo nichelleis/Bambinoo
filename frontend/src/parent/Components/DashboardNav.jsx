@@ -7,7 +7,7 @@ function SideNav() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/header", {
+    fetch("https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/header", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

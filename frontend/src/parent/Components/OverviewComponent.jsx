@@ -13,7 +13,7 @@ function Overview() {
     const token = localStorage.getItem("token");
 
     // header data
-    fetch("http://localhost:5000/header", {
+    fetch("https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/header", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -23,11 +23,14 @@ function Overview() {
       .catch(console.error);
 
     // growth trend data
-    fetch("http://localhost:5000/growth-trend", {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/growth-trend",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
       .then((res) => res.json())
       .then((data) => {
         setTrendData(data.trend);

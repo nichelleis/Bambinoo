@@ -16,13 +16,16 @@ const AIAnalytics = () => {
         return;
       }
 
-      const res = await fetch("http://127.0.0.1:5000/generate-plan", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/generate-plan",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       const data = await res.json();
       if (data.success) setResult(data.html);
       else alert(data.error);

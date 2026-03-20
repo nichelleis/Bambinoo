@@ -3,10 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import Plotly from "plotly.js-dist";
 import GrowthPredictionChart from "../../../components/GrowthPredictionChart";
 
-
 export default function AIAnalytics({ selectedChild }) {
   const [activeTab, setActiveTab] = useState("insights");
-
 
   const [clinicalData, setClinicalData] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -24,16 +22,23 @@ export default function AIAnalytics({ selectedChild }) {
       try {
         const numericId = parseInt(String(selectedChild.id).replace("CH", ""));
         const token = localStorage.getItem("token");
-        const res = await fetch(`http://127.0.0.1:5000/doctor/ai-insights/${numericId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await fetch(
+          `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/doctor/ai-insights/${numericId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
         const data = await res.json();
         if (!res.ok) {
           setAiError({
-            type:   data.error_type  || "unknown",
-            title:  data.error_title || "AI Analysis Failed",
-            detail: data.error_detail || data.error || "An unexpected error occurred.",
-            fix:    data.error_fix   || "Check the backend console for more details.",
+            type: data.error_type || "unknown",
+            title: data.error_title || "AI Analysis Failed",
+            detail:
+              data.error_detail ||
+              data.error ||
+              "An unexpected error occurred.",
+            fix:
+              data.error_fix || "Check the backend console for more details.",
           });
           return;
         }
@@ -42,27 +47,36 @@ export default function AIAnalytics({ selectedChild }) {
           aiConfidence: data.aiConfidence,
           lastAnalyzed: data.lastAnalyzed,
           dataPoints: data.dataPoints,
-          criticalAlerts:    data.insights?.criticalAlerts    ?? [],
-          redFlags:          data.insights?.redFlags          ?? [],
+          criticalAlerts: data.insights?.criticalAlerts ?? [],
+          redFlags: data.insights?.redFlags ?? [],
           aiRecommendations: data.insights?.aiRecommendations ?? [],
           diagnosticSupport: data.diagnostics?.diagnosticSupport ?? [],
-          medicationAnalysis: data.diagnostics?.medicationAnalysis ?? { currentMedications: [], interactions: [], alternatives: [] },
+          medicationAnalysis: data.diagnostics?.medicationAnalysis ?? {
+            currentMedications: [],
+            interactions: [],
+            alternatives: [],
+          },
           patternRecognition: data.patterns?.patternRecognition ?? [],
-          populationComparison: data.patterns?.populationComparison ?? { similarCases: 0, outcomeData: [], successfulProtocols: [] },
+          populationComparison: data.patterns?.populationComparison ?? {
+            similarCases: 0,
+            outcomeData: [],
+            successfulProtocols: [],
+          },
           complianceInsights: {
             overallAdherence: data.compliance?.overallAdherence ?? 0,
-            missedDoses:      data.compliance?.missedDoses ?? 0,
-            patterns:         data.compliance?.patterns ?? [],
-            parentEngagement: data.compliance?.parentEngagement ?? {}
+            missedDoses: data.compliance?.missedDoses ?? 0,
+            patterns: data.compliance?.patterns ?? [],
+            parentEngagement: data.compliance?.parentEngagement ?? {},
           },
           literatureInsights: data.literatureInsights ?? [],
         });
       } catch (err) {
         setAiError({
-          type:   "network_error",
-          title:  "Cannot Reach Backend",
-          detail: "The request to the backend server failed. The server may be offline.",
-          fix:    "Make sure the Flask backend is running on port 5000 and try again.",
+          type: "network_error",
+          title: "Cannot Reach Backend",
+          detail:
+            "The request to the backend server failed. The server may be offline.",
+          fix: "Make sure the Flask backend is running on port 5000 and try again.",
         });
       } finally {
         setAiLoading(false);
@@ -78,11 +92,19 @@ export default function AIAnalytics({ selectedChild }) {
   }, [selectedChild?.id]);
 
   const ERROR_META = {
-    invalid_api_key:  { icon: "ri-key-2-line",        color: "#E55B4D", bg: "#FFF0EF" },
-    quota_exceeded:   { icon: "ri-time-line",          color: "#E07B00", bg: "#FFF8EC" },
-    permission_denied:{ icon: "ri-shield-cross-line",  color: "#7C3AED", bg: "#F5F0FF" },
-    network_error:    { icon: "ri-wifi-off-line",      color: "#2563EB", bg: "#EFF6FF" },
-    unknown:          { icon: "ri-error-warning-line", color: "#6B7280", bg: "#F9FAFB" },
+    invalid_api_key: { icon: "ri-key-2-line", color: "#E55B4D", bg: "#FFF0EF" },
+    quota_exceeded: { icon: "ri-time-line", color: "#E07B00", bg: "#FFF8EC" },
+    permission_denied: {
+      icon: "ri-shield-cross-line",
+      color: "#7C3AED",
+      bg: "#F5F0FF",
+    },
+    network_error: {
+      icon: "ri-wifi-off-line",
+      color: "#2563EB",
+      bg: "#EFF6FF",
+    },
+    unknown: { icon: "ri-error-warning-line", color: "#6B7280", bg: "#F9FAFB" },
   };
 
   const AI_TABS = ["insights", "diagnostics", "patterns", "compliance"];
@@ -107,10 +129,8 @@ export default function AIAnalytics({ selectedChild }) {
 
   return (
     <div className="ai-analytics-page">
-
       <div className="ai-header">
         <div className="header-left">
-          
           <div>
             <h2>AI Clinical Decision Support</h2>
             <p>Intelligent analytics for: {selectedChild.name}</p>
@@ -131,37 +151,36 @@ export default function AIAnalytics({ selectedChild }) {
         </div>
       </div>
 
-
       <div className="ai-tabs">
-        <button 
+        <button
           className={activeTab === "insights" ? "tab active" : "tab"}
           onClick={() => setActiveTab("insights")}
         >
           <i className="ri-lightbulb-line"></i>
           Clinical Insights
         </button>
-        <button 
+        <button
           className={activeTab === "diagnostics" ? "tab active" : "tab"}
           onClick={() => setActiveTab("diagnostics")}
         >
           <i className="ri-stethoscope-line"></i>
           Diagnostic Support
         </button>
-        <button 
+        <button
           className={activeTab === "patterns" ? "tab active" : "tab"}
           onClick={() => setActiveTab("patterns")}
         >
           <i className="ri-line-chart-line"></i>
           Pattern Analysis
         </button>
-        <button 
+        <button
           className={activeTab === "compliance" ? "tab active" : "tab"}
           onClick={() => setActiveTab("compliance")}
         >
           <i className="ri-checkbox-circle-line"></i>
           Compliance Tracking
         </button>
-        <button 
+        <button
           className={activeTab === "growth-prediction" ? "tab active" : "tab"}
           onClick={() => setActiveTab("growth-prediction")}
         >
@@ -174,57 +193,85 @@ export default function AIAnalytics({ selectedChild }) {
         <div className="ai-loading-state">
           <div className="ai-spinner" />
           <h3>Analysing patient data with AI…</h3>
-          <p>Gemini is reviewing <strong>{selectedChild.name}</strong>'s complete health records.</p>
-          <p className="ai-loading-sub">This may take 10–20 seconds on first load.</p>
+          <p>
+            Gemini is reviewing <strong>{selectedChild.name}</strong>'s complete
+            health records.
+          </p>
+          <p className="ai-loading-sub">
+            This may take 10–20 seconds on first load.
+          </p>
         </div>
       )}
 
-      {AI_TABS.includes(activeTab) && !aiLoading && aiError && (() => {
-        const meta = ERROR_META[aiError.type] || ERROR_META.unknown;
-        return (
-          <div className="ai-error-state">
-            <div className="ai-error-card" style={{ borderTop: `4px solid ${meta.color}` }}>
-              <div className="ai-error-icon-wrap" style={{ background: meta.bg }}>
-                <i className={meta.icon} style={{ color: meta.color }} />
-              </div>
-              <h3 className="ai-error-title">{aiError.title}</h3>
-              <p className="ai-error-detail">{aiError.detail}</p>
-              <div className="ai-error-fix">
-                <i className="ri-tools-line" />
-                <span><strong>How to fix:</strong> {aiError.fix}</span>
-              </div>
-              {aiError.type === "invalid_api_key" && (
-                <div className="ai-error-steps">
-                  <p className="ai-error-steps-title">Quick steps:</p>
-                  <ol>
-                    <li>Go to <strong>aistudio.google.com</strong> → Get API Key</li>
-                    <li>Open <code>backend/.env</code></li>
-                    <li>Set <code>GEMINI_API_KEY=your_key_here</code></li>
-                    <li>Restart the Flask backend</li>
-                  </ol>
-                </div>
-              )}
-              {aiError.type === "quota_exceeded" && (
-                <div className="ai-error-steps">
-                  <p className="ai-error-steps-title">Quick steps:</p>
-                  <ol>
-                    <li>Wait 1–2 minutes for the rate limit to reset</li>
-                    <li>Or check your quota at <strong>aistudio.google.com</strong></li>
-                    <li>Click Retry when ready</li>
-                  </ol>
-                </div>
-              )}
-              <button
-                className="retry-btn"
-                style={{ background: meta.color }}
-                onClick={() => { setClinicalData(null); setAiError(null); }}
+      {AI_TABS.includes(activeTab) &&
+        !aiLoading &&
+        aiError &&
+        (() => {
+          const meta = ERROR_META[aiError.type] || ERROR_META.unknown;
+          return (
+            <div className="ai-error-state">
+              <div
+                className="ai-error-card"
+                style={{ borderTop: `4px solid ${meta.color}` }}
               >
-                <i className="ri-refresh-line" /> Try Again
-              </button>
+                <div
+                  className="ai-error-icon-wrap"
+                  style={{ background: meta.bg }}
+                >
+                  <i className={meta.icon} style={{ color: meta.color }} />
+                </div>
+                <h3 className="ai-error-title">{aiError.title}</h3>
+                <p className="ai-error-detail">{aiError.detail}</p>
+                <div className="ai-error-fix">
+                  <i className="ri-tools-line" />
+                  <span>
+                    <strong>How to fix:</strong> {aiError.fix}
+                  </span>
+                </div>
+                {aiError.type === "invalid_api_key" && (
+                  <div className="ai-error-steps">
+                    <p className="ai-error-steps-title">Quick steps:</p>
+                    <ol>
+                      <li>
+                        Go to <strong>aistudio.google.com</strong> → Get API Key
+                      </li>
+                      <li>
+                        Open <code>backend/.env</code>
+                      </li>
+                      <li>
+                        Set <code>GEMINI_API_KEY=your_key_here</code>
+                      </li>
+                      <li>Restart the Flask backend</li>
+                    </ol>
+                  </div>
+                )}
+                {aiError.type === "quota_exceeded" && (
+                  <div className="ai-error-steps">
+                    <p className="ai-error-steps-title">Quick steps:</p>
+                    <ol>
+                      <li>Wait 1–2 minutes for the rate limit to reset</li>
+                      <li>
+                        Or check your quota at{" "}
+                        <strong>aistudio.google.com</strong>
+                      </li>
+                      <li>Click Retry when ready</li>
+                    </ol>
+                  </div>
+                )}
+                <button
+                  className="retry-btn"
+                  style={{ background: meta.color }}
+                  onClick={() => {
+                    setClinicalData(null);
+                    setAiError(null);
+                  }}
+                >
+                  <i className="ri-refresh-line" /> Try Again
+                </button>
+              </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {activeTab === "insights" && _cd && (
         <>
@@ -233,9 +280,12 @@ export default function AIAnalytics({ selectedChild }) {
               <i className="ri-alarm-warning-line"></i>
               Critical Alerts Requiring Attention
             </h3>
-            
+
             {_cd.criticalAlerts.map((alert) => (
-              <div key={alert.id} className={`alert-card severity-${alert.severity}`}>
+              <div
+                key={alert.id}
+                className={`alert-card severity-${alert.severity}`}
+              >
                 <div className="alert-header">
                   <div className="alert-title-row">
                     <h4>{alert.title}</h4>
@@ -297,20 +347,23 @@ export default function AIAnalytics({ selectedChild }) {
             ))}
           </div>
 
-         
           <div className="red-flags-section">
             <h3 className="section-title">
               <i className="ri-flag-line"></i>
               Red Flags & Monitoring Points
             </h3>
-            
+
             {_cd.redFlags.map((flag, idx) => (
               <div key={idx} className="red-flag-item">
                 <div className="flag-icon">⚠️</div>
                 <div className="flag-content">
                   <h4>{flag.flag}</h4>
-                  <p><strong>Details:</strong> {flag.details}</p>
-                  <p><strong>Action Required:</strong> {flag.action}</p>
+                  <p>
+                    <strong>Details:</strong> {flag.details}
+                  </p>
+                  <p>
+                    <strong>Action Required:</strong> {flag.action}
+                  </p>
                 </div>
                 <span className={`flag-status ${flag.status.toLowerCase()}`}>
                   {flag.status}
@@ -319,27 +372,31 @@ export default function AIAnalytics({ selectedChild }) {
             ))}
           </div>
 
-        
           <div className="recommendations-grid">
             <h3 className="section-title">
               <i className="ri-ai-generate"></i>
               AI-Generated Action Items
             </h3>
-            
+
             {_cd.aiRecommendations.map((rec, idx) => (
-              <div key={idx} className={`recommendation-card priority-${rec.priority.toLowerCase()}`}>
+              <div
+                key={idx}
+                className={`recommendation-card priority-${rec.priority.toLowerCase()}`}
+              >
                 <div className="rec-header">
                   <span className={`rec-type ${rec.type.toLowerCase()}`}>
                     {rec.type}
                   </span>
-                  <span className={`rec-priority ${rec.priority.toLowerCase()}`}>
+                  <span
+                    className={`rec-priority ${rec.priority.toLowerCase()}`}
+                  >
                     {rec.priority} Priority
                   </span>
                 </div>
-                
+
                 <h4>{rec.title}</h4>
                 <p className="rec-rationale">{rec.rationale}</p>
-                
+
                 <div className="rec-footer">
                   <span className="rec-timing">
                     <i className="ri-timer-line"></i>
@@ -358,7 +415,6 @@ export default function AIAnalytics({ selectedChild }) {
         </>
       )}
 
-  
       {activeTab === "diagnostics" && _cd && (
         <div className="diagnostics-section">
           <h3 className="section-title">
@@ -369,7 +425,7 @@ export default function AIAnalytics({ selectedChild }) {
           {_cd.diagnosticSupport.map((diag, idx) => (
             <div key={idx} className="diagnostic-card">
               <h4 className="diag-title">{diag.symptomCluster}</h4>
-              
+
               <div className="diagnosis-list">
                 <strong>Ranked Differential Diagnoses:</strong>
                 {diag.likelyDiagnoses.map((dx, i) => (
@@ -377,14 +433,16 @@ export default function AIAnalytics({ selectedChild }) {
                     <div className="dx-info">
                       <span className="dx-rank">#{i + 1}</span>
                       <span className="dx-name">{dx.condition}</span>
-                      <span className={`dx-confidence ${dx.confidence.toLowerCase()}`}>
+                      <span
+                        className={`dx-confidence ${dx.confidence.toLowerCase()}`}
+                      >
                         {dx.confidence} Confidence
                       </span>
                     </div>
                     <div className="dx-probability">
                       <div className="probability-bar">
-                        <div 
-                          className="probability-fill" 
+                        <div
+                          className="probability-fill"
                           style={{ width: `${dx.probability}%` }}
                         ></div>
                       </div>
@@ -410,7 +468,9 @@ export default function AIAnalytics({ selectedChild }) {
                 </strong>
                 <div className="test-chips">
                   {diag.suggestedTests.map((test, i) => (
-                    <span key={i} className="test-chip">{test}</span>
+                    <span key={i} className="test-chip">
+                      {test}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -427,7 +487,9 @@ export default function AIAnalytics({ selectedChild }) {
               <div key={idx} className="med-analysis-card">
                 <div className="med-header">
                   <h4>{med.name}</h4>
-                  <span className={`effectiveness-badge ${med.effectiveness.toLowerCase()}`}>
+                  <span
+                    className={`effectiveness-badge ${med.effectiveness.toLowerCase()}`}
+                  >
                     {med.effectiveness} Effectiveness
                   </span>
                 </div>
@@ -436,8 +498,8 @@ export default function AIAnalytics({ selectedChild }) {
                   <div className="metric">
                     <span className="metric-label">Adherence Rate</span>
                     <div className="metric-bar">
-                      <div 
-                        className="metric-fill adherence" 
+                      <div
+                        className="metric-fill adherence"
                         style={{ width: `${med.adherence}%` }}
                       ></div>
                     </div>
@@ -462,9 +524,15 @@ export default function AIAnalytics({ selectedChild }) {
                 <strong>Alternative Treatment Considerations:</strong>
                 {_cd.medicationAnalysis.alternatives.map((alt, idx) => (
                   <div key={idx} className="alternative-card">
-                    <p><strong>Suggestion:</strong> {alt.suggestion}</p>
-                    <p><strong>AI Reasoning:</strong> {alt.reasoning}</p>
-                    <p><strong>Cost-Benefit:</strong> {alt.costBenefit}</p>
+                    <p>
+                      <strong>Suggestion:</strong> {alt.suggestion}
+                    </p>
+                    <p>
+                      <strong>AI Reasoning:</strong> {alt.reasoning}
+                    </p>
+                    <p>
+                      <strong>Cost-Benefit:</strong> {alt.costBenefit}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -472,7 +540,6 @@ export default function AIAnalytics({ selectedChild }) {
           </div>
         </div>
       )}
-
 
       {activeTab === "patterns" && _cd && (
         <div className="patterns-section">
@@ -514,7 +581,9 @@ export default function AIAnalytics({ selectedChild }) {
             <h3 className="section-title">
               <i className="ri-group-line"></i>
               Population-Based Insights
-              <span className="cohort-size">Based on {_cd.populationComparison.similarCases} similar cases</span>
+              <span className="cohort-size">
+                Based on {_cd.populationComparison.similarCases} similar cases
+              </span>
             </h3>
 
             <div className="comparison-grid">
@@ -525,8 +594,8 @@ export default function AIAnalytics({ selectedChild }) {
                     <div className="comparison-item">
                       <span>This Patient</span>
                       <div className="comp-bar">
-                        <div 
-                          className="comp-fill patient" 
+                        <div
+                          className="comp-fill patient"
                           style={{ width: `${outcome.thisPatient}%` }}
                         ></div>
                       </div>
@@ -535,15 +604,17 @@ export default function AIAnalytics({ selectedChild }) {
                     <div className="comparison-item">
                       <span>Cohort Avg</span>
                       <div className="comp-bar">
-                        <div 
-                          className="comp-fill cohort" 
+                        <div
+                          className="comp-fill cohort"
                           style={{ width: `${outcome.cohortAverage}%` }}
                         ></div>
                       </div>
                       <span>{outcome.cohortAverage}</span>
                     </div>
                   </div>
-                  <span className={`status-badge ${outcome.status.toLowerCase().replace(' ', '-')}`}>
+                  <span
+                    className={`status-badge ${outcome.status.toLowerCase().replace(" ", "-")}`}
+                  >
                     {outcome.status}
                   </span>
                 </div>
@@ -553,19 +624,20 @@ export default function AIAnalytics({ selectedChild }) {
             <div className="success-protocols">
               <strong>Evidence-Based Insights from Similar Cases:</strong>
               <ul>
-                {_cd.populationComparison.successfulProtocols.map((protocol, idx) => (
-                  <li key={idx}>
-                    <i className="ri-check-line"></i>
-                    {protocol}
-                  </li>
-                ))}
+                {_cd.populationComparison.successfulProtocols.map(
+                  (protocol, idx) => (
+                    <li key={idx}>
+                      <i className="ri-check-line"></i>
+                      {protocol}
+                    </li>
+                  ),
+                )}
               </ul>
             </div>
           </div>
         </div>
       )}
 
-    
       {activeTab === "compliance" && _cd && (
         <div className="compliance-section">
           <h3 className="section-title">
@@ -577,13 +649,20 @@ export default function AIAnalytics({ selectedChild }) {
             <div className="compliance-score-card">
               <div className="score-circle">
                 <svg viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="#e2e8f0" strokeWidth="8" />
-                  <circle 
-                    cx="50" 
-                    cy="50" 
-                    r="45" 
-                    fill="none" 
-                    stroke="#10b981" 
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    fill="none"
+                    stroke="#e2e8f0"
+                    strokeWidth="8"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="45"
+                    fill="none"
+                    stroke="#10b981"
                     strokeWidth="8"
                     strokeDasharray={`${_cd.complianceInsights.overallAdherence * 2.827} 283`}
                     strokeLinecap="round"
@@ -591,15 +670,19 @@ export default function AIAnalytics({ selectedChild }) {
                   />
                 </svg>
                 <div className="score-text">
-                  <span className="score-number">{_cd.complianceInsights.overallAdherence}%</span>
+                  <span className="score-number">
+                    {_cd.complianceInsights.overallAdherence}%
+                  </span>
                   <span className="score-label">Overall Adherence</span>
                 </div>
               </div>
-              
+
               <div className="compliance-stats">
                 <div className="stat">
                   <i className="ri-check-double-line"></i>
-                  <span>{100 - _cd.complianceInsights.missedDoses} doses completed</span>
+                  <span>
+                    {100 - _cd.complianceInsights.missedDoses} doses completed
+                  </span>
                 </div>
                 <div className="stat missed">
                   <i className="ri-close-circle-line"></i>
@@ -631,19 +714,25 @@ export default function AIAnalytics({ selectedChild }) {
               <i className="ri-parent-line"></i>
               Parent Engagement Analysis
             </h4>
-            
+
             <div className="engagement-grid">
               <div className="engagement-item">
                 <span className="eng-label">App Usage</span>
-                <span className="eng-value good">{_cd.complianceInsights.parentEngagement.appUsage}</span>
+                <span className="eng-value good">
+                  {_cd.complianceInsights.parentEngagement.appUsage}
+                </span>
               </div>
               <div className="engagement-item">
                 <span className="eng-label">Log Completeness</span>
-                <span className="eng-value good">{_cd.complianceInsights.parentEngagement.logCompleteness}%</span>
+                <span className="eng-value good">
+                  {_cd.complianceInsights.parentEngagement.logCompleteness}%
+                </span>
               </div>
               <div className="engagement-item">
                 <span className="eng-label">Response Time</span>
-                <span className="eng-value good">{_cd.complianceInsights.parentEngagement.responseTime}</span>
+                <span className="eng-value good">
+                  {_cd.complianceInsights.parentEngagement.responseTime}
+                </span>
               </div>
             </div>
 
@@ -655,45 +744,48 @@ export default function AIAnalytics({ selectedChild }) {
         </div>
       )}
 
-
       {activeTab === "growth-prediction" && (
         <div className="growth-pred-section">
           <GrowthPredictionChart selectedChild={selectedChild} />
         </div>
       )}
 
-      {_cd && <div className="literature-section">
+      {_cd && (
+        <div className="literature-section">
+          {_cd.literatureInsights.map((lit, idx) => (
+            <div key={idx} className="literature-card">
+              <div className="lit-header">
+                <h4>{lit.topic}</h4>
+                <span
+                  className={`relevance-badge ${lit.relevance.split(" ")[0].toLowerCase()}`}
+                >
+                  {lit.relevance}
+                </span>
+              </div>
 
-        {_cd.literatureInsights.map((lit, idx) => (
-          <div key={idx} className="literature-card">
-            <div className="lit-header">
-              <h4>{lit.topic}</h4>
-              <span className={`relevance-badge ${lit.relevance.split(' ')[0].toLowerCase()}`}>
-                {lit.relevance}
-              </span>
+              <p className="lit-finding">{lit.finding}</p>
+
+              <div className="lit-footer">
+                <span className="citation">
+                  <i className="ri-file-text-line"></i>
+                  {lit.citation}
+                </span>
+                <button className="lit-action">
+                  <i className="ri-arrow-right-line"></i>
+                  {lit.action}
+                </button>
+              </div>
             </div>
-            
-            <p className="lit-finding">{lit.finding}</p>
-            
-            <div className="lit-footer">
-              <span className="citation">
-                <i className="ri-file-text-line"></i>
-                {lit.citation}
-              </span>
-              <button className="lit-action">
-                <i className="ri-arrow-right-line"></i>
-                {lit.action}
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>}
+          ))}
+        </div>
+      )}
 
       <div className="ai-disclaimer">
         <i className="ri-information-line"></i>
         <p>
-          <strong>Clinical Decision Support Tool:</strong> AI-generated insights are intended to augment, 
-          not replace, clinical judgment. All recommendations should be evaluated in the context of individual 
+          <strong>Clinical Decision Support Tool:</strong> AI-generated insights
+          are intended to augment, not replace, clinical judgment. All
+          recommendations should be evaluated in the context of individual
           patient circumstances and professional medical expertise.
         </p>
       </div>

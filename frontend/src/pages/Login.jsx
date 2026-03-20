@@ -4,7 +4,7 @@ import style from "../assets/styleSheets/Login.module.css";
 import logo from "../assets/images/site icon.png";
 import { Link } from "react-router-dom";
 
-const API_URL = "http://127.0.0.1:5000";
+const API_URL = "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com";
 
 const Login = () => {
   const [username, setUsername] = useState("");

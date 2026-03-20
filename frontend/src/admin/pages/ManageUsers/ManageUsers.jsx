@@ -43,13 +43,16 @@ export default function ManageUsers() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/admin/users", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/users",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
       if (!response.ok) throw new Error("Failed to load user data");
       const data = await response.json();
       setUsers(data);
@@ -86,8 +89,8 @@ export default function ManageUsers() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     const url = editingUser
-      ? `http://localhost:5000/api/admin/users/${editingUser.id}`
-      : "http://localhost:5000/api/admin/create-user";
+      ? `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/users/${editingUser.id}`
+      : "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/create-user";
     const method = editingUser ? "PUT" : "POST";
 
     try {
@@ -119,7 +122,7 @@ export default function ManageUsers() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/admin/users/${userId}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/api/admin/users/${userId}`,
         {
           method: "DELETE",
           headers: {

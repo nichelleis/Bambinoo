@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import style from "../../../assets/styleSheets/Messages.module.css";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000", {
+const socket = io("https://stark-harbor-79359-9d7adf515fd1.herokuapp.com", {
   auth: {
     token: localStorage.getItem("token"),
   },
@@ -21,11 +21,14 @@ export default function Messages() {
 
   const fetchConversations = async () => {
     try {
-      const res = await fetch("http://localhost:5000/conversations", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const res = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/conversations",
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         },
-      });
+      );
       if (!res.ok) throw new Error("Failed to load conversations");
       const data = await res.json();
       setConversations(data);
@@ -54,7 +57,7 @@ export default function Messages() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/search-user/${searchCode}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/search-user/${searchCode}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -75,11 +78,14 @@ export default function Messages() {
 
   const loadMessages = async (userId) => {
     try {
-      const res = await fetch(`http://localhost:5000/messages/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const res = await fetch(
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/messages/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         },
-      });
+      );
 
       if (!res.ok) throw new Error("Failed to load messages");
 

@@ -82,7 +82,7 @@ export default function ClinicalNotes({ selectedChild }) {
     setNoteMsg("");
     try {
       const res = await fetch(
-        `http://localhost:5000/children/${numericId}/health-records/notes`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/children/${numericId}/health-records/notes`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -124,7 +124,7 @@ export default function ClinicalNotes({ selectedChild }) {
     setMedMsg("");
     try {
       const res = await fetch(
-        `http://localhost:5000/children/${numericId}/health-records/prescriptions`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/children/${numericId}/health-records/prescriptions`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

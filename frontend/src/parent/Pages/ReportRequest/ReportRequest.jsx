@@ -57,7 +57,7 @@ function ReportRequest() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    fetch("http://localhost:5000/profile", {
+    fetch("https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/profile", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
@@ -76,9 +76,12 @@ function ReportRequest() {
 
   const loadRequests = useCallback(() => {
     setLoadingRequests(true);
-    fetch("http://localhost:5000/report-requests", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/report-requests",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    )
       .then((r) => r.json())
       .then((data) => {
         setRequests(Array.isArray(data) ? data : []);
@@ -124,14 +127,17 @@ function ReportRequest() {
         reports_requested: selectedReports,
       };
 
-      const res = await fetch("http://localhost:5000/report-request", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/report-request",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Submission failed");
       setSuccessId(data.report_request_id);
@@ -150,7 +156,7 @@ function ReportRequest() {
       return;
     try {
       const res = await fetch(
-        `http://localhost:5000/report-requests/cancel/${requestId}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/report-requests/cancel/${requestId}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },

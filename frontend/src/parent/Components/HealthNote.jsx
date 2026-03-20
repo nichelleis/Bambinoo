@@ -53,17 +53,20 @@ function HealthNote() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/add-health-note", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/add-health-note",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            type: activeForm,
+            ...formData,
+          }),
         },
-        body: JSON.stringify({
-          type: activeForm,
-          ...formData,
-        }),
-      });
+      );
 
       if (response.ok) {
         alert(

@@ -6,11 +6,14 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState("");
 
   const handleSubmit = async () => {
-    const response = await fetch("http://127.0.0.1:5000/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+    const response = await fetch(
+      "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/forgot-password",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      },
+    );
     const data = await response.json();
     setMessage(data.message || data.error);
   };

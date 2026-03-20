@@ -16,12 +16,18 @@ function Analytics() {
         const token = localStorage.getItem("token");
 
         const [childRes, vaccineRes] = await Promise.all([
-          fetch("http://127.0.0.1:5000/analize", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("http://127.0.0.1:5000/vaccine", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          fetch(
+            "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/analize",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          ),
+          fetch(
+            "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/vaccine",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          ),
         ]);
 
         const child = await childRes.json();

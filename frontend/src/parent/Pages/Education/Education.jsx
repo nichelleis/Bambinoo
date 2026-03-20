@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 // Default HTML content displayed initially with trending books and videos
 const DEFAULT_CONTENT = `
@@ -47,42 +47,46 @@ const DEFAULT_CONTENT = `
 `;
 
 function Education() {
-    const [result, setResult] = useState(DEFAULT_CONTENT);
-    const [concern, setConcern] = useState('');
-    const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(DEFAULT_CONTENT);
+  const [concern, setConcern] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const handleSearch = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        try {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                alert("Please login first");
-                return;
-            }
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login first");
+        return;
+      }
 
-            const res = await fetch('http://127.0.0.1:5000/get-resources', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ concern }),
-            });
-            const data = await res.json();
-            
-            if (data.success) setResult(data.html);
-            else alert(data.error);
-            
-        } catch (err) {
-            alert("Error: Python server not running on port 5000");
-        }
-        setLoading(false);
-    };
+      const res = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/get-resources",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ concern }),
+        },
+      );
+      const data = await res.json();
 
-    return (
-        <>
-      <style dangerouslySetInnerHTML={{ __html: `
+      if (data.success) setResult(data.html);
+      else alert(data.error);
+    } catch (err) {
+      alert("Error: Python server not running on port 5000");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         :root {
           --primary: #2563eb;
           --primary-dark: #1e3a8a;
@@ -171,34 +175,38 @@ function Education() {
         .video-info .channel { font-size: 0.85em; color: #64748b; }
 
         
-            ` }} />
-        <div className="container">
-            <h1>Parenting Resource Hub</h1>
-            <p className="subtitle">Books and videos for the journey</p>
+            `,
+        }}
+      />
+      <div className="container">
+        <h1>Parenting Resource Hub</h1>
+        <p className="subtitle">Books and videos for the journey</p>
 
-            <form onSubmit={handleSearch} className="input-section">
-                <select
-                    required
-                    value={concern}
-                    onChange={(e) => setConcern(e.target.value)}
-                >
-                    <option value="" disabled>Select Topic</option>
-                    <option>Sleep Training</option>
-                    <option>Starting Solids</option>
-                    <option>Tantrums</option>
-                    <option>Speech Development</option>
-                </select>
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Searching...' : 'Find Resources'}
-                </button>
-            </form>
+        <form onSubmit={handleSearch} className="input-section">
+          <select
+            required
+            value={concern}
+            onChange={(e) => setConcern(e.target.value)}
+          >
+            <option value="" disabled>
+              Select Topic
+            </option>
+            <option>Sleep Training</option>
+            <option>Starting Solids</option>
+            <option>Tantrums</option>
+            <option>Speech Development</option>
+          </select>
+          <button type="submit" disabled={loading}>
+            {loading ? "Searching..." : "Find Resources"}
+          </button>
+        </form>
 
-            {loading && <p style={{ textAlign: 'center' }}>Searching...</p>}
-            
-            {result && <div dangerouslySetInnerHTML={{ __html: result }} />}
-        </div>
-         </>
-    );
+        {loading && <p style={{ textAlign: "center" }}>Searching...</p>}
+
+        {result && <div dangerouslySetInnerHTML={{ __html: result }} />}
+      </div>
+    </>
+  );
 }
 
 export default Education;

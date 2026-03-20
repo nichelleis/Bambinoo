@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Immunizations.css";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com";
 
 function formatDate(dateStr) {
   if (!dateStr) return "N/A";

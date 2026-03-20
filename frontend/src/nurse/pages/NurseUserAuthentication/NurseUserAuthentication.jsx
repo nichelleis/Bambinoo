@@ -27,7 +27,7 @@ const NurseUserAuthentication = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/search_registration/${searchQuery}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/search_registration/${searchQuery}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -58,7 +58,7 @@ const NurseUserAuthentication = () => {
       }
 
       const response = await fetch(
-        "http://127.0.0.1:5000/pending_registrations",
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/pending_registrations",
         {
           method: "GET",
           headers: {
@@ -100,7 +100,7 @@ const NurseUserAuthentication = () => {
   const handleApprove = async (registrationId) => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/pending_registrations/approve/${registrationId}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/pending_registrations/approve/${registrationId}`,
         {
           method: "POST",
           headers: {
@@ -146,7 +146,7 @@ const NurseUserAuthentication = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/pending_registrations/decline/${currentDeclineId}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/pending_registrations/decline/${currentDeclineId}`,
         {
           method: "POST",
           headers: {
@@ -195,9 +195,12 @@ const NurseUserAuthentication = () => {
   const fetchReportRequests = useCallback(async () => {
     setFetchingReports(true);
     try {
-      const response = await fetch("http://127.0.0.1:5000/admin/report-requests", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/admin/report-requests",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (response.ok) {
         const data = await response.json();
         setReportRequests(data);
@@ -238,7 +241,7 @@ const NurseUserAuthentication = () => {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/admin/report-requests/review/${selectedReport.id}`,
+        `https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/admin/report-requests/review/${selectedReport.id}`,
         {
           method: "POST",
           headers: {
@@ -250,7 +253,7 @@ const NurseUserAuthentication = () => {
             description: reviewDescription,
             collection_date: collectionDate,
           }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -293,7 +296,8 @@ const NurseUserAuthentication = () => {
           style={{
             padding: "10px 20px",
             border: "none",
-            background: activeTab === "registration" ? "#25a5b9" : "transparent",
+            background:
+              activeTab === "registration" ? "#25a5b9" : "transparent",
             color: activeTab === "registration" ? "#fff" : "#333",
             borderRadius: "5px",
             cursor: "pointer",

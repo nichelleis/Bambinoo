@@ -20,7 +20,9 @@ const NurseSearchChild = ({ onSelect }) => {
 
   const fetchChildren = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:5000/children");
+      const res = await axios.get(
+        "https://stark-harbor-79359-9d7adf515fd1.herokuapp.com/children",
+      );
       setChildren(res.data);
       setFilteredChildren(res.data);
     } catch (error) {
