@@ -29,7 +29,7 @@ def _get_growth_predictor():
             import sys
             if os.path.join(BASE_DIR, '..') not in sys.path:
                 sys.path.insert(0, os.path.join(BASE_DIR, '..'))
-            from ml.src.prediction_engine import GrowthPredictor
+            from ml_model.prediction_engine import GrowthPredictor
             _growth_predictor = GrowthPredictor()
             print("[ML] GrowthPredictor loaded and cached \u2713")
         except Exception as e:
