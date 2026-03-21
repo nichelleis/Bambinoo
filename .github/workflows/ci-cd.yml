@@ -49,7 +49,7 @@ jobs:
       - name: Run Frontend Tests
         run: |
           cd frontend
-          npm run test -- --watchAll=false
+          npm run test -- --run
 
       - name: Build Frontend
         run: |
